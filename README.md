@@ -126,7 +126,7 @@ Gabaix, X. (1999). Zipf’s law for cities: an explanation. Quarterly Journal of
 Giesen, K., & Südekum, J. (2010). Zipf’s law for cities in the regions and the country. Journal of Economic Geography, lbq019.
 González-Val, R. (2010). The Evolution of U.s. City Size Distribution from a Long-Term Perspective (1900–2000)*. Journal of Regional Science, 50(5), 952–972. http://doi.org/10.1111/j.1467-9787.2010.00685.x
 
-Guérin-Pace, F. (1995). Rank-size distribution and the process of urban growth. Urban Studies, 32(3), 551–562.
+Guerin-Pace, F. (1995). Rank-size distribution and the process of urban growth. Urban Studies, 32(3), 551–562.
 
 Gulden, T. R., & Hammond, R. A. (2012). Beyond Zipf: An agent-based understanding of city size distributions. In Agent-based models of geographical systems (pp. 677–704). Springer. 
 
@@ -155,6 +155,8 @@ Mirucki, J. (1986). Planned Economic Development and Loglinearity in the Rank-Si
 Moore, F. T. (1959). A note on city size distributions. Economic Development and Cultural Change, 7(4), 465–466.
 
 Moura Jr., N. J., & Ribeiro, M. B. (2006). Zipf law for Brazilian cities. Physica A: Statistical Mechanics and Its Applications, 367, 441–448. http://doi.org/10.1016/j.physa.2005.11.038
+
+Nitsch, V. (2005). Zipf zipped. Journal of Urban Economics, 57(1), 86?100.
 
 Parr, J. B. (1985). A note on the size distribution of cities over time. Journal of Urban Economics, 18(2), 199–212.
 
