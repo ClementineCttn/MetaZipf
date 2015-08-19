@@ -1,6 +1,6 @@
 
 library(ggplot2)
-
+library(RColorBrewer)
 
 SubsetMeta = function(table, attribute, value, operator="=="){
   tab = table
@@ -49,13 +49,9 @@ SummaryMeta = function(table, regression = "Lotka"){
 }
 
 meta = read.csv("data/zipf_meta.csv", sep=",", dec=".")
-meta$DECADE = as.character(meta$DECADE)
-meta$COUNTRY = as.character(meta$COUNTRY)
-meta$TERRITORY = as.character(meta$TERRITORY)
-meta$URBANSCALE = as.character(meta$URBANSCALE)
 
 
-
+my_palette = colorRampPalette(c("seashell", "dodgerblue3"))(n = 299)
 
 
 shinyServer(function(input, output) {
@@ -106,6 +102,25 @@ shinyServer(function(input, output) {
     }
     summary = SummaryMeta(table = tab, regression = reg)
     return(summary)
+  })
+  
+  output$plot = renderPlot({
+    tab = meta
+    if (input$alpha == "Lotka") tab$ALPHA = tab$ALPHALOTKA
+    if (input$alpha == "Pareto") tab$ALPHA = tab$ALPHAPARETO
+    
+    quanti = input$quanti
+    quali = input$quali
+    
+    tab$quanti = tab[,quanti]
+    if (input$log == "TRUE") tab$quanti = log(tab$quanti)
+    tab$Category = tab[,quali]
+    
+    tab = subset(tab, !is.na(quanti))
+    tab = subset(tab, !is.na(Category))
+    
+    p = ggplot(tab, aes(x = quanti, y = ALPHA, colour = Category)) + geom_point() +   labs(x = quanti, y = "alpha")
+    return(p)
   })
   
 })

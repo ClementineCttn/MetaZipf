@@ -54,8 +54,16 @@ shinyUI(fluidPage(
                                                                            "1870s", "1860s", "1850s", "1840s", "1830s", "1820s", "1810s", 
                                                                            "1800s", "1790s", "1780s", "1770s", "1760s", "1750s", 
                                                                            "1700s", "1600s"), multiple=FALSE))),
+                       dataTableOutput('review')),
+              tabPanel("Plots",
+                       "Plot alpha estimations by:",
+                       fluidRow(
+                         column(4,selectInput("quanti", "Continuous variable", choices=c("TRUNCATION_POINT", "DATE", "N"), multiple=FALSE)),
+                         column(4,selectInput("quali", "Discrete variable", choices=c("URBANSCALE", "COUNTRY", "DECADE"), multiple=FALSE)),
+                         column(4,checkboxInput("log", "Log variable")),
+                         plotOutput('plot')
+                         ))
                        
-                       dataTableOutput('review'))
               
          )
       )
