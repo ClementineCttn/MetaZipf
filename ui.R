@@ -69,7 +69,8 @@ shinyUI(fluidPage(
                column(4,checkboxInput("year4model", "Year", value=TRUE)),
                column(4,checkboxInput("truncation4model", "Truncation point", value=F)),
                column(4,checkboxInput("country4model", "Country?", value=F)),
-               tableOutput('model')
+               tableOutput('model'),
+               tableOutput('modelparameters')
              ))
     
                        
