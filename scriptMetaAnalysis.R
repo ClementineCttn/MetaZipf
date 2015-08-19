@@ -1,7 +1,7 @@
 library(ggplot2)
 
 meta = read.csv("~/Documents/MetaZipf/zipf_meta.csv", sep=",", dec=".")
-summaryl(meta)
+summary(meta)
 
 
 
@@ -15,20 +15,23 @@ SubsetMeta = function(table, attribute, value, operator="=="){
   return(sub)
 }
 
+
+
 SummaryMeta = function(table, regression = "Lotka"){
   tab = table
   if (regression == "Lotka") tab$zipf_coeff = tab$ALPHALOTKA
   if (regression == "Pareto") tab$zipf_coeff = tab$ALPHAPARETO
   references = length(list(unique(tab$REFERENCE))[[1]])
   duration = max(tab$DATE) - min(tab$DATE)
-  meanAlpha = mean(tab$zipf_coeff)
-  medianAlpha = median(tab$zipf_coeff)
-  sdAlpha = sd(tab$zipf_coeff)
-  minAlpha = min(tab$zipf_coeff)
-  maxAlpha = max(tab$zipf_coeff)
+  meanAlpha = round(mean(tab$zipf_coeff),3)
+  medianAlpha = round(median(tab$zipf_coeff),3)
+  sdAlpha = round(sd(tab$zipf_coeff),3)
+  minAlpha = round(min(tab$zipf_coeff),3)
+  maxAlpha = round(max(tab$zipf_coeff),3)
   estimations = dim(tab)[[1]]
-  pct_Local = dim(subset(tab, URBANSCALE == "local"))[[1]] / estimations * 100
-  pct_Metro = dim(subset(tab, URBANSCALE == "metro"))[[1]] / estimations * 100
+  pct_Local = round(dim(subset(tab, URBANSCALE == "local"))[[1]] / estimations * 100,1)
+  pct_Agglo = round(dim(subset(tab, URBANSCALE == "agglo"))[[1]] / estimations * 100,1)
+  pct_Metro = round(dim(subset(tab, URBANSCALE == "metro"))[[1]] / estimations * 100,1)
   t1 = subset(tab, !is.na(N))
   t2 = subset(tab, !is.na(TRUNCATION_POINT))
   medianN = median(t1$N)
@@ -36,13 +39,18 @@ SummaryMeta = function(table, regression = "Lotka"){
   
   Summary = data.frame(estimations, references, duration, 
                        meanAlpha, medianAlpha, sdAlpha, minAlpha, maxAlpha, 
-                       pct_Local, pct_Metro,
+                       pct_Local, pct_Agglo, pct_Metro,
                        medianN, medianTruncation)
   
   return(Summary)
 }
 
+tab = meta
+list(unique(tab$TERRITORY))[[1]]
+summary(tab$TERRITORY)
 
+nineties = SubsetMeta(table = meta, attribute = "DECADE", value = "1990s")
+head(nineties)
 
 usa = SubsetMeta(table = meta, attribute = "TERRITORY", value = "USA")
 summary(usa)
@@ -60,8 +68,10 @@ SummaryMeta(france)
 china = SubsetMeta(table = meta, attribute = "TERRITORY", value = "China")
 SummaryMeta(china)
 
+SummaryMeta(meta)
 
-
+countries = SubsetMeta(table = meta, attribute = "COUNTRY", value = "YES")
+SummaryMeta(countries)
 
 
 
@@ -78,3 +88,9 @@ p + geom_point()
 
 first_model = lm(ALPHALOTKA ~ DATE + TRUNCATION_POINT, data = meta)
 summary(first_model)
+
+
+
+
+
+
