@@ -113,13 +113,16 @@ shinyServer(function(input, output) {
     quali = input$quali
     
     tab$quanti = tab[,quanti]
-    if (input$log == "TRUE") tab$quanti = log(tab$quanti)
     tab$Category = tab[,quali]
     
     tab = subset(tab, !is.na(quanti))
     tab = subset(tab, !is.na(Category))
     
-    p = ggplot(tab, aes(x = quanti, y = ALPHA, colour = Category)) + geom_point() +   labs(x = quanti, y = "alpha")
+    p = ggplot(tab, aes(x = quanti, y = ALPHA, colour = Category)) +  geom_hline(yintercept=1, size=1, col="grey25") +
+      geom_point() +   labs(x = quanti, y = "alpha") 
+   
+      
+    if (input$log == "TRUE") p = p + scale_x_log10()
     return(p)
   })
   

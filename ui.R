@@ -58,9 +58,9 @@ shinyUI(fluidPage(
               tabPanel("Plots",
                        "Plot alpha estimations by:",
                        fluidRow(
-                         column(4,selectInput("quanti", "Continuous variable", choices=c("TRUNCATION_POINT", "DATE", "N"), multiple=FALSE)),
+                         column(4,selectInput("quanti", "Continuous variable", choices=c("N", "TRUNCATION_POINT", "DATE"), multiple=FALSE)),
+                         column(4,checkboxInput("log", "Log variable", value=TRUE)),
                          column(4,selectInput("quali", "Discrete variable", choices=c("URBANSCALE", "COUNTRY", "DECADE"), multiple=FALSE)),
-                         column(4,checkboxInput("log", "Log variable")),
                          plotOutput('plot')
                          ))
                        
