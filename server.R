@@ -132,10 +132,13 @@ shinyServer(function(input, output) {
     if (input$alpha == "Pareto") tab$ALPHA = tab$ALPHAPARETO
     
    regressants = "ALPHA ~ 1"
-    if (input$year4model == "TRUE") regressants = paste(regressants, " + DATE", sep="")
+   if (input$year4model == "TRUE") regressants = paste(regressants, " + DATE", sep="")
    if (input$truncation4model == "TRUE") regressants = paste(regressants, " + TRUNCATION_POINT", sep="")
+   if (input$scale4model == "TRUE") regressants = paste(regressants, " + URBANSCALE", sep="")
+   if (input$N4model == "TRUE") regressants = paste(regressants, " + N", sep="")
    if (input$country4model == "TRUE") regressants = paste(regressants, " + COUNTRY", sep="")
-      model = lm(regressants, data=tab, na.action = na.omit)
+   if (input$territory4model == "TRUE") regressants = paste(regressants, " + TERRITORY", sep="")
+   model = lm(regressants, data=tab, na.action = na.omit)
      mod = summary(model)
      return(mod)
   })
@@ -148,7 +151,10 @@ shinyServer(function(input, output) {
     regressants = "ALPHA ~ 1"
     if (input$year4model == "TRUE") regressants = paste(regressants, " + DATE", sep="")
     if (input$truncation4model == "TRUE") regressants = paste(regressants, " + TRUNCATION_POINT", sep="")
+    if (input$scale4model == "TRUE") regressants = paste(regressants, " + URBANSCALE", sep="")
+    if (input$N4model == "TRUE") regressants = paste(regressants, " + N", sep="")
     if (input$country4model == "TRUE") regressants = paste(regressants, " + COUNTRY", sep="")
+    if (input$territory4model == "TRUE") regressants = paste(regressants, " + TERRITORY", sep="")
     model = lm(regressants, data=tab, na.action = na.omit)
     R2 = summary(model)$r.squared
     Observations = summary(model)$df[[2]]
@@ -156,3 +162,5 @@ shinyServer(function(input, output) {
     return(summ)
   })
 })
+
+summary(meta)

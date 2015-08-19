@@ -67,10 +67,13 @@ shinyUI(fluidPage(
              "Run the meta-analysis",
              fluidRow(
                column(4,checkboxInput("year4model", "Year", value=TRUE)),
+               column(4,checkboxInput("scale4model", "City definition", value=F)),
                column(4,checkboxInput("truncation4model", "Truncation point", value=F)),
+               column(4,checkboxInput("N4model", "N Observations", value=F)),
                column(4,checkboxInput("country4model", "Country?", value=F)),
-               tableOutput('model'),
-               tableOutput('modelparameters')
+               column(4,checkboxInput("territory4model", "Territory", value=F)),
+               tableOutput('modelparameters'),  tableOutput('model')
+              
              ))
     
                        
