@@ -126,4 +126,17 @@ shinyServer(function(input, output) {
     return(p)
   })
   
+  output$model = renderTable({
+    tab = meta
+    if (input$alpha == "Lotka") tab$ALPHA = tab$ALPHALOTKA
+    if (input$alpha == "Pareto") tab$ALPHA = tab$ALPHAPARETO
+    
+   regressants = "ALPHA ~ 1"
+    if (input$year4model == "TRUE") regressants = paste(regressants, " + DATE", sep="")
+   if (input$truncation4model == "TRUE") regressants = paste(regressants, " + TRUNCATION_POINT", sep="")
+   if (input$country4model == "TRUE") regressants = paste(regressants, " + COUNTRY", sep="")
+      model = lm(regressants, data=tab, na.action = na.omit)
+     mod = summary(model)
+     return(mod)
+  })
 })

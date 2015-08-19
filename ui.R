@@ -9,13 +9,13 @@ shinyUI(fluidPage(
     
     tabPanel("Presentation", 
              h3("Zipf's law in empirical estimations, an interactive meta-analysis"),
-             h5("This application aims at presenting a meta-analysis of zipf's law estimations from the literature in an interactive way. Following the meta-analysis proposed by V. Nitsch in 2005, 
-                  we extend the pool of papers reviewed and give access to the database and specifications used."),
-             h5("The idea is to query and represent the variation of empiricial estimations of zipf's 
+             "This application aims at presenting a meta-analysis of zipf's law estimations from the literature in an interactive way. Following the meta-analysis proposed by V. Nitsch in 2005, 
+                  we extend the pool of papers reviewed and give access to the database and specifications used.",  br(),   br(),  
+             "The idea is to query and represent the variation of empiricial estimations of zipf's 
                   law in the literature and to relate them with urban characteristics (age of the system, economic development) and with the specifications of the regression used () to unveil
-                systematic variations and deviations from the iconic -1 slope."),
-               h5("The current database cover 750 estimations from 50 studies, from 1600 to 2011 in more than 80 countries"),
-             fluidRow(column(6,selectInput("alpha", "I prefer to express regressions like as", choices=c("Lotka", "Pareto"), multiple=FALSE))),
+                systematic variations and deviations from the iconic -1 slope.", br(),   br(),  
+             "The current database cover 750 estimations from 50 studies, from 1600 to 2011 in more than 80 countries", br(),   br(),  
+             fluidRow(column(6,selectInput("alpha", "I prefer to express regressions like as:", choices=c("Lotka", "Pareto"), multiple=FALSE))),
              h5("N.B.:"), 
              h6("the Lotka form : log(Pi) ~ alpha * log(Ri) + b + e(i)"),
              h6("the Pareto form : log(Ri) ~ alpha' * log(Pi) + b' + e'(i)"),
@@ -62,7 +62,16 @@ shinyUI(fluidPage(
                          column(4,checkboxInput("log", "Log variable", value=TRUE)),
                          column(4,selectInput("quali", "Discrete variable", choices=c("URBANSCALE", "COUNTRY", "DECADE"), multiple=FALSE)),
                          plotOutput('plot')
-                         ))
+                         )),
+               tabPanel("Models",
+             "Run the meta-analysis",
+             fluidRow(
+               column(4,checkboxInput("year4model", "Year", value=TRUE)),
+               column(4,checkboxInput("truncation4model", "Truncation point", value=F)),
+               column(4,checkboxInput("country4model", "Country?", value=F)),
+               tableOutput('model')
+             ))
+    
                        
               
          )
