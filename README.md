@@ -2,9 +2,9 @@ This repository aims at storing the materials for a meta analysis of Zipf's law 
 
 Description of files:
 
-	Äúmeta_zipf.csv‚Ä
+	meta_zipf.csv
 
-This table reviews empirical estimation of zipf'Äôs law for cities taken from the literature, along with the specification of the regressions and the significance results.
+This table reviews empirical estimation of zipf's law for cities taken from the literature, along with the specification of the regressions and the significance results.
 
 REFERENCE:
 
@@ -13,7 +13,7 @@ short reference to the paper, book, thesis and report from which the estimation 
 
 REGRESSION:
 
-Form of the regression used: Lotka (log P = alphalotka log R + b) or Pareto (log R = alphapareto log P + b'Äô), with P the city population and R its rank. 
+Form of the regression used: Lotka (log P = alphalotka log R + b) or Pareto (log R = alphapareto log P + b'), with P the city population and R its rank. 
 N.B. alphalotka = 1 / alphapareto
 
 
@@ -39,7 +39,7 @@ Definition of the cities used in the reference (official name of the urban units
 
 URBANSCALE:
 
-Estimation of the scale of the units defined as cities: "lÄúocal"Äù for administrative building blocks, "Äúagglo"Äù for built-up areas, "metro"Äù for metropolitan areas and "Äúmixed"Äù for a mix of different scales in the same city set.
+Estimation of the scale of the units defined as cities: "local" for administrative building blocks, "agglo" for built-up areas, "metro" for metropolitan areas and "mixed"¬ù for a mix of different scales in the same city set.
 
 
 N:
@@ -59,7 +59,7 @@ Spatial territory of the cities
 
 COUNTRY:
 
-"ÄúYES"Äù if the territory corresponds to national boundaries, "ÄúNO"Äù otherwise (for regional and super-regional scales such as continents, economic alliances or the world).
+"YES"¬ù if the territory corresponds to national boundaries, "NO" otherwise (for regional and super-regional scales such as continents, economic alliances or the world).
 
 
 DATE:
@@ -97,13 +97,13 @@ davis/Weinstein2002: the regression is performed on population density and not c
 
 LITERATURE REVIEWED (in progress):
 
-Allen, G. R. (1954). The "courbe des populations:", Äôa Further Analysis. Bulletin of the Oxford University Institute of Statistics, 16, 179-189.
+Allen, G. R. (1954). The "courbe des populations:", a Further Analysis. Bulletin of the Oxford University Institute of Statistics, 16, 179-189.
 
 Alperovich, G. (1989). The distribution of city size: A sensitivity analysis. Journal of Urban Economics, 25(1), 93-102.
 
-Anderson, G., & Ge, Y. (2005). The size distribution of Chinese cities. Regional Science and Urban Economics, 35(6), 756-Äì776. http://doi.org/10.1016/j.regsciurbeco.2005.01.003
+Anderson, G., & Ge, Y. (2005). The size distribution of Chinese cities. Regional Science and Urban Economics, 35(6), 756-‚Ç¨‚Äú776. http://doi.org/10.1016/j.regsciurbeco.2005.01.003
 
-Batty, M. (2001). Polynucleated urban landscapes. Urban Studies, 38(4), 635?655.
+Batty, M. (2001). Polynucleated urban landscapes. Urban Studies, 38(4), 635-655.
 
 Berry, B. J., & Okulicz-Kozaryn, A. (2012). The city size distribution debate: Resolution for US urban regions and megalopolitan areas. Cities, 29, S17-S23.
 
@@ -111,28 +111,28 @@ Black, D., & Henderson, V. (2003). Urban evolution in the USA. Journal of Econom
 
 Brakman, S., Garretsen, H., Van Marrewijk, C., & Van Den Berg, M. (1999). The return of Zipf: towards a further understanding of the rank-size distribution. Journal of Regional Science, 39(1), 183-213.
 
-Bretagnolle, A., Delisle, F., Mathian, H., & Vatin, G. (2015). Urbanization of the United States over two centuries: an approach based on a long-term database (1790-2010). International Journal of Geographical Information Science, (ahead-of-print), 1-Äì18.
+Bretagnolle, A., Delisle, F., Mathian, H., & Vatin, G. (2015). Urbanization of the United States over two centuries: an approach based on a long-term database (1790-2010). International Journal of Geographical Information Science, (ahead-of-print), 1-‚Ç¨‚Äú18.
 
-Bretagnolle, A., Giraud, T., & Mathian, H. (2008). La mesure de l‚Äôurbanisation aux Etats-Unis, des premiers comptoirs coloniaux aux Metropolitan Areas (1790-2000). Cybergeo‚ÄØ: European Journal of Geography. http://doi.org/10.4000/cybergeo.19683
+Bretagnolle, A., Giraud, T., & Mathian, H. (2008). La mesure de l'urbanisation aux Etats-Unis, des premiers comptoirs coloniaux aux Metropolitan Areas (1790-2000). Cybergeo: European Journal of Geography. http://doi.org/10.4000/cybergeo.19683
 
-Bretagnolle, A., Mathian, H., Pumain, D., & Rozenblat, C. (2000). Long-term dynamics of European towns and cities‚ÄØ: towards a spatial model of urban growth. Cybergeo‚ÄØ: European Journal of Geography. http://doi.org/10.4000/cybergeo.566
+Bretagnolle, A., Mathian, H., Pumain, D., & Rozenblat, C. (2000). Long-term dynamics of European towns and cities√¢‚Ç¨¬Ø: towards a spatial model of urban growth. Cybergeo√¢‚Ç¨¬Ø: European Journal of Geography. http://doi.org/10.4000/cybergeo.566
 
 Cameron, T. A. (1990). One-stage structural models to explain city size. Journal of Urban Economics, 27(3), 294-307.
 
-Cottineau, C. (2014). L'evolution des villes dans l‚Äôespace post-sovietique, Observation et modelisations. University Paris 1 ì Pantheon-Sorbonne, Paris. 
+Cottineau, C. (2014). L'evolution des villes dans l√¢‚Ç¨‚Ñ¢espace post-sovietique, Observation et modelisations. University Paris 1 ‚Äú Pantheon-Sorbonne, Paris. 
 
 De Vries, J. (2006). European Urbanization, 1500-1800 (Vol. 4). Routledge. 
 
 Dimou, M., & Schaffar, A. (2009). Urban hierarchies and city growth in the Balkans. Urban Studies. 
 
 Dobkins, L. H., Ioannides, Y. M., & others. (2000). Dynamic evolution of the US city size distribution. The Economics of Cities, 217-260.
-Eeckhout, J. (2004). Gibrat‚Äôs Law for (All) Cities. The American Economic Review, 94(5), 1429-1451.
+Eeckhout, J. (2004). Gibrat√¢‚Ç¨‚Ñ¢s Law for (All) Cities. The American Economic Review, 94(5), 1429-1451.
 
 Ettlinger, N., & Archer, J. C. (1987). City-size distributions and the world urban system in the twentieth century. Environment and Planning A, 19(9), 1161-1174.
 
-Gabaix, X. (1999). Zipf‚Äôs law for cities: an explanation. Quarterly Journal of Economics, 739-767.
+Gabaix, X. (1999). Zipf's law for cities: an explanation. Quarterly Journal of Economics, 739-767.
 
-Giesen, K., & S√ºdekum, J. (2010). Zipf‚Äôs law for cities in the regions and the country. Journal of Economic Geography, lbq019.
+Giesen, K., & Sudekum, J. (2010). Zipf's law for cities in the regions and the country. Journal of Economic Geography, lbq019.
 
 Gonzalez-Val, R. (2010). The Evolution of U.s. City Size Distribution from a Long-Term Perspective (1900-2000)*. Journal of Regional Science, 50(5), 952-972. http://doi.org/10.1111/j.1467-9787.2010.00685.x
 
@@ -145,7 +145,7 @@ Ignazzi C. A., 2015, Coevolution in the brazilian system of cities, University P
 
 Kamecke, U. (1990). Testing the rank size rule hypothesis with an efficient estimator. Journal of Urban Economics, 27(2), 222-231.
 
-Knudsen, T. (2001). Zipf‚Äôs law for cities and beyond: The case of Denmark. American Journal of Economics and Sociology, 60(1), 123-146.
+Knudsen, T. (2001). Zipf's law for cities and beyond: The case of Denmark. American Journal of Economics and Sociology, 60(1), 123-146.
 
 Krakover, S. (1998). Testing the turning-point hypothesis in city-size distribution: the Israeli situation re-examined. Urban Studies, 35(12), 2183-2196.
 
@@ -171,7 +171,7 @@ Nitsch, V. (2005). Zipf zipped. Journal of Urban Economics, 57(1), 86-100.
 
 Parr, J. B. (1985). A note on the size distribution of cities over time. Journal of Urban Economics, 18(2), 199-212.
 
-Paulus, F. (2004). Coevolution dans les systemes de villes: croissance et specialisation des aires urbaines fran√ßaises de 1950 √† 2000. Universite Pantheon-Sorbonne-Paris I. 
+Paulus, F. (2004). Coevolution dans les systemes de villes: croissance et specialisation des aires urbaines fran√É¬ßaises de 1950 √É¬† 2000. Universite Pantheon-Sorbonne-Paris I. 
 
 Pumain, D., Swerts, E., Cottineau, C., Vacchiani-Marcuzzo, C., Ignazzi, A., Bretagnolle, A., Baffi, S. (2015). Multilevel comparison of large urban systems. Cybergeo: European Journal of Geography. http://doi.org/10.4000/cybergeo.26730
 
@@ -179,19 +179,19 @@ Rosen, K. T., & Resnick, M. (1980). The size distribution of cities: an examinat
 
 Schaffar, A., & Dimou, M. (2012). Rank-size city dynamics in China and India, 1981-2004. Regional Studies, 46(6), 707-721.
 
-Singer, H. W. (1936). The "courbe des populations."Äô A parallel to Pareto'Äôs Law. The Economic Journal, 254-263.
+Singer, H. W. (1936). The "courbe des populations."‚Ç¨‚Ñ¢ A parallel to Pareto'‚Ç¨‚Ñ¢s Law. The Economic Journal, 254-263.
 
 Song, S., & Zhang, K. H. (2002). Urbanisation and city size distribution in China. Urban Studies, 39(12), 2317-2327.
 
-Soo, K. T. (2005). Zipf‚Äôs Law for cities: a cross-country investigation. Regional Science and Urban Economics, 35(3), 239-263.
+Soo, K. T. (2005). Zipf√¢‚Ç¨‚Ñ¢s Law for cities: a cross-country investigation. Regional Science and Urban Economics, 35(3), 239-263.
 
-Soo, K. T. (2007). Zipf‚Äôs Law and urban growth in Malaysia. Urban Studies, 44(1), 1-14.
+Soo, K. T. (2007). Zipf√¢‚Ç¨‚Ñ¢s Law and urban growth in Malaysia. Urban Studies, 44(1), 1-14.
 
 Suarez-Villa, L. (1980). Rank size distribution, city size hierarchies and the Beckmann model: some empirical results. Journal of Regional Science, 20(1), 91-95.
 
 Swerts, E. (2013). Les Systemes de Villes en Inde et en Chine. Paris 1 Pantheon-Sorbonne. 
 
-Vacchiani-Marcuzzo, C. (2005). Mondialisation et systeme de villes: les entreprises etrangeres et l‚Äôevolution des agglomerations sud-africaines. Universite Pantheon-Sorbonne-Paris I. 
+Vacchiani-Marcuzzo, C. (2005). Mondialisation et systeme de villes: les entreprises etrangeres et l'evolution des agglomerations sud-africaines. Universite Pantheon-Sorbonne-Paris I. 
 
 Veneri, P., & others. (2013). On city size distribution: evidence from OECD functional urban areas. Oecd Publishing.
 
