@@ -16,16 +16,17 @@ shinyUI(fluidPage(
              "The idea is to allow interactive queries and to represent the variation of empiricial estimations of Zipf's 
                   law in the literature. This meta-analysis relates the variation of Zipf's estimated coefficients with 
                 urban characteristics (age of the system, economic development) and with the specifications of the regression used (urban definitions,
-              truncation points, number of cities) to unveil systematic deviations from the iconic -1 slope.", br(),   br()),  
+              truncation points, number of cities) to unveil systematic deviations from the iconic -1 slope.", br(),   br(),
              "The current database cover 750 estimations from 49 studies, 
-            spanning from 1600 to 2011 in more than 80 countries", br(),   br(),  
+            spanning from 1600 to 2011 in more than 80 countries", 
+            h6("Nitsch, V. (2005). Zipf zipped. Journal of Urban Economics, 57(1), 86-100.")),
              fluidRow(column(6,selectInput("alpha", "I prefer results to be expressed in the regression form of:", choices=c("Lotka", "Pareto"), multiple=FALSE)),
             column(6,
              h6("The Lotka form : log(Pi) ~ alpha * log(Ri) + b + e(i)"),
              h6("The Pareto form : log(Ri) ~ alpha' * log(Pi) + b' + e'(i)"),
              h6("with: Pi the population of city i, Ri its rank in the urban hierarchy and alpha' = (1 / alpha)"))),
-            h5("Literature covered:"), 
-            dataTableOutput('references')),
+            h5("Literature covered:"), dataTableOutput('references')
+            ),
     
      tabPanel("Literature Summary", 
                  "Summarise estimations by:",

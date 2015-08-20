@@ -49,6 +49,8 @@ SummaryMeta = function(table, regression = "Lotka"){
 }
 
 meta = read.csv("data/zipf_meta.csv", sep=",", dec=".")
+refs = read.csv("data/zipf_refs.csv", sep=",", dec=".")
+
 
 
 my_palette = colorRampPalette(c("seashell", "dodgerblue3"))(n = 299)
@@ -57,7 +59,8 @@ my_palette = colorRampPalette(c("seashell", "dodgerblue3"))(n = 299)
 shinyServer(function(input, output) {
 
   output$references = renderDataTable({
-    
+    d = refs
+    return(d)
   })
   
   
