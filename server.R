@@ -56,6 +56,10 @@ my_palette = colorRampPalette(c("seashell", "dodgerblue3"))(n = 299)
 
 shinyServer(function(input, output) {
 
+  output$references = renderDataTable({
+    
+  })
+  
   
   output$review = renderDataTable({
     tab = meta
@@ -76,7 +80,7 @@ shinyServer(function(input, output) {
     if(def != "ALL") {
       tab = SubsetMeta(table = tab, attribute = "URBANSCALE", value = def)
     }
-    tab = tab[,c("ALPHA", "TERRITORY", "DATE", "N", "URBANSCALE",  "REFERENCE", "URBANDEF",  "TRUNCATION_POINT", "R2","DECADE", "COUNTRY", "REGRESSION", "NITSCH2005")]
+    tab = tab[,c("ALPHA", "TERRITORY", "DATE", "N", "URBANSCALE", "TRUNCATION", "R2", "REFERENCE", "URBANDEF")]
     return(tab)
   })
   
@@ -100,8 +104,8 @@ shinyServer(function(input, output) {
     if(def != "ALL") {
       tab = SubsetMeta(table = tab, attribute = "URBANSCALE", value = def)
     }
-    summary = SummaryMeta(table = tab, regression = reg)
-    return(summary)
+    summaryA = SummaryMeta(table = tab, regression = reg)
+    return(summaryA)
   })
   
   output$plot = renderPlot({
@@ -137,7 +141,6 @@ shinyServer(function(input, output) {
    if (input$scale4model == "TRUE") regressants = paste(regressants, " + URBANSCALE", sep="")
    if (input$N4model == "TRUE") regressants = paste(regressants, " + N", sep="")
    if (input$country4model == "TRUE") regressants = paste(regressants, " + COUNTRY", sep="")
-   if (input$territory4model == "TRUE") regressants = paste(regressants, " + TERRITORY", sep="")
    model = lm(regressants, data=tab, na.action = na.omit)
      mod = summary(model)
      return(mod)
@@ -154,13 +157,42 @@ shinyServer(function(input, output) {
     if (input$scale4model == "TRUE") regressants = paste(regressants, " + URBANSCALE", sep="")
     if (input$N4model == "TRUE") regressants = paste(regressants, " + N", sep="")
     if (input$country4model == "TRUE") regressants = paste(regressants, " + COUNTRY", sep="")
-    if (input$territory4model == "TRUE") regressants = paste(regressants, " + TERRITORY", sep="")
-    model = lm(regressants, data=tab, na.action = na.omit)
+     model = lm(regressants, data=tab, na.action = na.omit)
     R2 = summary(model)$r.squared
     Observations = summary(model)$df[[2]]
     summ = data.frame(R2, Observations)
     return(summ)
   })
+  
+  output$histalpha = renderPlot({
+    tab = meta
+    if (input$alpha == "Lotka") tab$ALPHA = tab$ALPHALOTKA
+    if (input$alpha == "Pareto") tab$ALPHA = tab$ALPHAPARETO
+    
+    
+    terr = input$territorys
+    dec = input$decades
+    def = input$scales
+    reg = input$alpha
+    
+    if(terr != "ALL") {
+      tab = SubsetMeta(table = tab, attribute = "TERRITORY", value = terr)
+    }
+    if(dec != "ALL") {
+      tab = SubsetMeta(table = tab, attribute = "DECADE", value = dec)
+    }
+    if(def != "ALL") {
+      tab = SubsetMeta(table = tab, attribute = "URBANSCALE", value = def)
+    }
+    
+    histo = ggplot(tab, aes(x = ALPHA))  +
+      geom_histogram(binwidth = 0.05, color = "aquamarine3", fill = "aquamarine3") +  
+      labs(x = "alpha", y = "frequency") +  geom_vline(xintercept=1, size=1, col="grey25")
+    
+    
+    return(histo)
+  })
+  
+  
 })
 
-summary(meta)

@@ -1,25 +1,31 @@
 library(shiny)
 
 shinyUI(fluidPage(
- # tags$head(tags$link(rel="shortcut icon", href="favicon.png")),
+  tags$head(tags$link(rel="shortcut icon", href="favicon.png")),
   titlePanel("MetaZipf"),
   titlePanel(h4("Meta Analysis of Zipf's law for cities")),
   
   navlistPanel(
     
-    tabPanel("Presentation", 
-             h3("Zipf's law in empirical estimations, an interactive meta-analysis"),
-             "This application aims at presenting a meta-analysis of zipf's law estimations from the literature in an interactive way. Following the meta-analysis proposed by V. Nitsch in 2005, 
+    tabPanel("Presentation",
+             column(3, img(src = "favicon.png",class="img-responsive")),
+             column(9, h1("Interactive meta-analysis of empirical Zipf's laws")),
+            tags$p(class="text-justify",
+            "This application aims at presenting a meta-analysis of Zipf's law estimations from the literature in an interactive way. Following the meta-analysis proposed by V. Nitsch in 2005, 
                   we extend the pool of papers reviewed and give access to the database and specifications used.",  br(),   br(),  
-             "The idea is to query and represent the variation of empiricial estimations of zipf's 
-                  law in the literature and to relate them with urban characteristics (age of the system, economic development) and with the specifications of the regression used () to unveil
-                systematic variations and deviations from the iconic -1 slope.", br(),   br(),  
-             "The current database cover 750 estimations from 50 studies, from 1600 to 2011 in more than 80 countries", br(),   br(),  
-             fluidRow(column(6,selectInput("alpha", "I prefer to express regressions like as:", choices=c("Lotka", "Pareto"), multiple=FALSE))),
-             h5("N.B.:"), 
-             h6("the Lotka form : log(Pi) ~ alpha * log(Ri) + b + e(i)"),
-             h6("the Pareto form : log(Ri) ~ alpha' * log(Pi) + b' + e'(i)"),
-             h6("with: Pi the population of city i, Ri its rank in the urban hierarchy and alpha' = (1 / alpha)")),
+             "The idea is to allow interactive queries and to represent the variation of empiricial estimations of Zipf's 
+                  law in the literature. This meta-analysis relates the variation of Zipf's estimated coefficients with 
+                urban characteristics (age of the system, economic development) and with the specifications of the regression used (urban definitions,
+              truncation points, number of cities) to unveil systematic deviations from the iconic -1 slope.", br(),   br()),  
+             "The current database cover 750 estimations from 49 studies, 
+            spanning from 1600 to 2011 in more than 80 countries", br(),   br(),  
+             fluidRow(column(6,selectInput("alpha", "I prefer results to be expressed in the regression form of:", choices=c("Lotka", "Pareto"), multiple=FALSE)),
+            column(6,
+             h6("The Lotka form : log(Pi) ~ alpha * log(Ri) + b + e(i)"),
+             h6("The Pareto form : log(Ri) ~ alpha' * log(Pi) + b' + e'(i)"),
+             h6("with: Pi the population of city i, Ri its rank in the urban hierarchy and alpha' = (1 / alpha)"))),
+            h5("Literature covered:"), 
+            dataTableOutput('references')),
     
      tabPanel("Literature Summary", 
                  "Summarise estimations by:",
@@ -36,7 +42,8 @@ shinyUI(fluidPage(
                                                                      "1870s", "1860s", "1850s", "1840s", "1830s", "1820s", "1810s", 
                                                                      "1800s", "1790s", "1780s", "1770s", "1760s", "1750s", 
                                                                      "1700s", "1600s"), multiple=FALSE)),
-                   dataTableOutput('summary')
+                   dataTableOutput('summary'),
+                   plotOutput('histalpha')
                    )),
               
               tabPanel("Literature Review", 
@@ -69,10 +76,9 @@ shinyUI(fluidPage(
                column(4,checkboxInput("year4model", "Year", value=TRUE)),
                column(4,checkboxInput("scale4model", "City definition", value=F)),
                column(4,checkboxInput("truncation4model", "Truncation point", value=F)),
-               column(4,checkboxInput("N4model", "N Observations", value=F)),
-               column(4,checkboxInput("country4model", "Country?", value=F)),
-               column(4,checkboxInput("territory4model", "Territory", value=F)),
-               tableOutput('modelparameters'),  tableOutput('model')
+               column(6,checkboxInput("N4model", "N Observations", value=F)),
+               column(6,checkboxInput("country4model", "Country?", value=F)), br(), 
+               tableOutput('modelparameters'),  br(), tableOutput('model')
               
              ))
     
