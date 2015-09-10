@@ -83,7 +83,7 @@ shinyServer(function(input, output) {
     if(def != "ALL") {
       tab = SubsetMeta(table = tab, attribute = "URBANSCALE", value = def)
     }
-    tab = tab[,c("ALPHA", "TERRITORY", "DATE", "N", "URBANSCALE", "TRUNCATION", "R2", "REFERENCE", "URBANDEF")]
+    tab = tab[,c("ALPHA", "TERRITORY", "DATE", "N", "URBANSCALE", "R2", "REFERENCE", "URBANDEF", "TRUNCATION", "GEOZONE")]
     return(tab)
   })
   
@@ -139,11 +139,21 @@ shinyServer(function(input, output) {
     if (input$alpha == "Pareto") tab$ALPHA = tab$ALPHAPARETO
     
    regressants = "ALPHA ~ 1"
+   Reference = "Reference Categories:"
    if (input$year4model == "TRUE") regressants = paste(regressants, " + DATE", sep="")
-   if (input$truncation4model == "TRUE") regressants = paste(regressants, " + TRUNCATION_POINT", sep="")
-   if (input$scale4model == "TRUE") regressants = paste(regressants, " + URBANSCALE", sep="")
+   if (input$truncation4model == "TRUE") {
+     tab$TRUNCATION_LEVEL = as.factor(ifelse(tab$TRUNCATION_POINT <= 10000, " Low (10000 or less)", ifelse(tab$TRUNCATION_POINT >= 100000, " High (100000 or more)", " Medium (10000-100000)")))
+     regressants = paste(regressants, " + TRUNCATION_LEVEL", sep="")
+     Reference = paste(Reference, "\n Truncation Level: >= 100000", sep="")}
+   if (input$scale4model == "TRUE") {
+     regressants = paste(regressants, " + URBANSCALE", sep="")
+     Reference = paste(Reference, "\n City Definition: 1. Local", sep="")}
    if (input$N4model == "TRUE") regressants = paste(regressants, " + N", sep="")
-   if (input$country4model == "TRUE") regressants = paste(regressants, " + COUNTRY", sep="")
+    if (input$urbanisation4model == "TRUE") {
+     tab = subset(tab, URBANISATION != "")
+     regressants = paste(regressants, " + URBANISATION", sep="")
+     Reference = paste(Reference, "\n Age of Urbanisation: Old", sep="")}
+   
    model = lm(regressants, data=tab, na.action = na.omit)
      mod = summary(model)
      return(mod)
@@ -167,6 +177,18 @@ shinyServer(function(input, output) {
     return(summ)
   })
   
+  
+  output$REFS = renderText({
+    Reference = "Reference Categories"
+     if (input$truncation4model == "TRUE") {
+          Reference = paste(Reference, " | Truncation Level: >= 100000", sep="")}
+    if (input$scale4model == "TRUE") {
+         Reference = paste(Reference, " | City Definition: 1. Local", sep="")}
+     if (input$urbanisation4model == "TRUE") {
+        Reference = paste(Reference, " | Age of Urbanisation: Old", sep="")}
+    return(Reference)
+  })
+    
   output$histalpha = renderPlot({
     tab = meta
     if (input$alpha == "Lotka") tab$ALPHA = tab$ALPHALOTKA

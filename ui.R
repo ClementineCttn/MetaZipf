@@ -18,14 +18,15 @@ shinyUI(fluidPage(
                 urban characteristics (age of the system, economic development) and with the specifications of the regression used (urban definitions,
               truncation points, number of cities) to unveil systematic deviations from the iconic -1 slope.", br(),   br(),
              "The current database cover 1005 estimations from 50 studies, 
-            spanning from 1600 to 2011 in more than 80 countries.", 
-            h6("Nitsch, V. (2005). Zipf zipped. Journal of Urban Economics, 57(1), 86-100.")),
+            spanning from 1600 to 2011 in more than 80 countries."),
              fluidRow(column(6,selectInput("alpha", "I prefer results to be expressed in the regression form of:", choices=c("Lotka", "Pareto"), multiple=FALSE)),
             column(6,
              h6("The Lotka form : log(Pi) ~ alpha * log(Ri) + b + e(i)"),
              h6("The Pareto form : log(Ri) ~ alpha' * log(Pi) + b' + e'(i)"),
              h6("with: Pi the population of city i, Ri its rank in the urban hierarchy and alpha' = (1 / alpha)"))),
-            h5("Literature covered:"), dataTableOutput('references')
+            h6("N.B. 'Old' continents refer to zones of early urbanisation, in Europe, South-East Asia and the Middle East. America, Oceania, Africa and central Asia are considered 'New' in that respect."),
+            h5("Literature covered:"), dataTableOutput('references'),
+            h6("Nitsch, V. (2005). Zipf zipped. Journal of Urban Economics, 57(1), 86-100.")
             ),
     
      tabPanel("Literature Summary", 
@@ -76,11 +77,12 @@ shinyUI(fluidPage(
              fluidRow(
                column(4,checkboxInput("year4model", "Year", value=TRUE)),
                column(4,checkboxInput("scale4model", "City definition", value=F)),
-               column(4,checkboxInput("truncation4model", "Truncation point", value=F)),
+               column(4,checkboxInput("truncation4model", "Truncation Level", value=F)),
                column(6,checkboxInput("N4model", "N Observations", value=F)),
-               column(6,checkboxInput("country4model", "Country?", value=F)), br(), 
-               tableOutput('modelparameters'),  br(), tableOutput('model')
-              
+               column(6,checkboxInput("urbanisation4model", "Age of Urbanisation", value=F)), br(), 
+               tableOutput('modelparameters'),
+                br(), tableOutput('model'),
+               textOutput('REFS')              
              ))
     
                        
