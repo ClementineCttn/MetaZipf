@@ -73,15 +73,19 @@ shinyUI(fluidPage(
                          plotOutput('plot')
                          )),
                tabPanel("Models",
-             "Run the meta-analysis",
+             h3("Select Features to Test in the Meta Analysis"),
              fluidRow(
-               column(4,checkboxInput("year4model", "Year", value=TRUE)),
+               column(4,checkboxInput("urbanisation4model", "Age of Urbanisation", value=F)), 
                column(4,checkboxInput("scale4model", "City definition", value=F)),
                column(4,checkboxInput("truncation4model", "Truncation Level", value=F)),
-               column(6,checkboxInput("N4model", "N Observations", value=F)),
-               column(6,checkboxInput("urbanisation4model", "Age of Urbanisation", value=F)), br(), 
+               column(4,checkboxInput("year4model", "Year", value=F)),
+               column(4,checkboxInput("N4model", "N Observations", value=F)),
+               column(4,checkboxInput("countrySize", "Country Size", value=F)),
+               br(), 
+               h3("Results of the Regression of Alpha by the Selected Features."),
                tableOutput('modelparameters'),
-                br(), tableOutput('model'),
+               h3("Estimated Coefficients on the Variation of Alpha"),
+               tableOutput('model'),
                textOutput('REFS')              
              ))
     

@@ -139,20 +139,16 @@ shinyServer(function(input, output) {
     if (input$alpha == "Pareto") tab$ALPHA = tab$ALPHAPARETO
     
    regressants = "ALPHA ~ 1"
-   Reference = "Reference Categories:"
    if (input$year4model == "TRUE") regressants = paste(regressants, " + DATE", sep="")
    if (input$truncation4model == "TRUE") {
      tab$TRUNCATION_LEVEL = as.factor(ifelse(tab$TRUNCATION_POINT <= 10000, " Low (10000 or less)", ifelse(tab$TRUNCATION_POINT >= 100000, " High (100000 or more)", " Medium (10000-100000)")))
-     regressants = paste(regressants, " + TRUNCATION_LEVEL", sep="")
-     Reference = paste(Reference, "\n Truncation Level: >= 100000", sep="")}
+     regressants = paste(regressants, " + TRUNCATION_LEVEL", sep="")}
    if (input$scale4model == "TRUE") {
-     regressants = paste(regressants, " + URBANSCALE", sep="")
-     Reference = paste(Reference, "\n City Definition: 1. Local", sep="")}
+     regressants = paste(regressants, " + URBANSCALE", sep="")}
    if (input$N4model == "TRUE") regressants = paste(regressants, " + N", sep="")
     if (input$urbanisation4model == "TRUE") {
      tab = subset(tab, URBANISATION != "")
-     regressants = paste(regressants, " + URBANISATION", sep="")
-     Reference = paste(Reference, "\n Age of Urbanisation: Old", sep="")}
+     regressants = paste(regressants, " + URBANISATION", sep="")}
    
    model = lm(regressants, data=tab, na.action = na.omit)
      mod = summary(model)
@@ -166,14 +162,22 @@ shinyServer(function(input, output) {
     
     regressants = "ALPHA ~ 1"
     if (input$year4model == "TRUE") regressants = paste(regressants, " + DATE", sep="")
-    if (input$truncation4model == "TRUE") regressants = paste(regressants, " + TRUNCATION_POINT", sep="")
-    if (input$scale4model == "TRUE") regressants = paste(regressants, " + URBANSCALE", sep="")
+    if (input$truncation4model == "TRUE") {
+      tab$TRUNCATION_LEVEL = as.factor(ifelse(tab$TRUNCATION_POINT <= 10000, " Low (10000 or less)", ifelse(tab$TRUNCATION_POINT >= 100000, " High (100000 or more)", " Medium (10000-100000)")))
+      regressants = paste(regressants, " + TRUNCATION_LEVEL", sep="")}
+    if (input$scale4model == "TRUE") {
+      regressants = paste(regressants, " + URBANSCALE", sep="")}
     if (input$N4model == "TRUE") regressants = paste(regressants, " + N", sep="")
-    if (input$country4model == "TRUE") regressants = paste(regressants, " + COUNTRY", sep="")
-     model = lm(regressants, data=tab, na.action = na.omit)
-    R2 = summary(model)$r.squared
+    if (input$urbanisation4model == "TRUE") {
+      tab = subset(tab, URBANISATION != "")
+      regressants = paste(regressants, " + URBANISATION", sep="")}
+    
+    model = lm(regressants, data=tab, na.action = na.omit)
+    
+    R2 = summary(model)$r.squared * 100
     Observations = summary(model)$df[[2]]
     summ = data.frame(R2, Observations)
+    colnames(summ) = c("R2 of regression (%)", "Number of Estimations")
     return(summ)
   })
   
