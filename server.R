@@ -23,9 +23,9 @@ SummaryMeta = function(table, regression = "Lotka"){
   minAlpha = round(min(tab$ALPHA),3)
   maxAlpha = round(max(tab$ALPHA),3)
   estimations = dim(tab)[[1]]
-  pct_Local = round(dim(subset(tab, URBANSCALE == "local"))[[1]] / estimations * 100,1)
-  pct_Agglo = round(dim(subset(tab, URBANSCALE == "agglo"))[[1]] / estimations * 100,1)
-  pct_Metro = round(dim(subset(tab, URBANSCALE == "metro"))[[1]] / estimations * 100,1)
+  pct_Local = round(dim(subset(tab, URBANSCALE == "1_Local"))[[1]] / estimations * 100,1)
+  pct_Agglo = round(dim(subset(tab, URBANSCALE == "2_Agglo"))[[1]] / estimations * 100,1)
+  pct_Metro = round(dim(subset(tab, URBANSCALE == "3_Metro"))[[1]] / estimations * 100,1)
   t1 = subset(tab, !is.na(N))
   t2 = subset(tab, !is.na(TRUNCATION_POINT))
   medianN = median(t1$N)
