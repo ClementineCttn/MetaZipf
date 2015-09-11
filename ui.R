@@ -17,20 +17,23 @@ shinyUI(fluidPage(
                   law in the literature. This meta-analysis relates the variation of Zipf's estimated coefficients with 
                 urban characteristics (age of the system, economic development) and with the specifications of the regression used (urban definitions,
               truncation points, number of cities) to unveil systematic deviations from the iconic -1 slope.", br(),   br(),
-             "The current database cover 1005 estimations from 50 studies, 
-            spanning from 1600 to 2011 in more than 80 countries."),
-             fluidRow(column(6,selectInput("alpha", "I prefer results to be expressed in the regression form of:", choices=c("Lotka", "Pareto"), multiple=FALSE)),
+             "The current database covers 1005 estimations from 50 studies, spanning from 1600 to 2011 in more than 80 countries. It is available here: https://github.com/ClementineCttn/MetaZipf."),
+                      
+            br(),
+            fluidRow(column(6,selectInput("alpha", "I prefer results to be expressed in the regression form of:", choices=c("Lotka", "Pareto"), multiple=FALSE)),
             column(6,
              h6("The Lotka form : log(Pi) ~ alpha * log(Ri) + b + e(i)"),
              h6("The Pareto form : log(Ri) ~ alpha' * log(Pi) + b' + e'(i)"),
              h6("with: Pi the population of city i, Ri its rank in the urban hierarchy and alpha' = (1 / alpha)"))),
-            h6("N.B. 'Old' continents refer to zones of early urbanisation, in Europe, South-East Asia and the Middle East. America, Oceania, Africa and central Asia are considered 'New' in that respect."),
-            h5("Literature covered:"), dataTableOutput('references'),
+            br(),h4("Contact: c.cottineau@ucl.ac.uk | Clementine Cottineau, 2015, University College London.")
+    ),
+    tabPanel("Literature Overview",
+            h3("Literature covered:"), dataTableOutput('references'),
             h6("Nitsch, V. (2005). Zipf zipped. Journal of Urban Economics, 57(1), 86-100. Total population in thousands, from UN estimates (1950-2015) <http://esa.un.org/unpd/wpp/DVD/Files/1_Excel%20(Standard)/EXCEL_FILES/1_Population/WPP2015_POP_F01_1_TOTAL_POPULATION_BOTH_SEXES.XLS.>")
             ),
     
      tabPanel("Literature Summary", 
-                 "Summarise estimations by:",
+              h3("Summarise estimations by:"),
                  fluidRow(
                    column(4,selectInput("territorys", "Territory", choices=c("ALL","WORLD", "United States of America", "India", "China", "Russia", "Brazil", "South Africa", 
                                                                              "United Kingdom", "France", "USSR", "Israel", "Japan", "Europe", "Spain", "Austria",
@@ -49,7 +52,7 @@ shinyUI(fluidPage(
                    )),
               
               tabPanel("Literature Review", 
-                       "Subset Table by:",
+                       h3("Subset Table by:"),
                        fluidRow(
                          column(4,selectInput("territory", "Territory", choices=c("ALL","WORLD", "United States of America", "India", "China", "Russia", "Brazil", "South Africa", 
                                                                                   "United Kingdom", "France", "USSR", "Israel", "Japan", "Europe", "Spain", "Austria",
@@ -65,7 +68,7 @@ shinyUI(fluidPage(
                                                                            "1700s", "1600s"), multiple=FALSE))),
                        dataTableOutput('review')),
               tabPanel("Plots",
-                       "Plot alpha estimations by:",
+                       h3("Plot alpha estimations by:"),
                        fluidRow(
                          column(4,selectInput("quanti", "Continuous variable", choices=c("N", "TRUNCATION_POINT", "DATE"), multiple=FALSE)),
                          column(4,checkboxInput("log", "Log variable", value=TRUE)),
@@ -103,7 +106,9 @@ shinyUI(fluidPage(
                  sliderInput("PopVal", "Thousands of Residents (to define large, medium and small countries)",
                              min = 1, max = 1000000, value = c(10000, 100000)))),
              
-               textOutput('REFS')              
+               textOutput('REFS'),
+               h6("N.B. 'Old' continents refer to zones of early urbanisation, in Europe, South-East Asia and the Middle East. America, Oceania, Africa and central Asia are considered 'New' in that respect.")
+               
              ))
     
                        
