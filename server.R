@@ -134,27 +134,40 @@ shinyServer(function(input, output) {
     return(p)
   })
   
+  
+  
+  
+  bb = c("scale4model", "truncation4model","N4model")
+  'scale4model' %in% bb
+  
+  
   output$model = renderTable({
     tab = meta
     if (input$alpha == "Lotka") tab$ALPHA = tab$ALPHALOTKA
     if (input$alpha == "Pareto") tab$ALPHA = tab$ALPHAPARETO
     
+    TechnicalSpecs = input$technicalSpecs
+    TopicalSpecs = input$topicalSpecs
+    
+    if ('alltech' %in% TechnicalSpecs == "TRUE") TechnicalSpecs = c("scale4model",  "truncation4model", "N4model")
+    if ('alltop' %in% TopicalSpecs == "TRUE") TopicalSpecs = c("urbanisation4model",  "countrySize", "year4model")
+    
    regressants = "ALPHA ~ 1"
-   if (input$year4model == "TRUE")  {
+   if ('year4model' %in% TopicalSpecs == "TRUE")  {
      tab$NORMALIZED_DATE = tab$DATE - 1950
      regressants = paste(regressants, " + NORMALIZED_DATE", sep="")}
-   if (input$truncation4model == "TRUE") {
+   if ('truncation4model' %in% TechnicalSpecs == "TRUE") {
      tab$TRUNCATION_LEVEL = as.factor(ifelse(tab$TRUNCATION_POINT <= 10000, " Low (10000 or less)", ifelse(tab$TRUNCATION_POINT >= 100000, " High (100000 or more)", " Medium (10000-100000)")))
      regressants = paste(regressants, " + TRUNCATION_LEVEL", sep="")}
-   if (input$scale4model == "TRUE") {
+   if ('scale4model' %in% TechnicalSpecs == "TRUE") {
      regressants = paste(regressants, " + URBANSCALE", sep="")}
-   if (input$N4model == "TRUE") {
+   if ('N4model' %in% TechnicalSpecs == "TRUE") {
      tab$N_SAMPLE = as.factor(ifelse(tab$N <= 30, " Small (30 or less)", ifelse(tab$N >= 300, " Large (300 or more)", " Medium (30-300)")))
      regressants = paste(regressants, " + N_SAMPLE", sep="")}
-    if (input$urbanisation4model == "TRUE") {
+    if ('urbanisation4model' %in% TopicalSpecs == "TRUE") {
      tab = subset(tab, URBANISATION != "")
      regressants = paste(regressants, " + URBANISATION", sep="")}
-   if (input$countrySize == "TRUE") {
+   if ('countrySize' %in% TopicalSpecs == "TRUE") {
      tab = subset(tab, TOTAL_POP > 0)
      tab$COUNTRY_SIZE = as.factor(ifelse(tab$TOTAL_POP <= 10000, " Small (10 millions or less)", ifelse(tab$TOTAL_POP >= 100000, " Large (100 millions or more)", " Medium (10 - 100 millions)")))
      regressants = paste(regressants, " + COUNTRY_SIZE", sep="")}
@@ -169,22 +182,28 @@ shinyServer(function(input, output) {
     if (input$alpha == "Lotka") tab$ALPHA = tab$ALPHALOTKA
     if (input$alpha == "Pareto") tab$ALPHA = tab$ALPHAPARETO
     
+    TechnicalSpecs = input$technicalSpecs
+    TopicalSpecs = input$topicalSpecs
+    
+    if ('alltech' %in% TechnicalSpecs == "TRUE") TechnicalSpecs = c("scale4model",  "truncation4model", "N4model")
+    if ('alltop' %in% TopicalSpecs == "TRUE") TopicalSpecs = c("urbanisation4model",  "countrySize", "year4model")
+
     regressants = "ALPHA ~ 1"
-    if (input$year4model == "TRUE") {
+    if ('year4model' %in% TopicalSpecs == "TRUE") {
       tab$NORMALIZED_DATE = tab$DATE - 1950
       regressants = paste(regressants, " + NORMALIZED_DATE", sep="")}
-    if (input$truncation4model == "TRUE") {
+    if ('truncation4model' %in% TechnicalSpecs == "TRUE"){
       tab$TRUNCATION_LEVEL = as.factor(ifelse(tab$TRUNCATION_POINT <= 10000, " Low (10000 or less)", ifelse(tab$TRUNCATION_POINT >= 100000, " High (100000 or more)", " Medium (10000-100000)")))
       regressants = paste(regressants, " + TRUNCATION_LEVEL", sep="")}
-    if (input$scale4model == "TRUE") {
+    if ('scale4model' %in% TechnicalSpecs == "TRUE")  {
       regressants = paste(regressants, " + URBANSCALE", sep="")}
-    if (input$N4model == "TRUE") {
+    if ('N4model' %in% TechnicalSpecs == "TRUE")  {
       tab$N_SAMPLE = as.factor(ifelse(tab$N <= 30, " Small (30 or less)", ifelse(tab$N >= 300, " Large (300 or more)", " Medium (30-300)")))
       regressants = paste(regressants, " + N_SAMPLE", sep="")}
-    if (input$urbanisation4model == "TRUE") {
+    if ('urbanisation4model' %in% TopicalSpecs == "TRUE"){
       tab = subset(tab, URBANISATION != "")
       regressants = paste(regressants, " + URBANISATION", sep="")}
-    if (input$countrySize == "TRUE") {
+    if ('countrySize' %in% TopicalSpecs  == "TRUE") {
       tab = subset(tab, TOTAL_POP > 0)
       tab$COUNTRY_SIZE = as.factor(ifelse(tab$TOTAL_POP <= 10000, " Small (10 millions or less)", ifelse(tab$TOTAL_POP >= 100000, " Large (100 millions or more)", " Medium (10 - 100 millions)")))
       regressants = paste(regressants, " + COUNTRY_SIZE", sep="")}
@@ -200,13 +219,19 @@ shinyServer(function(input, output) {
   
   
   output$REFS = renderText({
+    TechnicalSpecs = input$technicalSpecs
+    TopicalSpecs = input$topicalSpecs
+    
+    if ('alltech' %in% TechnicalSpecs == "TRUE") TechnicalSpecs = c("scale4model",  "truncation4model", "N4model")
+    if ('alltop' %in% TopicalSpecs == "TRUE") TopicalSpecs = c("urbanisation4model",  "countrySize", "year4model")
+
     Reference = "Reference Categories"
-    if (input$urbanisation4model == "TRUE") Reference = paste(Reference, " | Age of Urbanisation: Old", sep="")
-    if (input$truncation4model == "TRUE") Reference = paste(Reference, " | Truncation Level: >= 100000", sep="")
-    if (input$N4model == "TRUE") Reference = paste(Reference, " | Sample Size: Large (300 or more)", sep="")
-    if (input$year4model == "TRUE") Reference = paste(Reference, " | Year: 1950", sep="")
-    if (input$scale4model == "TRUE") Reference = paste(Reference, " | City Definition: 1. Local", sep="")
-     if (input$countrySize == "TRUE") Reference = paste(Reference, " | Country Size: Large (100 millions or more)", sep="")
+    if ('urbanisation4model' %in% TopicalSpecs == "TRUE") Reference = paste(Reference, " | Age of Urbanisation: Old", sep="")
+    if ('truncation4model' %in% TechnicalSpecs == "TRUE")Reference = paste(Reference, " | Truncation Level: >= 100000", sep="")
+    if ('N4model' %in% TechnicalSpecs == "TRUE") Reference = paste(Reference, " | Sample Size: Large (300 or more)", sep="")
+    if ('year4model' %in% TopicalSpecs == "TRUE") Reference = paste(Reference, " | Year: 1950", sep="")
+    if ('scale4model' %in% TechnicalSpecs == "TRUE") Reference = paste(Reference, " | City Definition: 1. Local", sep="")
+    if ('countrySize' %in% TopicalSpecs  == "TRUE") Reference = paste(Reference, " | Country Size: Large (100 millions or more)", sep="")
     
     return(Reference)
   })
