@@ -85,17 +85,24 @@ shinyUI(fluidPage(
                                              "Age of Urbanisation" = "urbanisation4model",
                                              "Date (relative to 1950)" = "year4model",
                                              "Country Population" = "countrySize"), selected = NULL, inline = FALSE)),
-              # column(4,checkboxInput("urbanisation4model", "Age of Urbanisation", value=F)), 
-              # column(4,checkboxInput("truncation4model", "Truncation Level", value=F)),
-              #  column(4,checkboxInput("year4model", "Year", value=F)),
-             #  column(4,checkboxInput("N4model", "N Cities", value=F)),
-            #   column(4,checkboxInput("scale4model", "City definition", value=F)),
-            #   column(4,checkboxInput("countrySize", "Country Population", value=F)),
-               br(), 
+                 br(), 
                h3("Results of the Regression of Alpha by the Selected Features."),
                tableOutput('modelparameters'),
                h3("Estimated Coefficients on the Variation of Alpha"),
                tableOutput('model'),
+               column(4,conditionalPanel(
+                 condition = "'truncation4model' %in% input.technicalSpecs == 'TRUE'",
+                 sliderInput("truncVal", "Truncation points (to define high, medium and low truncatures)",
+                             min = 0, max = 1000000, value = c(10000, 100000)))),
+                 column(4,conditionalPanel(
+                 condition = "'N4model' %in% input.technicalSpecs == 'TRUE'",
+                 sliderInput("NVal", "Number of cities (to define large, medium and small samples)",
+                             min = 1, max = 1000, value = c(30, 300)))),
+                 column(4,conditionalPanel(
+                 condition = "'countrySize' %in% input.topicalSpecs == 'TRUE'",
+                 sliderInput("PopVal", "Thousands of Residents (to define large, medium and small countries)",
+                             min = 1, max = 1000000, value = c(10000, 100000)))),
+             
                textOutput('REFS')              
              ))
     
