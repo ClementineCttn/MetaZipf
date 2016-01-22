@@ -97,15 +97,15 @@ shinyUI(fluidPage(
                tableOutput('model'),
                column(4,conditionalPanel(
                  condition = "'truncation4model' %in% input.technicalSpecs == 'TRUE'",
-                 sliderInput("truncVal", "Truncation points (to define high, medium and low truncatures)",
+                 sliderInput("truncVal", "Truncation Level (to define high, medium and low truncatures)",
                              min = 0, max = 1000000, value = c(10000, 100000)))),
                  column(4,conditionalPanel(
                  condition = "'N4model' %in% input.technicalSpecs == 'TRUE'",
-                 sliderInput("NVal", "Number of cities (to define large, medium and small samples)",
+                 sliderInput("NVal", "N Cities (to define large, medium and small sets)",
                              min = 1, max = 1000, value = c(30, 300)))),
                  column(4,conditionalPanel(
                  condition = "'countrySize' %in% input.topicalSpecs == 'TRUE'",
-                 sliderInput("PopVal", "Thousands of Residents (to define large, medium and small countries)",
+                 sliderInput("PopVal", "Country Population (Thousands of Residents to define large, medium and small countries)",
                              min = 1, max = 1000000, value = c(10000, 100000)))),
              
                textOutput('REFS'),
