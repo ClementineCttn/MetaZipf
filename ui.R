@@ -17,7 +17,7 @@ shinyUI(fluidPage(
                   law in the literature. This meta-analysis relates the variation of Zipf's estimated coefficients with 
                 urban characteristics (age of the system, economic development) and with the specifications of the regression used (urban definitions,
               truncation points, number of cities) to unveil systematic deviations from the iconic -1 slope.", br(),   br(),
-             "The current database covers 1005 estimations from 50 studies, spanning from 1600 to 2011 in more than 80 countries. It is available here: https://github.com/ClementineCttn/MetaZipf."),
+             "The current database covers 1034 estimations from 52 studies, spanning from 1600 to 2011 in more than 80 countries. It is available here: https://github.com/ClementineCttn/MetaZipf."),
                       
             br(),
             fluidRow(column(6,selectInput("alpha", "I prefer results to be expressed in the regression form of:", choices=c("Lotka", "Pareto"), multiple=FALSE)),
