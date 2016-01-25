@@ -17,7 +17,7 @@ shinyUI(fluidPage(
                   law in the literature. This meta-analysis relates the variation of Zipf's estimated coefficients with 
                 urban characteristics (age of the system, economic development) and with the specifications of the regression used (urban definitions,
               truncation points, number of cities) to unveil systematic deviations from the iconic -1 slope.", br(),   br(),
-             "The current database covers 1105 estimations from 57 studies, spanning from 1600 to 2011 in more than 80 countries. It is available here: https://github.com/ClementineCttn/MetaZipf."),
+             "The current database covers 1110 estimations from 59 studies, spanning from 1600 to 2011 in more than 80 countries. It is available here: https://github.com/ClementineCttn/MetaZipf."),
                       
             br(),
             fluidRow(column(6,selectInput("alpha", "I prefer results to be expressed in the regression form of:", choices=c("Lotka", "Pareto"), multiple=FALSE)),
@@ -25,7 +25,7 @@ shinyUI(fluidPage(
              h6("The Lotka form : log(Pi) ~ alpha * log(Ri) + b + e(i)"),
              h6("The Pareto form : log(Ri) ~ alpha' * log(Pi) + b' + e'(i)"),
              h6("with: Pi the population of city i, Ri its rank in the urban hierarchy and alpha' = (1 / alpha)"))),
-            br(),h4("Contact: c.cottineau@ucl.ac.uk | Clementine Cottineau, 2015, University College London.")
+            br(),h4("Contact: c.cottineau@ucl.ac.uk | Clementine Cottineau, 2016, University College London.")
     ),
     tabPanel("Literature Overview",
             h3("Literature covered:"), dataTableOutput('references'),
@@ -74,22 +74,25 @@ shinyUI(fluidPage(
                        fluidRow(
                          column(4,selectInput("quanti", "Continuous variable", choices=c("N", "TRUNCATION_POINT", "DATE"), multiple=FALSE)),
                          column(4,checkboxInput("log", "Log variable", value=TRUE)),
-                         column(4,selectInput("quali", "Discrete variable", choices=c("URBANSCALE", "COUNTRY", "DECADE"), multiple=FALSE)),
+                         column(4,selectInput("quali", "Discrete variable", choices=c("URBANSCALE", "COUNTRY", "DECADE", "ECO", "SOC", "PHYS"), multiple=FALSE)),
                          plotOutput('plot')
                          )),
                tabPanel("Models",
              h3("Select Features to Test in the Meta Analysis"),
              fluidRow(
-               column(6,checkboxGroupInput("technicalSpecs", "Technical Specifications", 
+               column(4,checkboxGroupInput("technicalSpecs", "Technical Specifications", 
                                            c("All" = "alltech",
                                              "City definition" = "scale4model", 
                                               "Truncation Level" = "truncation4model",
                                               "N Cities" = "N4model"), selected = NULL, inline = FALSE)),
-               column(6,checkboxGroupInput("topicalSpecs", "Topical Specifications", 
+               column(4,checkboxGroupInput("topicalSpecs", "Topical Specifications", 
                                            c("All" = "alltop",
                                              "Age of Urbanisation" = "urbanisation4model",
                                              "Date (relative to 1950)" = "year4model",
                                              "Country Population" = "countrySize"), selected = NULL, inline = FALSE)),
+               column(4,checkboxGroupInput("otherSpecs", "Other Specifications", 
+                                           c("All" = "allother",
+                                             "Journal Subject" = "discipline", "", ""), selected = NULL, inline = FALSE)),
                  br(), 
                h3("Results of the Regression of Alpha by the Selected Features."),
                tableOutput('modelparameters'),

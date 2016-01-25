@@ -121,7 +121,7 @@ shinyServer(function(input, output) {
     quali = input$quali
     
     tab$quanti = tab[,quanti]
-    tab$Category = tab[,quali]
+    tab$Category = as.character(tab[,quali])
     
     tab = subset(tab, !is.na(quanti))
     tab = subset(tab, !is.na(Category))
@@ -148,9 +148,11 @@ shinyServer(function(input, output) {
     
     TechnicalSpecs = input$technicalSpecs
     TopicalSpecs = input$topicalSpecs
+    OtherSpecs = input$otherSpecs
     
     if ('alltech' %in% TechnicalSpecs == "TRUE") TechnicalSpecs = c("scale4model",  "truncation4model", "N4model")
     if ('alltop' %in% TopicalSpecs == "TRUE") TopicalSpecs = c("urbanisation4model",  "countrySize", "year4model")
+    if ('allother' %in% OtherSpecs == "TRUE") OtherSpecs = c("discipline")
     
    regressants = "ALPHA ~ 1"
    if ('year4model' %in% TopicalSpecs == "TRUE")  {
@@ -171,6 +173,9 @@ shinyServer(function(input, output) {
      tab = subset(tab, TOTAL_POP > 0)
      tab$COUNTRY_SIZE = as.factor(ifelse(tab$TOTAL_POP <= input$PopVal[[1]], " Small", ifelse(tab$TOTAL_POP >= input$PopVal[[2]], " Large", " Medium")))
      regressants = paste(regressants, " + COUNTRY_SIZE", sep="")}
+   if ('discipline' %in% OtherSpecs == "TRUE") {
+     tab = subset(tab, ECO != "")
+     regressants = paste(regressants, " + ECO + SOC + PHYS", sep="")}
    
    model = lm(regressants, data=tab, na.action = na.omit)
      mod = summary(model)
@@ -184,10 +189,12 @@ shinyServer(function(input, output) {
     
     TechnicalSpecs = input$technicalSpecs
     TopicalSpecs = input$topicalSpecs
+    OtherSpecs = input$otherSpecs
     
     if ('alltech' %in% TechnicalSpecs == "TRUE") TechnicalSpecs = c("scale4model",  "truncation4model", "N4model")
     if ('alltop' %in% TopicalSpecs == "TRUE") TopicalSpecs = c("urbanisation4model",  "countrySize", "year4model")
-
+    if ('allother' %in% OtherSpecs == "TRUE") OtherSpecs = c("discipline")
+    
     regressants = "ALPHA ~ 1"
     if ('year4model' %in% TopicalSpecs == "TRUE") {
       tab$NORMALIZED_DATE = tab$DATE - 1950
@@ -207,6 +214,9 @@ shinyServer(function(input, output) {
       tab = subset(tab, TOTAL_POP > 0)
       tab$COUNTRY_SIZE = as.factor(ifelse(tab$TOTAL_POP <= input$PopVal[[1]], " Small", ifelse(tab$TOTAL_POP >= input$PopVal[[2]], " Large", " Medium")))
       regressants = paste(regressants, " + COUNTRY_SIZE", sep="")}
+    if ('discipline' %in% OtherSpecs == "TRUE") {
+      tab = subset(tab, ECO != "")
+      regressants = paste(regressants, " + ECO + SOC + PHYS", sep="")}
     
     model = lm(regressants, data=tab, na.action = na.omit)
     
