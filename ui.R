@@ -17,7 +17,7 @@ shinyUI(fluidPage(
                   law in the literature. This meta-analysis relates the variation of Zipf's estimated coefficients with 
                 urban characteristics (age of the system, economic development) and with the specifications of the regression used (urban definitions,
               truncation points, number of cities) to unveil systematic deviations from the iconic -1 slope.", br(),   br(),
-             "The current database covers 1051 estimations from 53 studies, spanning from 1600 to 2011 in more than 80 countries. It is available here: https://github.com/ClementineCttn/MetaZipf."),
+             "The current database covers 1104 estimations from 56 studies, spanning from 1600 to 2011 in more than 80 countries. It is available here: https://github.com/ClementineCttn/MetaZipf."),
                       
             br(),
             fluidRow(column(6,selectInput("alpha", "I prefer results to be expressed in the regression form of:", choices=c("Lotka", "Pareto"), multiple=FALSE)),
@@ -97,15 +97,15 @@ shinyUI(fluidPage(
                tableOutput('model'),
                column(4,conditionalPanel(
                  condition = "'truncation4model' %in% input.technicalSpecs == 'TRUE'",
-                 sliderInput("truncVal", "Truncation Level (to define high, medium and low truncatures)",
+                 sliderInput("truncVal", "Truncation points (to define high, medium and low truncatures)",
                              min = 0, max = 1000000, value = c(10000, 100000)))),
                  column(4,conditionalPanel(
                  condition = "'N4model' %in% input.technicalSpecs == 'TRUE'",
-                 sliderInput("NVal", "N Cities (to define large, medium and small sets)",
+                 sliderInput("NVal", "Number of cities (to define large, medium and small samples)",
                              min = 1, max = 1000, value = c(30, 300)))),
                  column(4,conditionalPanel(
                  condition = "'countrySize' %in% input.topicalSpecs == 'TRUE'",
-                 sliderInput("PopVal", "Country Population (Thousands of Residents to define large, medium and small countries)",
+                 sliderInput("PopVal", "Thousands of Residents (to define large, medium and small countries)",
                              min = 1, max = 1000000, value = c(10000, 100000)))),
              
                textOutput('REFS'),
