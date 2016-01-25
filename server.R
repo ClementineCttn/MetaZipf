@@ -60,7 +60,7 @@ my_palette = colorRampPalette(c("seashell", "dodgerblue3"))(n = 299)
 shinyServer(function(input, output) {
 
   output$references = renderDataTable({
-    d = refs
+    d = refs[,c("AUTHOR", "YEAR", "JOURNAL", "PAGE", "N_ESTIM", "ECO", "SOC", "PHYS", "REGRESSIONFORM", "IN_NITSCH", "IN_HERE", "SOURCE")]
     return(d)
   })
   
