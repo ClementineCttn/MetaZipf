@@ -28,7 +28,19 @@ shinyUI(fluidPage(
             br(),h4("Contact: c.cottineau@ucl.ac.uk | Clementine Cottineau, 2016, University College London.")
     ),
     tabPanel("Literature Overview",
-            h3("Literature covered:"), dataTableOutput('references'),
+             
+            h4('The TOP 5 journals where the estimations* from are:'),br(),  
+            tableOutput('top5journals'),
+            '*Each reference count as one, irrespective of the number of estimations',br(),  
+            h4('The TOP 5 authors* providing estimations are:'),br(),  
+            tableOutput('top5authors'),
+            '*the estimations published by the same author(s) in different publications are not added.',br(),  
+            h4('The TOP 5 countries for the diversity of results* are:'),br(),  
+            tableOutput('top5countries'),
+            '*measured by the coefficient of variation for countries with more than 5 estimations.',br(),  
+            h4('The TOP 5 maximum and minimum Alpha measured are:'),br(),  
+            tableOutput('top5extremes'),
+            h3("Complete list of references:"), dataTableOutput('references'),
             h6("Nitsch, V. (2005). Zipf zipped. Journal of Urban Economics, 57(1), 86-100. Total population in thousands, from UN estimates (1950-2015) <http://esa.un.org/unpd/wpp/DVD/Files/1_Excel%20(Standard)/EXCEL_FILES/1_Population/WPP2015_POP_F01_1_TOTAL_POPULATION_BOTH_SEXES.XLS.>")
             ),
     
