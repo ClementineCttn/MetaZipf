@@ -29,7 +29,7 @@ shinyUI(fluidPage(
     ),
     tabPanel("Literature Overview",
              
-            h4('The TOP 5 journals where the estimations* from are:'),br(),  
+            h4('The TOP 5 journals where the estimations* are drawn from are:'),  
             tableOutput('top5journals'),
             '*Each reference count as one, irrespective of the number of estimations',br(),  
             h4('The TOP 5 authors* providing estimations are:'),br(),  

@@ -64,6 +64,13 @@ shinyServer(function(input, output) {
     return(d)
   })
   
+  output$top5journals= renderTable({
+    d = refs[refs$JOURNAL !="Dissertation",]
+    d = d[,c("JOURNAL")]
+    top5 = as.data.frame(head(sort(table(d), decreasing = T), 5))
+    colnames(top5) = c("Number of references")
+    return(top5)
+  })
   
   output$review = renderDataTable({
     tab = meta
