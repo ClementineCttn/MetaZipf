@@ -72,6 +72,17 @@ shinyServer(function(input, output) {
     return(top5)
   })
   
+  
+  output$top5authors= renderTable({
+    d = refs[,c("AUTHOR", "YEAR", "JOURNAL", "N_ESTIM")]
+    ds = d[order(-d$N_ESTIM),]
+    top5 = as.data.frame(head(ds, 5))
+   colnames(top5) = c("Author", "Year", "Journal","Number of estimations")
+   rownames(top5) = NULL
+    return(top5)
+  })
+  
+  
   output$review = renderDataTable({
     tab = meta
     
