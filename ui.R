@@ -44,7 +44,7 @@ shinyUI(fluidPage(
             h6("Nitsch, V. (2005). Zipf zipped. Journal of Urban Economics, 57(1), 86-100. Total population in thousands, from UN estimates (1950-2015) <http://esa.un.org/unpd/wpp/DVD/Files/1_Excel%20(Standard)/EXCEL_FILES/1_Population/WPP2015_POP_F01_1_TOTAL_POPULATION_BOTH_SEXES.XLS.>")
             ),
     
-     tabPanel("Literature Summary", 
+     tabPanel("Zipf's Estimates Summary", 
               h3("Summarise estimations by:"),
                  fluidRow(
                    column(4,selectInput("territorys", "Territory", choices=c("ALL","WORLD", "United States of America", "India", "China", "Russia", "Brazil", "South Africa", 
@@ -62,34 +62,17 @@ shinyUI(fluidPage(
                                                                      "1700s", "1600s"), multiple=FALSE)),
                    dataTableOutput('summary'),
                    plotOutput('histalpha')
-                   )),
+                   ),
+              h3("Plot alpha estimations by:"),
+              fluidRow(
+                column(4,selectInput("quanti", "Continuous variable", choices=c("N", "TRUNCATION_POINT", "DATE"), multiple=FALSE)),
+                column(4,checkboxInput("log", "Log variable", value=TRUE)),
+                column(4,selectInput("quali", "Discrete variable", choices=c("URBANSCALE", "COUNTRY", "DECADE", "ECO", "SOC", "PHYS"), multiple=FALSE)),
+                plotOutput('plot')
+              )),
               
-              tabPanel("Literature Review", 
-                       h3("Subset Table by:"),
-                       fluidRow(
-                         column(4,selectInput("territory", "Territory", choices=c("ALL","WORLD", "United States of America", "India", "China", "Russia", "Brazil", "South Africa", 
-                                                                                  "United Kingdom", "France", "USSR", "Israel", "Japan", "Europe", "Spain", "Austria",
-                                                                                  "Germany", "Sweden", "Malaysia", "Netherlands", "Turkey", "Ukraine",
-                                                                                  "Canada", "Egypt", "Mexico", "Italy", "Argentina", "Denmark",
-                                                                                  "Nigeria", "Poland", "Austrialia", "Balkans", "Colombia", "Greece", "Hungary", "Indonesia",
-                                                                                  "Morocco", "Norway", "Romania", "Switzerland", "Venezuela"), multiple=FALSE)),
-                         column(4,selectInput("scale", "Urban Definition", choices=c("ALL", "Local Units" = "1_Local", "Agglomerations" = "2_Agglo", 
-                                                                                     "Metropolitan Areas" = "3_Metro", "Mixed Definitions" = "4_Mixed"), multiple=FALSE)),
-                         column(4,selectInput("decade", "Decade", choices=c("ALL","2010s", "2000s", "1990s", "1980s", "1970s", "1960s", "1950s",
-                                                                           "1940s", "1930s", "1920s", "1910s", "1900s", "1890s", "1880s",
-                                                                           "1870s", "1860s", "1850s", "1840s", "1830s", "1820s", "1810s", 
-                                                                           "1800s", "1790s", "1780s", "1770s", "1760s", "1750s", 
-                                                                           "1700s", "1600s"), multiple=FALSE))),
-                       dataTableOutput('review')),
-              tabPanel("Plots",
-                       h3("Plot alpha estimations by:"),
-                       fluidRow(
-                         column(4,selectInput("quanti", "Continuous variable", choices=c("N", "TRUNCATION_POINT", "DATE"), multiple=FALSE)),
-                         column(4,checkboxInput("log", "Log variable", value=TRUE)),
-                         column(4,selectInput("quali", "Discrete variable", choices=c("URBANSCALE", "COUNTRY", "DECADE", "ECO", "SOC", "PHYS"), multiple=FALSE)),
-                         plotOutput('plot')
-                         )),
-               tabPanel("Models",
+             
+               tabPanel("Meta Analysis",
              h3("Select Features to Test in the Meta Analysis"),
              fluidRow(
                column(4,checkboxGroupInput("technicalSpecs", "Technical Specifications", 
@@ -126,9 +109,25 @@ shinyUI(fluidPage(
                textOutput('REFS'),
                h6("N.B. 'Old' continents refer to zones of early urbanisation, in Europe, South-East Asia and the Middle East. America, Oceania, Africa and central Asia are considered 'New' in that respect.")
                
-             ))
+             )),
     
-                       
+    tabPanel("Review Data", 
+             h3("Subset Table by:"),
+             fluidRow(
+               column(4,selectInput("territory", "Territory", choices=c("ALL","WORLD", "United States of America", "India", "China", "Russia", "Brazil", "South Africa", 
+                                                                        "United Kingdom", "France", "USSR", "Israel", "Japan", "Europe", "Spain", "Austria",
+                                                                        "Germany", "Sweden", "Malaysia", "Netherlands", "Turkey", "Ukraine",
+                                                                        "Canada", "Egypt", "Mexico", "Italy", "Argentina", "Denmark",
+                                                                        "Nigeria", "Poland", "Austrialia", "Balkans", "Colombia", "Greece", "Hungary", "Indonesia",
+                                                                        "Morocco", "Norway", "Romania", "Switzerland", "Venezuela"), multiple=FALSE)),
+               column(4,selectInput("scale", "Urban Definition", choices=c("ALL", "Local Units" = "1_Local", "Agglomerations" = "2_Agglo", 
+                                                                           "Metropolitan Areas" = "3_Metro", "Mixed Definitions" = "4_Mixed"), multiple=FALSE)),
+               column(4,selectInput("decade", "Decade", choices=c("ALL","2010s", "2000s", "1990s", "1980s", "1970s", "1960s", "1950s",
+                                                                  "1940s", "1930s", "1920s", "1910s", "1900s", "1890s", "1880s",
+                                                                  "1870s", "1860s", "1850s", "1840s", "1830s", "1820s", "1810s", 
+                                                                  "1800s", "1790s", "1780s", "1770s", "1760s", "1750s", 
+                                                                  "1700s", "1600s"), multiple=FALSE))),
+             dataTableOutput('review'))                       
               
          )
       )
