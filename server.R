@@ -134,7 +134,12 @@ shinyServer(function(input, output) {
     top2 = as.data.frame(head(ds2, ntop))    
     top = rbind(top1, top2) 
     
-    colnames(top) = c("Alpha", "Territory", "Date","Cities", "R2", "N", "Truncation", "Reference")
+    rownames(top) = top$ALPHA
+    top$ALPHA = NULL
+    
+    colnames(top) = c("Territory", "Date","Cities", "R2", "N", "Truncation", "Reference")
+    
+
     return(top)
   })
   
