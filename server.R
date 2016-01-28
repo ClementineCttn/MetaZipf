@@ -1,6 +1,8 @@
 
 library(ggplot2)
 library(RColorBrewer)
+library(plyr)
+
 
 SubsetMeta = function(table, attribute, value, operator="=="){
   tab = table
@@ -48,6 +50,15 @@ SummaryMeta = function(table, regression = "Lotka"){
   return(Summary)
 }
 
+sumNum = function(x){sum(as.numeric(x), na.rm=TRUE)}
+
+CoeffVar = function(x){
+  sdev = sd(x)
+  m = mean(x)
+  cvar = sdev / m
+  return(cvar)
+}
+  
 meta = read.csv("data/zipf_meta.csv", sep=",", dec=".")
 meta$TOTAL_POP = as.numeric(meta$TOTAL_POP)
 refs = read.csv("data/zipf_refs.csv", sep=",", dec=".")
@@ -59,27 +70,53 @@ my_palette = colorRampPalette(c("seashell", "dodgerblue3"))(n = 299)
 
 shinyServer(function(input, output) {
 
+  
   output$references = renderDataTable({
     d = refs[,c("AUTHOR", "YEAR", "JOURNAL", "PAGE", "N_ESTIM", "ECO", "SOC", "PHYS", "REGRESSIONFORM", "IN_NITSCH", "IN_HERE", "SOURCE")]
     return(d)
   })
   
-  output$top5journals= renderTable({
+  output$topjournals= renderTable({
+    ntop = input$top
     d = refs[refs$JOURNAL !="Dissertation",]
     d = d[,c("JOURNAL")]
-    top5 = as.data.frame(head(sort(table(d), decreasing = T), 5))
-    colnames(top5) = c("Number of references")
-    return(top5)
+    top = as.data.frame(head(sort(table(d), decreasing = T), ntop))
+    colnames(top) = c("References")
+    return(top)
   })
   
-  
-  output$top5authors= renderTable({
+  output$topauthors= renderTable({
+    ntop = input$top
     d = refs[,c("AUTHOR", "YEAR", "JOURNAL", "N_ESTIM")]
     ds = d[order(-d$N_ESTIM),]
-    top5 = as.data.frame(head(ds, 5))
-   colnames(top5) = c("Author", "Year", "Journal","Number of estimations")
-   rownames(top5) = NULL
-    return(top5)
+    top = as.data.frame(head(ds, ntop))
+    rownames(top) = top$AUTHOR
+    top$AUTHOR = NULL
+   colnames(top) = c("Year", "Journal/Book","Estimations")
+    return(top)
+  })
+  
+  output$topcountries= renderTable({
+    ntop = input$top
+    m = meta[meta$COUNTRY == "YES",]
+    if (input$alpha == "Lotka") m$ALPHA = m$ALPHALOTKA
+    if (input$alpha == "Pareto") m$ALPHA = m$ALPHAPARETO
+    
+    m$count = 1
+    keep = aggregate(m[, "count"], unique(list(m$TERRITORY)), FUN = sumNum)
+    keep = subset(keep, x >= 5)
+    m = m[m$TERRITORY %in% keep[,1],]
+    d = aggregate(m[, "ALPHA"], unique(list(m$TERRITORY)), FUN = CoeffVar)
+    str(d)
+    ds = d[order(-d$x),]
+    top = as.data.frame(head(ds, ntop))
+    top$x = round(top$x, 3)
+    top = join(top, keep, by = "Group.1")
+    rownames(top) = top$Group.1
+    top$Group.1 = NULL
+    colnames(top) = c("Diversity* of Alpha", "Estimations")
+    top$Estimations = as.integer(top$Estimations)
+    return(top)
   })
   
   
