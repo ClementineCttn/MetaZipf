@@ -129,17 +129,15 @@ shinyServer(function(input, output) {
     d = m[,c("ALPHA", "TERRITORY", "DATE","URBANDEF", "R2", "N", "TRUNCATION", "REFERENCE")]
     
     ds1 = d[order(-d$ALPHA),]
-    ds2 = d[order(d$ALPHA),]
     top1 = as.data.frame(head(ds1, ntop))
-    top2 = as.data.frame(head(ds2, ntop))    
+    top2 = as.data.frame(tail(ds1, ntop))    
     top = rbind(top1, top2) 
     
     rownames(top) = top$ALPHA
     top$ALPHA = NULL
     
     colnames(top) = c("Territory", "Date","Cities", "R2", "N", "Truncation", "Reference")
-    
-
+  
     return(top)
   })
   
