@@ -3,13 +3,13 @@ library(shiny)
 shinyUI(fluidPage(
   tags$head(tags$link(rel="shortcut icon", href="favicon.png")),
   titlePanel("MetaZipf"),
-  titlePanel(h4("Meta Analysis of Zipf's law for cities")),
+  titlePanel(h4("Open Meta Analysis of Zipf's law for cities")),
   
   navlistPanel(
     
     tabPanel("Presentation",
              column(3, img(src = "favicon.png",class="img-responsive")),
-             column(9, h1("Interactive meta-analysis of empirical Zipf's laws")),
+             column(9, h1("Interactive Meta-analysis of Empirical Zipf's Estimates")),
             tags$p(class="text-justify",
             "This application aims at presenting a meta-analysis of Zipf's law estimations from the literature in an interactive way. Following the meta-analysis proposed by V. Nitsch in 2005, 
                   and extending the pool of papers reviewed, it gives access to the database and specifications used.",  br(),   br(),  
@@ -109,7 +109,7 @@ shinyUI(fluidPage(
                
              )),
     
-    tabPanel("Review Data", 
+    tabPanel("Raw Meta Data", 
              h3("Subset Table by:"),
              fluidRow(
                column(4,selectInput("territory", "Territory", choices=c("ALL","WORLD", "United States of America", "India", "China", "Russia", "Brazil", "South Africa", 
@@ -125,8 +125,56 @@ shinyUI(fluidPage(
                                                                   "1870s", "1860s", "1850s", "1840s", "1830s", "1820s", "1810s", 
                                                                   "1800s", "1790s", "1780s", "1770s", "1760s", "1750s", 
                                                                   "1700s", "1600s"), multiple=FALSE))),
-             dataTableOutput('review'))                       
-              
+             dataTableOutput('review')),                       
+    tabPanel("Contribute !",
+             wellPanel(
+             h3("Add your own reviewed estimates:"), 
+             column(4,selectInput("type", "Document type", choices=c("Journal Article", "Book", "Dissertation"), multiple=FALSE)),
+             column(4,textInput("author", "Author(s)", value = "Ex: Lotka A. J.")),
+             column(4,numericInput("year", "Publication Year", value = "2016")),
+             column(4,textInput("journal", "Journal / Book Title", value = "")),
+             column(4,numericInput("page", "Page of Results", value = "1")),
+             column(4,selectInput("regression", "Regression Form*", choices=c("LOTKA", "PARETO"), multiple=FALSE)),
+             h6("*Regression forms: LOTKA = log(Pi) ~ alpha * log(Ri) + b + e(i) or PARETO = log(Ri) ~ alpha' * log(Pi) + b' + e'(i)"),
+             h6("with: Pi the population of city i, Ri its rank in the urban hierarchy and alpha' = (1 / alpha)"),
+             column(4,numericInput("nestimates", "Number of estimates", value = "1")), 
+             column(8,textInput("url", "URL of document", value = ""))
+             ),
+
+             
+             conditionalPanel(
+               condition = 'input.regression == "PARETO"',
+               selectInput("smoothMethod", "Method",
+                           list("lm", "glm", "gam", "loess", "rlm"))
+             )
+             
+            # column(4,actionButton("addRef", label = "Add Reference"))
+    ),
+    tabPanel("test",
+      selectInput(
+        "plotType", "Plot Type",
+        c(Scatter = "scatter",
+          Histogram = "hist")),
+      
+      # Only show this panel if the plot type is a histogram
+      conditionalPanel(
+        condition = "input.plotType == 'hist'",
+        selectInput(
+          "breaks", "Breaks",
+          c("Sturges",
+            "Scott",
+            "Freedman-Diaconis",
+            "[Custom]" = "custom")),
+        
+        # Only show this panel if Custom is selected
+        conditionalPanel(
+          condition = "input.breaks == 'custom'",
+          sliderInput("breakCount", "Break Count", min=1, max=1000, value=10)
+        )
+      )
+    )
+
+    
          )
       )
     )

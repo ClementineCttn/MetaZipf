@@ -132,7 +132,6 @@ shinyServer(function(input, output) {
   
   output$review = renderDataTable({
     tab = meta
-    
     if (input$alpha == "Lotka") tab$ALPHA = tab$ALPHALOTKA
     if (input$alpha  == "Pareto") tab$ALPHA = tab$ALPHAPARETO
     
@@ -149,10 +148,18 @@ shinyServer(function(input, output) {
     if(def != "ALL") {
       tab = SubsetMeta(table = tab, attribute = "URBANSCALE", value = def)
     }
+    
+    tab = tab[order(tab$DATE),]
+    
     tab = tab[,c("ALPHA", "TERRITORY", "DATE", "N", "URBANSCALE", "R2", "REFERENCE", "URBANDEF", "TRUNCATION", "GEOZONE")]
     return(tab)
   }, options = list(paging = FALSE))
   
+ 
+ 
+ 
+ 
+ 
   output$summary = renderDataTable({
     tab = meta
     if (input$alpha == "Lotka") tab$ALPHA = tab$ALPHALOTKA
