@@ -81,7 +81,7 @@ shinyServer(function(input, output) {
     top = as.data.frame(ds)
     colnames(top) = c("Journal","References")
     return(top)
-  }, options = list(pageLength = 10))
+  }, options = list(pageLength = 10, paging = FALSE, searching = FALSE))
   
   output$topauthors= renderDataTable({
     ntop = input$top
@@ -151,7 +151,7 @@ shinyServer(function(input, output) {
     }
     tab = tab[,c("ALPHA", "TERRITORY", "DATE", "N", "URBANSCALE", "R2", "REFERENCE", "URBANDEF", "TRUNCATION", "GEOZONE")]
     return(tab)
-  })
+  }, options = list(paging = FALSE))
   
   output$summary = renderDataTable({
     tab = meta
@@ -175,12 +175,28 @@ shinyServer(function(input, output) {
     }
     summaryA = SummaryMeta(table = tab, regression = reg)
     return(summaryA)
-  })
+  }, options = list(paging = FALSE, searching = FALSE))
   
   output$plot = renderPlot({
     tab = meta
     if (input$alpha == "Lotka") tab$ALPHA = tab$ALPHALOTKA
     if (input$alpha == "Pareto") tab$ALPHA = tab$ALPHAPARETO
+    
+    
+    terr = input$territorys
+    dec = input$decades
+    def = input$scales
+    reg = input$alpha
+    
+    if(terr != "ALL") {
+      tab = SubsetMeta(table = tab, attribute = "TERRITORY", value = terr)
+    }
+    if(dec != "ALL") {
+      tab = SubsetMeta(table = tab, attribute = "DECADE", value = dec)
+    }
+    if(def != "ALL") {
+      tab = SubsetMeta(table = tab, attribute = "URBANSCALE", value = def)
+    }
     
     quanti = input$quanti
     quali = input$quali
@@ -191,11 +207,11 @@ shinyServer(function(input, output) {
     tab = subset(tab, !is.na(quanti))
     tab = subset(tab, !is.na(Category))
     
-    p = ggplot(tab, aes(x = quanti, y = ALPHA, colour = Category)) +  geom_hline(yintercept=1, size=1, col="grey25") +
-      geom_point() +   labs(x = quanti, y = "alpha") 
+    p = ggplot(tab, aes(y = quanti, x = ALPHA, colour = Category)) +  geom_vline(xintercept=1, size=1, col="grey25") +
+      geom_point() +   labs(y = quanti, x = "alpha") 
    
       
-    if (input$log == "TRUE") p = p + scale_x_log10()
+    if (input$log == "TRUE") p = p + scale_y_log10()
     return(p)
   })
   

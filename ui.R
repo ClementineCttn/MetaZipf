@@ -61,11 +61,11 @@ shinyUI(fluidPage(
                    dataTableOutput('summary'),
                    plotOutput('histalpha')
                    ),
-              h3("Plot alpha estimations by:"),
+              h3("Visualise variation of alpha with:"),
               fluidRow(
-                column(4,selectInput("quanti", "Continuous variable", choices=c("N", "TRUNCATION_POINT", "DATE"), multiple=FALSE)),
-                column(4,checkboxInput("log", "Log variable", value=TRUE)),
-                column(4,selectInput("quali", "Discrete variable", choices=c("URBANSCALE", "COUNTRY", "DECADE", "ECO", "SOC", "PHYS"), multiple=FALSE)),
+                column(4,selectInput("quanti", "Continuous variable (y)", choices=c("N", "TRUNCATION_POINT", "DATE"), multiple=FALSE)),
+                column(4,checkboxInput("log", "Log(y)", value=TRUE)),
+                column(4,selectInput("quali", "Discrete variable (colour)", choices=c("URBANSCALE", "COUNTRY", "DECADE", "ECO", "SOC", "PHYS"), multiple=FALSE)),
                 plotOutput('plot')
               )),
               
