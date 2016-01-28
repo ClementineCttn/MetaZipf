@@ -80,7 +80,9 @@ shinyServer(function(input, output) {
     ntop = input$top
     d = refs[refs$JOURNAL !="Dissertation",]
     d = d[,c("JOURNAL")]
-    top = as.data.frame(head(sort(table(d), decreasing = T), ntop))
+    ds = table(d)
+    ds = ds[ds>=2]
+    top = as.data.frame(head(sort(ds, decreasing = T), ntop))
     colnames(top) = c("References")
     return(top)
   })
@@ -101,7 +103,6 @@ shinyServer(function(input, output) {
     m = meta[meta$COUNTRY == "YES",]
     if (input$alpha == "Lotka") m$ALPHA = m$ALPHALOTKA
     if (input$alpha == "Pareto") m$ALPHA = m$ALPHAPARETO
-    
     m$count = 1
     keep = aggregate(m[, "count"], unique(list(m$TERRITORY)), FUN = sumNum)
     keep = subset(keep, x >= 5)
@@ -116,6 +117,24 @@ shinyServer(function(input, output) {
     top$Group.1 = NULL
     colnames(top) = c("Diversity* of Alpha", "Estimations")
     top$Estimations = as.integer(top$Estimations)
+    return(top)
+  })
+  
+  output$topextremes= renderTable({
+    ntop = input$top
+    m = meta
+    if (input$alpha == "Lotka") m$ALPHA = m$ALPHALOTKA
+    if (input$alpha == "Pareto") m$ALPHA = m$ALPHAPARETO
+    
+    d = m[,c("ALPHA", "TERRITORY", "DATE","URBANDEF", "R2", "N", "TRUNCATION", "REFERENCE")]
+    
+    ds1 = d[order(-d$ALPHA),]
+    ds2 = d[order(d$ALPHA),]
+    top1 = as.data.frame(head(ds1, ntop))
+    top2 = as.data.frame(head(ds2, ntop))    
+    top = rbind(top1, top2) 
+    
+    colnames(top) = c("Alpha", "Territory", "Date","Cities", "R2", "N", "Truncation", "Reference")
     return(top)
   })
   
