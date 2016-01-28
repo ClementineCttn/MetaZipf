@@ -52,12 +52,7 @@ SummaryMeta = function(table, regression = "Lotka"){
 
 sumNum = function(x){sum(as.numeric(x), na.rm=TRUE)}
 
-CoeffVar = function(x){
-  sdev = sd(x)
-  m = mean(x)
-  cvar = sdev / m
-  return(cvar)
-}
+stdDev = function(x){sd(as.numeric(x), na.rm=TRUE)}
   
 meta = read.csv("data/zipf_meta.csv", sep=",", dec=".")
 meta$TOTAL_POP = as.numeric(meta$TOTAL_POP)
@@ -76,29 +71,28 @@ shinyServer(function(input, output) {
     return(d)
   })
   
-  output$topjournals= renderTable({
+  output$topjournals= renderDataTable({
     ntop = input$top
     d = refs[refs$JOURNAL !="Dissertation",]
-    d = d[,c("JOURNAL")]
-    ds = table(d)
-    ds = ds[ds>=2]
-    top = as.data.frame(head(sort(ds, decreasing = T), ntop))
-    colnames(top) = c("References")
+    d$count = 1
+    ds = aggregate(d[, "count"], unique(list(d$JOURNAL)), FUN = sumNum)
+    ds = subset(ds, x > 1)  
+    ds = ds[order(-ds$x),]
+    top = as.data.frame(ds)
+    colnames(top) = c("Journal","References")
     return(top)
-  })
+  }, options = list(pageLength = 10))
   
-  output$topauthors= renderTable({
+  output$topauthors= renderDataTable({
     ntop = input$top
     d = refs[,c("AUTHOR", "YEAR", "JOURNAL", "N_ESTIM")]
     ds = d[order(-d$N_ESTIM),]
-    top = as.data.frame(head(ds, ntop))
-    rownames(top) = top$AUTHOR
-    top$AUTHOR = NULL
-   colnames(top) = c("Year", "Journal/Book","Estimations")
+    top = as.data.frame(ds)
+   colnames(top) = c("Author", "Year", "Journal/Book","Estimations")
     return(top)
-  })
+  }, options = list(pageLength = 10))
   
-  output$topcountries= renderTable({
+  output$topcountries= renderDataTable({
     ntop = input$top
     m = meta[meta$COUNTRY == "YES",]
     if (input$alpha == "Lotka") m$ALPHA = m$ALPHALOTKA
@@ -107,19 +101,19 @@ shinyServer(function(input, output) {
     keep = aggregate(m[, "count"], unique(list(m$TERRITORY)), FUN = sumNum)
     keep = subset(keep, x >= 5)
     m = m[m$TERRITORY %in% keep[,1],]
-    d = aggregate(m[, "ALPHA"], unique(list(m$TERRITORY)), FUN = CoeffVar)
+    d = aggregate(m[, "ALPHA"], unique(list(m$TERRITORY)), FUN = stdDev)
     ds = d[order(-d$x),]
-    top = as.data.frame(head(ds, ntop))
+    top = as.data.frame(ds)
     top$x = round(top$x, 3)
     top = join(top, keep, by = "Group.1")
     rownames(top) = top$Group.1
-    top$Group.1 = NULL
-    colnames(top) = c("Diversity* of Alpha", "Estimations")
+ #  top$Group.1 = NULL
+    colnames(top) = c("Country", "Diversity* of Alpha", "Estimations")
     top$Estimations = as.integer(top$Estimations)
     return(top)
-  })
+  }, options = list(pageLength = 10))
   
-  output$topextremes= renderTable({
+  output$topextremes= renderDataTable({
     ntop = input$top
     m = meta
     if (input$alpha == "Lotka") m$ALPHA = m$ALPHALOTKA
@@ -129,10 +123,7 @@ shinyServer(function(input, output) {
     
     ds1 = d[order(-d$ALPHA),]
     rownames(ds1) = 1:dim(ds1)[[1]]
-    top1 = as.data.frame(head(ds1, ntop))
-    top2 = as.data.frame(tail(ds1, ntop))    
-    top = rbind(top1, top2) 
-    
+    top = as.data.frame(ds1)
     colnames(top) = c("Alpha", "Territory", "Date","Cities", "R2", "N", "Truncation", "Reference")
   
     return(top)
