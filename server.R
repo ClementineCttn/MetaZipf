@@ -108,7 +108,6 @@ shinyServer(function(input, output) {
     keep = subset(keep, x >= 5)
     m = m[m$TERRITORY %in% keep[,1],]
     d = aggregate(m[, "ALPHA"], unique(list(m$TERRITORY)), FUN = CoeffVar)
-    str(d)
     ds = d[order(-d$x),]
     top = as.data.frame(head(ds, ntop))
     top$x = round(top$x, 3)
@@ -129,14 +128,12 @@ shinyServer(function(input, output) {
     d = m[,c("ALPHA", "TERRITORY", "DATE","URBANDEF", "R2", "N", "TRUNCATION", "REFERENCE")]
     
     ds1 = d[order(-d$ALPHA),]
+    rownames(ds1) = 1:dim(ds1)[[1]]
     top1 = as.data.frame(head(ds1, ntop))
     top2 = as.data.frame(tail(ds1, ntop))    
     top = rbind(top1, top2) 
     
-    rownames(top) = top$ALPHA
-    top$ALPHA = NULL
-    
-    colnames(top) = c("Territory", "Date","Cities", "R2", "N", "Truncation", "Reference")
+    colnames(top) = c("Alpha", "Territory", "Date","Cities", "R2", "N", "Truncation", "Reference")
   
     return(top)
   })
