@@ -140,25 +140,50 @@ shinyUI(fluidPage(
              h6("*Regression forms: LOTKA = log(Pi) ~ alpha * log(Ri) + b + e(i) or PARETO = log(Ri) ~ alpha' * log(Pi) + b' + e'(i)"),
              h6("with: Pi the population of city i, Ri its rank in the urban hierarchy and alpha' = (1 / alpha)")),
           
-             column(4,sliderInput("nestimates", "Number of estimates",   min = 1, max = 50, value = 1)), 
+             fluidRow(column(4,sliderInput("nestimates", "Number of estimates",   min = 1, max = 50, value = 1)), 
              column(4,textInput("url", "URL of document", value = "")),
-             column(4,actionButton("addref", "Add Reference")),br(),
+             column(4,actionButton("addref", "Add Reference"))),
              
-            column(12,uiOutput("singleEstimateForm")),
+             
+conditionalPanel(
+  condition = 'input.nestimates == 1',
+  mainPanel(column(6,numericInput("alphaestim" , "Alpha", value = "1")),
+           column(6,textInput("territoryestim", "Territory", value = "Ex: France")),
+           column(6,textInput("urbandefestim", "Urban Definition", value = "Ex: SMA, Boroughs, UN agglomerations...")),
+           column(6,numericInput("truncestim", "Minimum Population of Cities", value = "10000")),
+           column(4,numericInput("dateestim", "Date", value = "2000")),
+           column(4,numericInput("nCitiesestim", "Number of cities", value = "100")),
+           column(4,numericInput("r2estim", "R2", value = "100"))
+           ),
+           column(4,'-------------------'),
+           column(4,actionButton("addest", "Add Estimate")),
+           column(4,'-------------------')
+ ),
             conditionalPanel(
-              condition = 'input.nestimates === 1',
-               column(6,numericInput("alphaestim" , "Alpha", value = "1")),
-                       column(6,numericInput("dateestim", "Date of estimation", value = "2000")),
-                       column(6,textInput("urbandefestim", "Urban Definition", value = "Ex: SMA, Boroughs, UN agglomerations...")),
-                       column(6,numericInput("truncestim", "Minimum Population of Cities", value = "10000")),
-                       column(4,numericInput("nCitiesestim", "Number of cities", value = "100")),
-                       column(4,textInput("territoryestim", "Territory", value = "Ex: France")),
-                       column(4,numericInput("r2estim", "R2", value = "100"))
-            ),         
-            column(4,actionButton("addest", "Add Estimates"))
+              condition = 'input.nestimates > 1',          
+              
+              
+              ####### TO DO ################
+              #
+              # Change 10 by input$nestimates
+              #
+              ##############################
+              
+              lapply(1:10, function(i) {
+              uiOutput(paste0('b', i))
+              }),
+              
+              ##############################
+              #
+              ##############################
+              
+              column(4,'-------------------'),
+              column(4,actionButton("addest", "Add Estimates")),
+              column(4,'-------------------')
              
-             
+                )
+           
      )
-         )
+)
       )
     )

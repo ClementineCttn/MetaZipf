@@ -2,7 +2,7 @@
 library(ggplot2)
 library(RColorBrewer)
 library(plyr)
-
+library(shiny)
 
 SubsetMeta = function(table, attribute, value, operator="=="){
   tab = table
@@ -63,9 +63,8 @@ refs = read.csv("data/zipf_refs.csv", sep=",", dec=".")
 my_palette = colorRampPalette(c("seashell", "dodgerblue3"))(n = 299)
 
 
-shinyServer(function(input, output) {
-
-  
+shinyServer(function(input, output, session) {
+   
   output$references = renderDataTable({
     d = refs[,c("AUTHOR", "YEAR", "JOURNAL", "PAGE", "N_ESTIM", "ECO", "SOC", "PHYS", "REGRESSIONFORM", "IN_NITSCH", "IN_HERE", "SOURCE")]
     return(d)
@@ -364,25 +363,22 @@ shinyServer(function(input, output) {
   })
   
  
- 
- output$singleEstimateForm <- renderUI({
-   nestim <- input$nestimates
-   final = wellPanel()
-  if (nestim >1) {
-      final = fluidRow(column(6,numericInput(paste("alphaestim",', nestim,') , paste("Alpha",', nestim, ') , value = "1")),
-               column(6,numericInput("dateestim", "Date of estimation", value = "2000")),
-               column(6,textInput("urbandefestim", "Urban Definition", value = "Ex: SMA, Boroughs, UN agglomerations...")),
-               column(6,numericInput("truncestim", "Minimum Population of Cities", value = "10000")),
-               column(4,numericInput("nCitiesestim", "Number of cities", value = "100")),
-               column(4,textInput("territoryestim", "Territory", value = "Ex: France")),
-               column(4,numericInput("r2estim", "R2", value = "100"))
-      )
-               }
+lapply(1:100, function(i) {
   
-  return(final)
- })
-  
- 
- 
+  output[[paste0('b', i)]] <- renderUI({
+    
+     mainPanel(column(6,numericInput(paste("alphaestim", i) , paste("Alpha ", i, sep = "_"), value = "1")),
+             column(6,textInput(paste("territoryestim", i), paste("Territory", i, sep = "_"), value = "Ex: France")),
+             column(6,textInput(paste("urbandefestim", i), paste("Urban Definition", i, sep = "_"), value = "Ex: SMA, Boroughs, UN agglomerations...")),
+             column(6,numericInput(paste("truncestim", i), paste("Minimum Population of Cities", i, sep = "_"), value = "10000")),
+             column(4,numericInput(paste("dateestim", i), paste("Date", i, sep = "_"), value = "2000")),
+             column(4,numericInput(paste("nCitiesestim", i), paste("Number of cities", i, sep = "_"), value = "100")),
+             column(4,numericInput(paste("r2estim", i), paste("R2", i, sep = "_"), value = "100"))
+     )
+             
+  })
+})
+       
+
 })
 
