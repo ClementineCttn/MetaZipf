@@ -363,6 +363,26 @@ shinyServer(function(input, output) {
     return(histo)
   })
   
+ 
+ 
+ output$singleEstimateForm <- renderUI({
+   nestim <- input$nestimates
+   final = wellPanel()
+  if (nestim >1) {
+      final = fluidRow(column(6,numericInput(paste("alphaestim",', nestim,') , paste("Alpha",', nestim, ') , value = "1")),
+               column(6,numericInput("dateestim", "Date of estimation", value = "2000")),
+               column(6,textInput("urbandefestim", "Urban Definition", value = "Ex: SMA, Boroughs, UN agglomerations...")),
+               column(6,numericInput("truncestim", "Minimum Population of Cities", value = "10000")),
+               column(4,numericInput("nCitiesestim", "Number of cities", value = "100")),
+               column(4,textInput("territoryestim", "Territory", value = "Ex: France")),
+               column(4,numericInput("r2estim", "R2", value = "100"))
+      )
+               }
   
+  return(final)
+ })
+  
+ 
+ 
 })
 

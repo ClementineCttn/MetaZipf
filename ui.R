@@ -27,7 +27,7 @@ shinyUI(fluidPage(
              h6("with: Pi the population of city i, Ri its rank in the urban hierarchy and alpha' = (1 / alpha)"))),
             br(),h4("Contact: c.cottineau@ucl.ac.uk | Clementine Cottineau, 2016, University College London.")
     ),
-    
+    '-------',
     tabPanel("Literature Overview",
              h4('TOP journals where the estimations* are drawn from:'),  
             dataTableOutput('topjournals'),
@@ -92,15 +92,15 @@ shinyUI(fluidPage(
                h3("Estimated Coefficients on the Variation of Alpha"),
                tableOutput('model'),
                column(4,conditionalPanel(
-                 condition = "'truncation4model' %in% input.technicalSpecs == 'TRUE'",
+                 condition = 'input.technicalSpecs.indexOf("truncation4model") != -1', 
                  sliderInput("truncVal", "Truncation points (to define high, medium and low truncatures)",
                              min = 0, max = 1000000, value = c(10000, 100000)))),
                  column(4,conditionalPanel(
-                 condition = "'N4model' %in% input.technicalSpecs == 'TRUE'",
+                 condition = 'input.technicalSpecs.indexOf("N4model") != -1',
                  sliderInput("NVal", "Number of cities (to define large, medium and small samples)",
                              min = 1, max = 1000, value = c(30, 300)))),
                  column(4,conditionalPanel(
-                 condition = "'countrySize' %in% input.topicalSpecs == 'TRUE'",
+                   condition = 'input.topicalSpecs.indexOf("countrySize") != -1',
                  sliderInput("PopVal", "Thousands of Residents (to define large, medium and small countries)",
                              min = 1, max = 1000000, value = c(10000, 100000)))),
              
@@ -125,10 +125,12 @@ shinyUI(fluidPage(
                                                                   "1870s", "1860s", "1850s", "1840s", "1830s", "1820s", "1810s", 
                                                                   "1800s", "1790s", "1780s", "1770s", "1760s", "1750s", 
                                                                   "1700s", "1600s"), multiple=FALSE))),
-             dataTableOutput('review')),                       
+             dataTableOutput('review')),    
+    '-------',
     tabPanel("Contribute !",
-             wellPanel(
+
              h3("Add your own reviewed estimates:"), 
+             wellPanel(
              column(4,selectInput("type", "Document type", choices=c("Journal Article", "Book", "Dissertation"), multiple=FALSE)),
              column(4,textInput("author", "Author(s)", value = "Ex: Lotka A. J.")),
              column(4,numericInput("year", "Publication Year", value = "2016")),
@@ -136,45 +138,27 @@ shinyUI(fluidPage(
              column(4,numericInput("page", "Page of Results", value = "1")),
              column(4,selectInput("regression", "Regression Form*", choices=c("LOTKA", "PARETO"), multiple=FALSE)),
              h6("*Regression forms: LOTKA = log(Pi) ~ alpha * log(Ri) + b + e(i) or PARETO = log(Ri) ~ alpha' * log(Pi) + b' + e'(i)"),
-             h6("with: Pi the population of city i, Ri its rank in the urban hierarchy and alpha' = (1 / alpha)"),
-             column(4,numericInput("nestimates", "Number of estimates", value = "1")), 
-             column(8,textInput("url", "URL of document", value = ""))
-             ),
-
+             h6("with: Pi the population of city i, Ri its rank in the urban hierarchy and alpha' = (1 / alpha)")),
+          
+             column(4,sliderInput("nestimates", "Number of estimates",   min = 1, max = 50, value = 1)), 
+             column(4,textInput("url", "URL of document", value = "")),
+             column(4,actionButton("addref", "Add Reference")),br(),
              
-             conditionalPanel(
-               condition = 'input.regression == "PARETO"',
-               selectInput("smoothMethod", "Method",
-                           list("lm", "glm", "gam", "loess", "rlm"))
-             )
+            column(12,uiOutput("singleEstimateForm")),
+            conditionalPanel(
+              condition = 'input.nestimates === 1',
+               column(6,numericInput("alphaestim" , "Alpha", value = "1")),
+                       column(6,numericInput("dateestim", "Date of estimation", value = "2000")),
+                       column(6,textInput("urbandefestim", "Urban Definition", value = "Ex: SMA, Boroughs, UN agglomerations...")),
+                       column(6,numericInput("truncestim", "Minimum Population of Cities", value = "10000")),
+                       column(4,numericInput("nCitiesestim", "Number of cities", value = "100")),
+                       column(4,textInput("territoryestim", "Territory", value = "Ex: France")),
+                       column(4,numericInput("r2estim", "R2", value = "100"))
+            ),         
+            column(4,actionButton("addest", "Add Estimates"))
              
-            # column(4,actionButton("addRef", label = "Add Reference"))
-    ),
-    tabPanel("test",
-      selectInput(
-        "plotType", "Plot Type",
-        c(Scatter = "scatter",
-          Histogram = "hist")),
-      
-      # Only show this panel if the plot type is a histogram
-      conditionalPanel(
-        condition = "input.plotType == 'hist'",
-        selectInput(
-          "breaks", "Breaks",
-          c("Sturges",
-            "Scott",
-            "Freedman-Diaconis",
-            "[Custom]" = "custom")),
-        
-        # Only show this panel if Custom is selected
-        conditionalPanel(
-          condition = "input.breaks == 'custom'",
-          sliderInput("breakCount", "Break Count", min=1, max=1000, value=10)
-        )
-      )
-    )
-
-    
+             
+     )
          )
       )
     )
