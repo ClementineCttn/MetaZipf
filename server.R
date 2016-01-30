@@ -363,22 +363,44 @@ shinyServer(function(input, output, session) {
   })
   
  
-lapply(1:100, function(i) {
-  
-  output[[paste0('b', i)]] <- renderUI({
+  observe({
+    req(input$nestimates)
+    estRows <- lapply(1:input$nestimates,FUN = generateEstimRows)
+    if (input$nestimates > 1){
+      estbutton <- fluidRow(
+        column(4,'-------------------'),
+        column(4,actionButton("addest", "Add Estimates")),
+        column(4,'-------------------')    
+      )
+    } else {
+      estbutton <- fluidRow(
+        column(4,'-------------------'),
+        column(4,actionButton("addest", "Add Estimate")),
+        column(4,'-------------------')    
+      )
+    }
+    estRows <- list(estRows, estbutton)
+    output$nestimateRows <- renderUI({
+      do.call(fluidPage, estRows)
+    })
     
-     mainPanel(column(6,numericInput(paste("alphaestim", i) , paste("Alpha ", i, sep = "_"), value = "1")),
-             column(6,textInput(paste("territoryestim", i), paste("Territory", i, sep = "_"), value = "Ex: France")),
-             column(6,textInput(paste("urbandefestim", i), paste("Urban Definition", i, sep = "_"), value = "Ex: SMA, Boroughs, UN agglomerations...")),
-             column(6,numericInput(paste("truncestim", i), paste("Minimum Population of Cities", i, sep = "_"), value = "10000")),
-             column(4,numericInput(paste("dateestim", i), paste("Date", i, sep = "_"), value = "2000")),
-             column(4,numericInput(paste("nCitiesestim", i), paste("Number of cities", i, sep = "_"), value = "100")),
-             column(4,numericInput(paste("r2estim", i), paste("R2", i, sep = "_"), value = "100"))
-     )
-             
   })
+  
 })
-       
+  
+generateEstimRows <- function(i){
+  list(
+    fluidRow(
+      column(1,numericInput(paste("alphaestim", i) , paste("Alpha ", i, sep = "_"), value = "1")),
+      column(3,textInput(paste("territoryestim", i), paste("Territory", i, sep = "_"), value = "Ex: France")),
+      column(3,textInput(paste("urbandefestim", i), paste("Urban Def.", i, sep = "_"), value = "Ex: SMA, Boroughs, UN agglomerations...")),
+      column(1,numericInput(paste("truncestim", i), paste("Min. pop of Cities", i, sep = "_"), value = "10000")),
+      column(1,numericInput(paste("dateestim", i), paste("Date", i, sep = "_"), value = "2000")),
+      column(2,numericInput(paste("nCitiesestim", i), paste("# of cities", i, sep = "_"), value = "100")),
+      column(1,numericInput(paste("r2estim", i), paste("R2", i, sep = "_"), value = "100"))
+    ),
+    tags$hr()
+  )
+}
 
-})
 
