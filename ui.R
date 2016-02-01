@@ -147,6 +147,7 @@ shinyUI(fluidPage(
                                            min = 1, max = 50, value = 1)), 
              column(4,textInput("url", "URL of document", value = "")),
              column(4,actionButton("addref", "Add Reference"))),
+             tags$hr(),
              uiOutput(outputId = "nestimateRows")
      )
 )

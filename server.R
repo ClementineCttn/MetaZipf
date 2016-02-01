@@ -391,13 +391,15 @@ shinyServer(function(input, output, session) {
 generateEstimRows <- function(i){
   list(
     fluidRow(
-      column(1,numericInput(paste("alphaestim", i) , paste("Alpha ", i, sep = "_"), value = "1")),
-      column(3,textInput(paste("territoryestim", i), paste("Territory", i, sep = "_"), value = "Ex: France")),
-      column(3,textInput(paste("urbandefestim", i), paste("Urban Def.", i, sep = "_"), value = "Ex: SMA, Boroughs, UN agglomerations...")),
-      column(1,numericInput(paste("truncestim", i), paste("Min. pop of Cities", i, sep = "_"), value = "10000")),
-      column(1,numericInput(paste("dateestim", i), paste("Date", i, sep = "_"), value = "2000")),
+      column(2, paste("Estimation ", i, sep = "")),
+      column(2,numericInput(paste("alphaestim", i) , paste("Alpha ", i, sep = "_"), value = "1")),
+      column(4,textInput(paste("territoryestim", i), paste("Territory", i, sep = "_"), value = "Ex: France")),
+      column(4,textInput(paste("urbandefestim", i), paste("Urban Def.", i, sep = "_"), value = "Ex: SMA, Boroughs, UN agglomerations...")),
+      column(2, " "),
+      column(4,numericInput(paste("truncestim", i), paste("Min. pop of Cities", i, sep = "_"), value = "10000")),
+      column(2,numericInput(paste("dateestim", i), paste("Date", i, sep = "_"), value = "2000")),
       column(2,numericInput(paste("nCitiesestim", i), paste("# of cities", i, sep = "_"), value = "100")),
-      column(1,numericInput(paste("r2estim", i), paste("R2", i, sep = "_"), value = "100"))
+      column(2,numericInput(paste("r2estim", i), paste("R2", i, sep = "_"), value = "100"))
     ),
     tags$hr()
   )
