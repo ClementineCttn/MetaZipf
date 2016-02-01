@@ -1101,12 +1101,12 @@ textarea {
   line-height: inherit;
 }
 a {
-  color: #18bc9c;
+  color: #1e90ff;
   text-decoration: none;
 }
 a:hover,
 a:focus {
-  color: #18bc9c;
+  color: #1e90ff;
   text-decoration: underline;
 }
 a:focus {
@@ -1219,7 +1219,7 @@ h6 .small,
 .h6 .small {
   font-weight: normal;
   line-height: 1;
-  color: #b4bcc2;
+  color: #1e90ff;
 }
 h1,
 .h1,
@@ -1270,14 +1270,15 @@ h6 .small,
 h1,
 .h1 {
   font-size: 39px;
-}
+  }
 h2,
 .h2 {
   font-size: 32px;
-}
+ }
 h3,
 .h3 {
   font-size: 26px;
+  color: #1e90ff;
 }
 h4,
 .h4 {

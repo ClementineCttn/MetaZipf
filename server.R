@@ -355,10 +355,9 @@ shinyServer(function(input, output, session) {
     }
     
     histo = ggplot(tab, aes(x = ALPHA)) + 
-      geom_histogram(binwidth = 0.05, color = "aquamarine3", fill = "aquamarine3") +  
+      geom_histogram(binwidth = 0.05, color = "dodgerblue3", fill = "dodgerblue3") +  
       labs(x = "alpha", y = "frequency") +  geom_vline(xintercept=1, size=1, col="grey25") 
-    
-    
+        
     return(histo)
   })
   
@@ -417,5 +416,4 @@ generateEstimRows <- function(i){
     tags$hr()
   )
 }
-
 
