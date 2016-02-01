@@ -386,6 +386,19 @@ shinyServer(function(input, output, session) {
     
   })
   
+ 
+ observe({
+   if(is.null(input$send) || input$send==0) return(NULL)
+   from <- isolate(input$from)
+   to <- "c.cottineau@ucl.ac.uk"
+   subject <- "My contribution to MetaZipf"
+   comment <- isolate(input$comment)
+   msg = paste("Dear Clementine, I have added some estimations to MetaZipf.", comment , sep = "\n")
+   sendmail(from, to, subject, msg)
+ })
+ 
+ 
+ 
 })
   
 generateEstimRows <- function(i){

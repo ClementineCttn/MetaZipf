@@ -1,9 +1,19 @@
 library(shiny)
 
-shinyUI(fluidPage(
-  tags$head(tags$link(rel="shortcut icon", href="favicon.png")),
-  titlePanel("MetaZipf"),
-  titlePanel(h4("Open Meta Analysis of Zipf's law for cities")),
+shinyUI(
+  fluidPage(theme = "flatly_bootstrap.css",
+            tags$head(tags$link(rel="shortcut icon", href="favicon.png")),
+            
+            tags$head(
+              tags$style(HTML("
+      @import url('//fonts.googleapis.com/css?family=Orbitron|Cabin:400,700');
+    "))
+            ),
+            headerPanel(h1("MetaZipf")),
+            #   headerPanel(),
+    
+  titlePanel(
+             h4("Interactive and Open Meta Analysis of Zipf's law for cities")),
   
   navlistPanel(
     
@@ -19,25 +29,28 @@ shinyUI(fluidPage(
               truncation points, number of cities) to unveil systematic deviations from the iconic -1 slope.", br(),   br(),
              "The current database covers 1135 estimations from 61 studies, spanning more than 80 countries over 400 years. It is available here: https://github.com/ClementineCttn/MetaZipf."),
                       
-            br(),
+            tags$hr(),
+            
             fluidRow(column(6,selectInput("alpha", "I prefer results to be expressed in the regression form of:", choices=c("Lotka", "Pareto"), multiple=FALSE)),
             column(6,
              h6("The Lotka form : log(Pi) ~ alpha * log(Ri) + b + e(i)"),
              h6("The Pareto form : log(Ri) ~ alpha' * log(Pi) + b' + e'(i)"),
              h6("with: Pi the population of city i, Ri its rank in the urban hierarchy and alpha' = (1 / alpha)"))),
-            br(),h4("Contact: c.cottineau@ucl.ac.uk | Clementine Cottineau, 2016, University College London.")
-    ),
-    '-------',
+            tags$hr(),
+           h4("Contact: c.cottineau@ucl.ac.uk | Clementine Cottineau, 2016, University College London."),
+           tags$hr(),
+           "Credits: bootswatch.com for Flatly css file."),
+    tags$hr(),
     tabPanel("Literature Overview",
              h4('TOP journals where the estimations* are drawn from:'),  
             dataTableOutput('topjournals'),
-            '*Each reference count as one, irrespective of the number of estimations',   br(),
+            '*Each reference count as one, irrespective of the number of estimations',  tags$hr(),
             h4('TOP authors* providing estimations:'), 
             dataTableOutput('topauthors'),
-            '*the estimations published by the same author(s) in different publications are not added.',    br(),
+            '*the estimations published by the same author(s) in different publications are not added.',   tags$hr(),
             h4('TOP countries for the dispersion of results*:'),
             dataTableOutput('topcountries'),
-            '*measured by the standard deviation of alpha for countries with more than 5 estimations.',    br(),
+            '*measured by the standard deviation of alpha for countries with more than 5 estimations.',  tags$hr(),
             h3("Complete list of references:"), dataTableOutput('references'),
             h6("Nitsch, V. (2005). Zipf zipped. Journal of Urban Economics, 57(1), 86-100. Total population in thousands, from UN estimates (1950-2015) <http://esa.un.org/unpd/wpp/DVD/Files/1_Excel%20(Standard)/EXCEL_FILES/1_Population/WPP2015_POP_F01_1_TOTAL_POPULATION_BOTH_SEXES.XLS.>")
             ),
@@ -59,8 +72,10 @@ shinyUI(fluidPage(
                                                                      "1800s", "1790s", "1780s", "1770s", "1760s", "1750s", 
                                                                      "1700s", "1600s"), multiple=FALSE)),
                    dataTableOutput('summary'),
+                   tags$hr(),
                    plotOutput('histalpha')
                    ),
+              tags$hr(),
               h3("Visualise variation of alpha with:"),
               fluidRow(
                 column(4,selectInput("quanti", "Continuous variable (y)", choices=c("N", "TRUNCATION_POINT", "DATE"), multiple=FALSE)),
@@ -86,10 +101,10 @@ shinyUI(fluidPage(
                column(4,checkboxGroupInput("otherSpecs", "Other Specifications", 
                                            c("All" = "allother",
                                              "Journal Subject" = "discipline", "", ""), selected = NULL, inline = FALSE)),
-                 br(), 
+               tags$hr(),
                h3("Results of the Regression of Alpha by the Selected Features."),
                tableOutput('modelparameters'),
-               h3("Estimated Coefficients on the Variation of Alpha"),
+               tags$hr(), h3("Estimated Coefficients on the Variation of Alpha"),
                tableOutput('model'),
                column(4,conditionalPanel(
                  condition = 'input.technicalSpecs.indexOf("truncation4model") != -1', 
@@ -126,9 +141,11 @@ shinyUI(fluidPage(
                                                                   "1800s", "1790s", "1780s", "1770s", "1760s", "1750s", 
                                                                   "1700s", "1600s"), multiple=FALSE))),
              dataTableOutput('review')),    
-    '-------',
+    tags$hr(),
     tabPanel("Contribute !",
              h3("Add your own reviewed estimates:"), 
+             "Please remember to press buttons to add the reference and the estimates, 
+             and to send this data to the moderator for them to be added to the open database.",
              wellPanel(
              column(4,selectInput("type", "Document type",
                                   choices=c("Journal Article", "Book", "Dissertation"),
@@ -148,7 +165,11 @@ shinyUI(fluidPage(
              column(4,textInput("url", "URL of document", value = "")),
              column(4,actionButton("addref", "Add Reference"))),
              tags$hr(),
-             uiOutput(outputId = "nestimateRows")
+             uiOutput(outputId = "nestimateRows"),
+             tags$hr(),
+             column(4,textInput("comment", NULL, value = "Any Comment?")),
+             column(4,textInput("from", NULL, value = "Your E-mail")),
+             column(4,actionButton("sendMail", "Save data and send them."))
      )
 )
       )
