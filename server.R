@@ -14,7 +14,6 @@ SubsetMeta = function(table, attribute, value, operator="=="){
   return(sub)
 }
 
-
 SummaryMeta = function(table, regression = "Lotka"){
   tab = table
   references = length(list(unique(tab$REFERENCE))[[1]])
@@ -57,6 +56,11 @@ stdDev = function(x){sd(as.numeric(x), na.rm=TRUE)}
 meta = read.csv("data/zipf_meta.csv", sep=",", dec=".")
 meta$TOTAL_POP = as.numeric(meta$TOTAL_POP)
 refs = read.csv("data/zipf_refs.csv", sep=",", dec=".")
+
+
+metaToAdd = data.frame()
+refsToAdd = data.frame()
+
 
 
 
@@ -314,7 +318,6 @@ shinyServer(function(input, output, session) {
     return(summ)
   })
   
-  
   output$REFS = renderText({
     TechnicalSpecs = input$technicalSpecs
     TopicalSpecs = input$topicalSpecs
@@ -367,15 +370,15 @@ shinyServer(function(input, output, session) {
     estRows <- lapply(1:input$nestimates,FUN = generateEstimRows)
     if (input$nestimates > 1){
       estbutton <- fluidRow(
-        column(4,'-------------------'),
-        column(4,actionButton("addest", "Add Estimates")),
-        column(4,'-------------------')    
+        column(4,' '),
+        column(4,actionButton("addest", "Add Estimates and Save")),
+        column(4,' ')    
       )
     } else {
       estbutton <- fluidRow(
-        column(4,'-------------------'),
-        column(4,actionButton("addest", "Add Estimate")),
-        column(4,'-------------------')    
+        column(4,' '),
+        column(4,actionButton("addest", "Add Estimate and Save")),
+        column(4,' ')    
       )
     }
     estRows <- list(estRows, estbutton)
@@ -397,23 +400,61 @@ shinyServer(function(input, output, session) {
  })
  
  
+ observe({
+   refsToAdd = refsToAdd
+   if(is.null(input$addest) || input$addest==0) return(NULL)
+   line = dim(refsToAdd)[1]
+   refsToAdd[1, 1] = input$author
+   refsToAdd[1, 2] = input$year
+   refsToAdd[1, 3] = input$page
+   if (input$type != "Thesis") refsToAdd[1, 4] = input$journal
+   if (input$type == "Thesis") refsToAdd[1, 4] = "Dissertation"
+   refsToAdd[1, 5] = input$nestimates
+   refsToAdd[1, 6] = input$regression
+   refsToAdd[1, 7] = input$url
+   colnames(refsToAdd) = c("author", "year", "p", "journal", "n", "form", "url")
+   
+#    refName = paste(input$author, input$year, "p.", input$page, sep="")
+#    
+#    estimToAdd <- lapply(1:input$nestimates,FUN = generateEstimFile)
+#    metaToAdd = rbind(estimToAdd)
+#    colnames(metaToAdd) = c("alpha", "where", "what", "truncation", "when", "n", "r2")
+#    metaToAdd$refName = rep(refName, input$nestimates)
+   
+   s = as.character(Sys.time())
+   write.csv(refsToAdd, paste("data/ToAdd/refToAdd_session", s, ".csv", sep=""))
+   write.csv(metaToAdd, paste("data/ToAdd/metaToAdd_session", s, ".csv", sep=""))
+ })
+ 
  
 })
   
 generateEstimRows <- function(i){
   list(
     fluidRow(
-      column(2, paste("Estimation ", i, sep = "")),
-      column(2,numericInput(paste("alphaestim", i) , paste("Alpha ", i, sep = "_"), value = "1")),
-      column(4,textInput(paste("territoryestim", i), paste("Territory", i, sep = "_"), value = "Ex: France")),
-      column(4,textInput(paste("urbandefestim", i), paste("Urban Def.", i, sep = "_"), value = "Ex: SMA, Boroughs, UN agglomerations...")),
+      column(2, h5(paste("Estimation ", i, sep = ""))),
+      column(2,numericInput(paste("alphaestim", i, sep="_") , paste("Alpha ", i, sep = "_"), value = "1")),
+      column(4,textInput(paste("territoryestim", i, sep="_"), paste("Territory", i, sep = "_"), value = "Ex: France")),
+      column(4,textInput(paste("urbandefestim", i, sep="_"), paste("Urban Def.", i, sep = "_"), value = "Ex: SMA, Boroughs, UN agglomerations...")),
       column(2, " "),
-      column(4,numericInput(paste("truncestim", i), paste("Min. pop of Cities", i, sep = "_"), value = "10000")),
-      column(2,numericInput(paste("dateestim", i), paste("Date", i, sep = "_"), value = "2000")),
-      column(2,numericInput(paste("nCitiesestim", i), paste("# of cities", i, sep = "_"), value = "100")),
-      column(2,numericInput(paste("r2estim", i), paste("R2", i, sep = "_"), value = "100"))
+      column(4,numericInput(paste("truncestim", i, sep="_"), paste("Min. pop of Cities", i, sep = "_"), value = "10000")),
+      column(2,numericInput(paste("dateestim", i, sep="_"), paste("Date", i, sep = "_"), value = "2000")),
+      column(2,numericInput(paste("nCitiesestim", i, sep="_"), paste("# of cities", i, sep = "_"), value = "100")),
+      column(2,numericInput(paste("r2estim", i, sep="_"), paste("R2", i, sep = "_"), value = "100"))
     ),
     tags$hr()
   )
 }
 
+# 
+# generateEstimFile <- function(i){
+#   a = get(paste("input$alphaestim", i, sep="_"))
+#   w = get(paste("input$territoryestim", i, sep="_"))
+#   u = get(paste("input$urbandefestim", i, sep="_"))
+#   t = get(paste("input$truncestim", i, sep="_"))
+#   d = get(paste("input$dateestim", i, sep="_"))
+#   n = get(paste("input$nCitiesestim", i, sep="_"))
+#   r = get(paste("input$r2estim", i, sep="_"))
+#   row = c(a, w, u, t, d, n, r)
+#   return(row)
+# }

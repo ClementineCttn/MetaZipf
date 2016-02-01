@@ -9,7 +9,7 @@ shinyUI(
       @import url('//fonts.googleapis.com/css?family=Orbitron|Cabin:400,700');
     "))
             ),
-            headerPanel(h1("MetaZipf")),
+            headerPanel("MetaZipf"),
             #   headerPanel(),
     
   titlePanel(
@@ -150,7 +150,7 @@ shinyUI(
              and to send this data to the moderator for them to be added to the open database.",
              wellPanel(
              column(4,selectInput("type", "Document type",
-                                  choices=c("Journal Article", "Book", "Dissertation"),
+                                  choices=c("Journal Article", "Book", "Thesis"),
                                   multiple=FALSE)),
              column(4,textInput("author", "Author(s)",
                                 value = "Ex: Lotka A. J.")),
@@ -162,16 +162,15 @@ shinyUI(
              h6("*Regression forms: LOTKA = log(Pi) ~ alpha * log(Ri) + b + e(i) or PARETO = log(Ri) ~ alpha' * log(Pi) + b' + e'(i)"),
              h6("with: Pi the population of city i, Ri its rank in the urban hierarchy and alpha' = (1 / alpha)")),
           
-             fluidRow(column(4,sliderInput("nestimates", "Number of estimates",
-                                           min = 1, max = 50, value = 1)), 
-             column(4,textInput("url", "URL of document", value = "")),
-             column(4,actionButton("addref", "Add Reference"))),
+             fluidRow(column(6,sliderInput("nestimates", "Number of estimates",
+                                           min = 1, max = 100, value = 1)), 
+             column(6,textInput("url", "URL of document", value = ""))),
              tags$hr(),
              uiOutput(outputId = "nestimateRows"),
              tags$hr(),
              column(4,textInput("comment", NULL, value = "Any Comment?")),
              column(4,textInput("from", NULL, value = "Your E-mail")),
-             column(4,actionButton("sendMail", "Save data and send them."))
+             column(4,actionButton("sendMail", "Report your additions"))
      )
 )
       )
