@@ -224,13 +224,14 @@ shinyServer(function(input, output, session) {
     
     if(quali != "DECADE") {
       cols = c("#2c3e50", "#18BC9C", "#B91838", "#1e90ff")
-    p = p + scale_fill_manual(values=cols)  + scale_colour_manual(values=cols)
-    }
+     }
     
     if(quali == "DECADE") {
-      p = p + scale_fill_grey(start=0.99, end=0.01)  + scale_color_grey(start=0.99, end=0.01)
-    }
-      
+     cols = colorRampPalette(c("white", "#1e90ff", "#2c3e50"))(n = 25)
+       }
+   
+    p = p + scale_fill_manual(values=cols)  + scale_colour_manual(values=cols)
+    
     if (input$log == "TRUE") p = p + scale_y_log10()
     return(p)
   })
