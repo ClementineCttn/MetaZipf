@@ -40,7 +40,7 @@ shinyUI(
            h5("Clementine Cottineau, 2016, University College London (CASA)."),
           h5("For any information / comment / suggestion, contact: c.cottineau@ucl.ac.uk"),
            tags$hr(),
-           h6("Credits: bootswatch.com for Flatly css file.")),
+           h6("Credits: T. Park from bootswatch.com for Flatly css file")),
     
     tabPanel("Meta-Analysis",
              tabsetPanel(
@@ -61,12 +61,13 @@ shinyUI(
      tabPanel("Estimates Summary", 
               h4("Summarise estimations by:"),
                  fluidRow(
-                   column(4,selectInput("territorys", "Territory", choices=c("ALL","WORLD", "United States of America", "India", "China", "Russia", "Brazil", "South Africa", 
-                                                                             "United Kingdom", "France", "USSR", "Israel", "Japan", "Europe", "Spain", "Austria",
-                                                                           "Germany", "Sweden", "Malaysia", "Netherlands", "Turkey", "Ukraine",
-                                                                           "Canada", "Egypt", "Mexico", "Italy", "Argentina", "Denmark",
-                                                                           "Nigeria", "Poland", "Austrialia", "Balkans", "Colombia", "Greece", "Hungary", "Indonesia",
-                                                                           "Morocco", "Norway", "Romania", "Switzerland", "Venezuela"), multiple=FALSE)),
+                   column(4,selectInput("territorys", "Country", choices=c("ALL",
+                        "Algeria", "Argentina", "Australia", "Austria", "Bangladesh", "Belgium", "Brazil", "Bulgaria",
+                        "Canada", "Chile", "China", "Colombia", "Cuba", "Denmark", "Egypt", "Finland", "France", "Germany",
+                        "Greece", "Hungary", "India", "Indonesia", "Iran", "Israel", "Italy", "Japan", "Kazakhstan", "Malaysia",
+                        "Mexico", "Morocco", "Netherlands","Nigeria", "Norway", "Pakistan", "Peru", "Philippines", "Poland",
+                        "Portugal", "Romania", "Russia", "South Africa", "South Korea", "Spain", "Sweden", "Switzerland", "Taiwan",
+                        "Thailand", "Turkey", "Ukraine", "United Kingdom", "United States of America", "Venezuela", "Vietnam"), multiple=FALSE)),
                    column(4,selectInput("scales", "Urban Definition", choices=c("ALL", "Local Units" = "1_Local", "Agglomerations" = "2_Agglo", 
                                                                                "Metropolitan Areas" = "3_Metro", "Mixed Definitions" = "4_Mixed"), multiple=FALSE)),
                    column(4,selectInput("decades", "Decade", choices=c("ALL","2010s", "2000s", "1990s", "1980s", "1970s", "1960s", "1950s",
@@ -83,7 +84,7 @@ shinyUI(
               fluidRow(
                 column(4,selectInput("quanti", "Continuous variable (y)", choices=c("N", "TRUNCATION_POINT", "DATE"), multiple=FALSE)),
                 column(4,checkboxInput("log", "Log(y)", value=TRUE)),
-                column(4,selectInput("quali", "Discrete variable (colour)", choices=c("URBANSCALE", "COUNTRY", "DECADE", "ECO", "SOC", "PHYS"), multiple=FALSE)),
+                column(4,selectInput("quali", "Categorical variable (colour)", choices=c("URBANSCALE", "COUNTRY", "DECADE", "ECO", "SOC", "PHYS"), multiple=FALSE)),
                 plotOutput('plot')
               )),
               
@@ -110,15 +111,15 @@ shinyUI(
                tags$hr(), h4("Estimated Coefficients on the Variation of Alpha"),
                tableOutput('model'),
                column(4,conditionalPanel(
-                 condition = 'input.technicalSpecs.indexOf("truncation4model") != -1', 
+                 condition = 'input.technicalSpecs.indexOf("truncation4model") != -1 || input.technicalSpecs.indexOf("alltech") != -1', 
                  sliderInput("truncVal", "Truncation points (to define high, medium and low truncatures)",
                              min = 0, max = 1000000, value = c(10000, 100000)))),
                  column(4,conditionalPanel(
-                 condition = 'input.technicalSpecs.indexOf("N4model") != -1',
+                 condition = 'input.technicalSpecs.indexOf("N4model") != -1 || input.technicalSpecs.indexOf("alltech") != -1',
                  sliderInput("NVal", "Number of cities (to define large, medium and small samples)",
                              min = 1, max = 1000, value = c(30, 300)))),
                  column(4,conditionalPanel(
-                   condition = 'input.topicalSpecs.indexOf("countrySize") != -1',
+                   condition = 'input.topicalSpecs.indexOf("countrySize") != -1 || input.topicalSpecs.indexOf("alltop") != -1',
                  sliderInput("PopVal", "Thousands of Residents (to define large, medium and small countries)",
                              min = 1, max = 1000000, value = c(10000, 100000)))),
              
@@ -130,12 +131,12 @@ shinyUI(
     tabPanel("Raw Meta Data", 
              h4("Subset Table by:"),
              fluidRow(
-               column(4,selectInput("territory", "Territory", choices=c("ALL","WORLD", "United States of America", "India", "China", "Russia", "Brazil", "South Africa", 
-                                                                        "United Kingdom", "France", "USSR", "Israel", "Japan", "Europe", "Spain", "Austria",
-                                                                        "Germany", "Sweden", "Malaysia", "Netherlands", "Turkey", "Ukraine",
-                                                                        "Canada", "Egypt", "Mexico", "Italy", "Argentina", "Denmark",
-                                                                        "Nigeria", "Poland", "Austrialia", "Balkans", "Colombia", "Greece", "Hungary", "Indonesia",
-                                                                        "Morocco", "Norway", "Romania", "Switzerland", "Venezuela"), multiple=FALSE)),
+               column(4,selectInput("territory", "Country", choices=c("ALL","Algeria", "Argentina", "Australia", "Austria", "Bangladesh", "Belgium", "Brazil", "Bulgaria",
+                                                                        "Canada", "Chile", "China", "Colombia", "Cuba", "Denmark", "Egypt", "Finland", "France", "Germany",
+                                                                        "Greece", "Hungary", "India", "Indonesia", "Iran", "Israel", "Italy", "Japan", "Kazakhstan", "Malaysia",
+                                                                        "Mexico", "Morocco", "Netherlands","Nigeria", "Norway", "Pakistan", "Peru", "Philippines", "Poland",
+                                                                        "Portugal", "Romania", "Russia", "South Africa", "South Korea", "Spain", "Sweden", "Switzerland", "Taiwan",
+                                                                        "Thailand", "Turkey", "Ukraine", "United Kingdom", "United States of America", "Venezuela", "Vietnam"), multiple=FALSE)),
                column(4,selectInput("scale", "Urban Definition", choices=c("ALL", "Local Units" = "1_Local", "Agglomerations" = "2_Agglo", 
                                                                            "Metropolitan Areas" = "3_Metro", "Mixed Definitions" = "4_Mixed"), multiple=FALSE)),
                column(4,selectInput("decade", "Decade", choices=c("ALL","2010s", "2000s", "1990s", "1980s", "1970s", "1960s", "1950s",
@@ -145,9 +146,9 @@ shinyUI(
                                                                   "1700s", "1600s"), multiple=FALSE))),
              dataTableOutput('review')))),    
     tabPanel("Contribute !",
-             h3("Add your own reviewed estimates:"), 
-             "Please remember to press buttons to add the reference and the estimates, 
-             and to send this data to the moderator for them to be added to the open database.",
+             h1("Add your own reviewed estimates:"), 
+             h5("Please remember to press buttons to add the reference and the estimates, 
+             and to send this data to the moderator for them to be added to the open database."),
              wellPanel(
              column(4,selectInput("type", "Document type",
                                   choices=c("Journal Article", "Book", "Thesis"),
