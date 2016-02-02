@@ -1101,12 +1101,12 @@ textarea {
   line-height: inherit;
 }
 a {
-  color: #1e90ff;
+  color: #517293 ;
   text-decoration: none;
 }
 a:hover,
 a:focus {
-  color: #1e90ff;
+  color: #517293;
   text-decoration: underline;
 }
 a:focus {
@@ -1273,7 +1273,7 @@ h1,
   }
 h2,
 .h2 {
-  font-size: 32px;
+  font-size: 19px;
  }
 h3,
 .h3 {
@@ -1282,7 +1282,8 @@ h3,
 }
 h4,
 .h4 {
-  font-size: 19px;
+  font-size: 26px;
+  color: #18BC9C;
 }
 h5,
 .h5 {
@@ -3556,7 +3557,7 @@ tbody.collapse.in {
   height: 1px;
   margin: 9.5px 0;
   overflow: hidden;
-  background-color: #e5e5e5;
+  background-color: # v;
 }
 .dropdown-menu > li > a {
   display: block;

@@ -13,7 +13,7 @@ shinyUI(
             #   headerPanel(),
     
   titlePanel(
-             h4("Interactive and Open Meta Analysis of Zipf's law for cities")),
+             h2("Interactive and Open Meta Analysis of Zipf's law for cities")),
   
   navlistPanel(
     
@@ -45,21 +45,21 @@ shinyUI(
     tabPanel("Meta-Analysis",
              tabsetPanel(
       tabPanel("Literature Overview",
-             h3('TOP journals where the estimations* are drawn from:'),  
+             h4('TOP journals where the estimations* are drawn from:'),  
             dataTableOutput('topjournals'),
             '*Each reference count as one, irrespective of the number of estimations',  tags$hr(),
-            h3('TOP authors* providing estimations:'), 
+            h4('TOP authors* providing estimations:'), 
             dataTableOutput('topauthors'),
             '*the estimations published by the same author(s) in different publications are not added.',   tags$hr(),
-            h3('TOP countries for the dispersion of results*:'),
+            h4('TOP countries for the dispersion of results*:'),
             dataTableOutput('topcountries'),
             '*measured by the standard deviation of alpha for countries with more than 5 estimations.',  tags$hr(),
-            h3("Complete list of references:"), dataTableOutput('references'),
+            h4("Complete list of references:"), dataTableOutput('references'),
             h6("Nitsch, V. (2005). Zipf zipped. Journal of Urban Economics, 57(1), 86-100. Total population in thousands, from UN estimates (1950-2015) <http://esa.un.org/unpd/wpp/DVD/Files/1_Excel%20(Standard)/EXCEL_FILES/1_Population/WPP2015_POP_F01_1_TOTAL_POPULATION_BOTH_SEXES.XLS.>")
             ),
     
      tabPanel("Estimates Summary", 
-              h3("Summarise estimations by:"),
+              h4("Summarise estimations by:"),
                  fluidRow(
                    column(4,selectInput("territorys", "Territory", choices=c("ALL","WORLD", "United States of America", "India", "China", "Russia", "Brazil", "South Africa", 
                                                                              "United Kingdom", "France", "USSR", "Israel", "Japan", "Europe", "Spain", "Austria",
@@ -79,7 +79,7 @@ shinyUI(
                    plotOutput('histalpha')
                    ),
               tags$hr(),
-              h3("Visualise variation of alpha with:"),
+              h4("Visualise variation of alpha with:"),
               fluidRow(
                 column(4,selectInput("quanti", "Continuous variable (y)", choices=c("N", "TRUNCATION_POINT", "DATE"), multiple=FALSE)),
                 column(4,checkboxInput("log", "Log(y)", value=TRUE)),
@@ -89,7 +89,7 @@ shinyUI(
               
              
                tabPanel("Meta Analysis",
-             h3("Select Features to Test in the Meta Analysis"),
+             h4("Select Features to Test in the Meta Analysis"),
              fluidRow(
                column(4,checkboxGroupInput("technicalSpecs", "Technical Specifications", 
                                            c("All" = "alltech",
@@ -105,9 +105,9 @@ shinyUI(
                                            c("All" = "allother",
                                              "Journal Subject" = "discipline", "", ""), selected = NULL, inline = FALSE)),
                tags$hr(),
-               h3("Results of the Regression of Alpha by the Selected Features."),
+               h4("Results of the Regression of Alpha by the Selected Features."),
                tableOutput('modelparameters'),
-               tags$hr(), h3("Estimated Coefficients on the Variation of Alpha"),
+               tags$hr(), h4("Estimated Coefficients on the Variation of Alpha"),
                tableOutput('model'),
                column(4,conditionalPanel(
                  condition = 'input.technicalSpecs.indexOf("truncation4model") != -1', 
@@ -128,7 +128,7 @@ shinyUI(
              )),
     
     tabPanel("Raw Meta Data", 
-             h3("Subset Table by:"),
+             h4("Subset Table by:"),
              fluidRow(
                column(4,selectInput("territory", "Territory", choices=c("ALL","WORLD", "United States of America", "India", "China", "Russia", "Brazil", "South Africa", 
                                                                         "United Kingdom", "France", "USSR", "Israel", "Japan", "Europe", "Spain", "Austria",

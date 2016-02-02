@@ -24,7 +24,7 @@ SummaryMeta = function(table, regression = "Lotka"){
   minAlpha = round(min(tab$ALPHA),3)
   maxAlpha = round(max(tab$ALPHA),3)
   estimations = dim(tab)[[1]]
-  pct_Local = round(dim(subset(tab, URBANSCALE == "1_Local"))[[1]] / estimations * 100,1)
+  #pct_Local = round(dim(subset(tab, URBANSCALE == "1_Local"))[[1]] / estimations * 100,1)
   pct_Agglo = round(dim(subset(tab, URBANSCALE == "2_Agglo"))[[1]] / estimations * 100,1)
   pct_Metro = round(dim(subset(tab, URBANSCALE == "3_Metro"))[[1]] / estimations * 100,1)
   t1 = subset(tab, !is.na(N))
@@ -35,14 +35,15 @@ SummaryMeta = function(table, regression = "Lotka"){
   names = c("Number of estimations", "Number of references", "Number of years covered", 
             "Mean Alpha", "Median Alpha", "Standard Deviation Alpha", 
             "Mininimum Alpha", "Maximum Alpha", 
-            "% of estimations with political Units (local)", 
+            #"% of estimations with political Units (local)", 
             "% of estimations with Built-up areas (agglo)", 
             "% of estimations with Functional Areas (metro)",
             "Median Number of observations", 
             "Median Truncation Point for population")
   summ = data.frame(estimations, references, duration, 
                        meanAlpha, medianAlpha, sdAlpha, minAlpha, maxAlpha, 
-                       pct_Local, pct_Agglo, pct_Metro,
+                       #pct_Local, 
+                    pct_Agglo, pct_Metro,
                        medianN, medianTruncation)
   Summary = data.frame(cbind(names,t(summ)))
   colnames(Summary) = c("Descriptor", "Value")
@@ -217,9 +218,18 @@ shinyServer(function(input, output, session) {
     tab = subset(tab, !is.na(quanti))
     tab = subset(tab, !is.na(Category))
     
-    p = ggplot(tab, aes(y = quanti, x = ALPHA, colour = Category)) +  geom_vline(xintercept=1, size=1, col="grey25") +
+    
+    p = ggplot(tab, aes(y = quanti, x = ALPHA, fill = Category, colour = Category)) +  geom_vline(xintercept=1, size=1, col="#2c3e50") +
       geom_point() +   labs(y = quanti, x = "alpha") 
-   
+    
+    if(quali != "DECADE") {
+      cols = c("#2c3e50", "#18BC9C", "#B91838", "#1e90ff")
+    p = p + scale_fill_manual(values=cols)  + scale_colour_manual(values=cols)
+    }
+    
+    if(quali == "DECADE") {
+      p = p + scale_fill_grey(start=0.99, end=0.01)  + scale_color_grey(start=0.99, end=0.01)
+    }
       
     if (input$log == "TRUE") p = p + scale_y_log10()
     return(p)
@@ -358,8 +368,8 @@ shinyServer(function(input, output, session) {
     }
     
     histo = ggplot(tab, aes(x = ALPHA)) + 
-      geom_histogram(binwidth = 0.05, color = "dodgerblue3", fill = "dodgerblue3") +  
-      labs(x = "alpha", y = "frequency") +  geom_vline(xintercept=1, size=1, col="grey25") 
+      geom_histogram(binwidth = 0.05, color = "#18BC9C", fill = "#18BC9C") +  
+      labs(x = "alpha", y = "frequency") +  geom_vline(xintercept=1, size=1, col="#2c3e50") 
         
     return(histo)
   })
