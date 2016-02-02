@@ -21,13 +21,18 @@ shinyUI(
              column(3, img(src = "favicon.png",class="img-responsive")),
              column(9, h1("Interactive Meta-analysis of Empirical Zipf's Estimates")), br(),
             tags$p(class="text-justify",
-            "This application aims at presenting a meta-analysis of Zipf's law estimations from the literature in an interactive way. Following the meta-analysis proposed by V. Nitsch in 2005, 
-                  and extending the pool of papers reviewed, it gives access to the database and specifications used.",  br(),   br(),  
-             "The idea is to allow interactive queries and to represent the variation of empiricial estimations of Zipf's 
-                  law in the literature. This meta-analysis relates the variation of Zipf's estimated coefficients with 
-                urban characteristics (age of the system, economic development) and with the specifications of the regression used (urban definitions,
-              truncation points, number of cities) to unveil systematic deviations from the iconic -1 slope.", br(),   br(),
-             "The current database covers 1135 estimations from 61 studies, spanning more than 80 countries over 400 years. It is available here: https://github.com/ClementineCttn/MetaZipf."),
+            "This application aims at presenting a meta-analysis of Zipf's law estimations from the literature in an interactive way. 
+Following the work of V. Nitsch (2005), it extends the pool of papers reviewed (initially and through crowdsourcing) and gives access 
+            to the database used.",  br(),   br(),  
+             "The idea is to allow interactive queries into this pool of papers, to represent and to model the variation of empiricial estimations of Zipf's 
+                  law's exponent in the literature, with respect to the systems of cities studied. Indeed, this meta-analysis 
+        considers urban characteristics (age of the system, total population), the specifications of the regression used (urban definitions,
+              truncation points, number of cities) and meta-informations (discipline of the journal publishing the paper) 
+            to unveil systematic deviations from the iconic -1 value.", br(),   br(),
+             "The current database covers 1135 estimations from 61 studies, spanning more than 80 countries over 400 years. 
+            It is available for download at this address (https://github.com/ClementineCttn/MetaZipf) and the user of this application
+            is strongly invited to enrich this database by submitting their own empirical estimates using the 'Contribute !' tab on the left.", br(),   br(),
+            "Before starting, choose a regression form into which all subsequent results will be expressed."),
                       
             tags$hr(),
             
@@ -68,7 +73,7 @@ shinyUI(
                         "Mexico", "Morocco", "Netherlands","Nigeria", "Norway", "Pakistan", "Peru", "Philippines", "Poland",
                         "Portugal", "Romania", "Russia", "South Africa", "South Korea", "Spain", "Sweden", "Switzerland", "Taiwan",
                         "Thailand", "Turkey", "Ukraine", "United Kingdom", "United States of America", "Venezuela", "Vietnam"), multiple=FALSE)),
-                   column(4,selectInput("scales", "Urban Definition", choices=c("ALL", "Local Units" = "1_Local", "Agglomerations" = "2_Agglo", 
+                   column(4,selectInput("scales", "Urban Definition*", choices=c("ALL", "Local Units" = "1_Local", "Agglomerations" = "2_Agglo", 
                                                                                "Metropolitan Areas" = "3_Metro", "Mixed Definitions" = "4_Mixed"), multiple=FALSE)),
                    column(4,selectInput("decades", "Decade", choices=c("ALL","2010s", "2000s", "1990s", "1980s", "1970s", "1960s", "1950s",
                                                                      "1940s", "1930s", "1920s", "1910s", "1900s", "1890s", "1880s",
@@ -76,6 +81,9 @@ shinyUI(
                                                                      "1800s", "1790s", "1780s", "1770s", "1760s", "1750s", 
                                                                      "1700s", "1600s"), multiple=FALSE)),
                    dataTableOutput('summary'),
+                   h6('* The Urban Definition refers to the way cities are defined: locally as political units, morphologically as built-up agglomeration, 
+                   functionally as metropolitan areas or a mix of these.'),
+                   
                    tags$hr(),
                    plotOutput('histalpha')
                    ),
@@ -105,8 +113,7 @@ shinyUI(
                column(4,checkboxGroupInput("otherSpecs", "Other Specifications", 
                                            c("All" = "allother",
                                              "Journal Subject" = "discipline", "", ""), selected = NULL, inline = FALSE)),
-               tags$hr(),
-               h4("Results of the Regression of Alpha by the Selected Features."),
+               tags$hr(),h4("Results of the Regression of Alpha by the Selected Features."),
                tableOutput('modelparameters'),
                tags$hr(), h4("Estimated Coefficients on the Variation of Alpha"),
                tableOutput('model'),
