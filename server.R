@@ -414,13 +414,20 @@ shinyServer(function(input, output, session) {
    refsToAdd[1, 7] = input$url
    colnames(refsToAdd) = c("author", "year", "p", "journal", "n", "form", "url")
    
-#    refName = paste(input$author, input$year, "p.", input$page, sep="")
-#    
-#    estimToAdd <- lapply(1:input$nestimates,FUN = generateEstimFile)
-#    metaToAdd = rbind(estimToAdd)
-#    colnames(metaToAdd) = c("alpha", "where", "what", "truncation", "when", "n", "r2")
-#    metaToAdd$refName = rep(refName, input$nestimates)
+    refName = paste(input$author, input$year, "p.", input$page, sep="")
+    
+   r = input$nestimates
    
+    estimToAdd <- lapply(1:r, function(i) {c(input[[paste0("alphaestim_",i)]],
+       input[[paste0("territoryestim_",i)]],input[[paste0("urbandefestim_",i)]],
+       input[[paste0("truncestim_",i)]],input[[paste0("dateestim_",i)]],
+       input[[paste0("nCitiesestim_",i)]],input[[paste0("r2estim_",i)]])})
+   
+    metaToAdd = as.data.frame(t(as.data.frame(estimToAdd)))
+     colnames(metaToAdd) = c("alpha", "where", "what", "truncation", "when", "n", "r2")
+    rownames(metaToAdd) = 1:r
+    metaToAdd$ref = refName
+     
    s = as.character(Sys.time())
    write.csv(refsToAdd, paste("data/ToAdd/refToAdd_session", s, ".csv", sep=""))
    write.csv(metaToAdd, paste("data/ToAdd/metaToAdd_session", s, ".csv", sep=""))
@@ -446,15 +453,3 @@ generateEstimRows <- function(i){
   )
 }
 
-# 
-# generateEstimFile <- function(i){
-#   a = get(paste("input$alphaestim", i, sep="_"))
-#   w = get(paste("input$territoryestim", i, sep="_"))
-#   u = get(paste("input$urbandefestim", i, sep="_"))
-#   t = get(paste("input$truncestim", i, sep="_"))
-#   d = get(paste("input$dateestim", i, sep="_"))
-#   n = get(paste("input$nCitiesestim", i, sep="_"))
-#   r = get(paste("input$r2estim", i, sep="_"))
-#   row = c(a, w, u, t, d, n, r)
-#   return(row)
-# }

@@ -158,7 +158,7 @@ shinyUI(
              column(4,textInput("journal", "Journal / Book Title", value = "")),
              column(4,numericInput("page", "Page of Results", value = "1")),
              column(4,selectInput("regression", "Regression Form*",
-                                  choices=c("LOTKA", "PARETO"), multiple=FALSE)),
+                                  choices=c("LOTKA", "PARETO"), multiple=FALSE)), br(),
              h6("*Regression forms: LOTKA = log(Pi) ~ alpha * log(Ri) + b + e(i) or PARETO = log(Ri) ~ alpha' * log(Pi) + b' + e'(i)"),
              h6("with: Pi the population of city i, Ri its rank in the urban hierarchy and alpha' = (1 / alpha)")),
           
