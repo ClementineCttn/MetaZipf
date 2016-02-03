@@ -29,18 +29,21 @@ Following the work of V. Nitsch (2005), it extends the pool of papers reviewed (
         considers urban characteristics (age of the system, total population), the specifications of the regression used (urban definitions,
               truncation points, number of cities) and meta-informations (discipline of the journal publishing the paper) 
             to unveil systematic deviations from the iconic -1 value.", br(),   br(),
-             "The current database covers 1135 estimations from 61 studies, spanning more than 80 countries over 400 years. 
-            It is available for download at this address (https://github.com/ClementineCttn/MetaZipf) and the user of this application
-            is strongly invited to enrich this database by submitting their own empirical estimates using the 'Contribute !' tab on the left.", br(),   br(),
+             HTML('The current database covers 1135 estimations from 61 studies, spanning more than 80 countries over 400 years. 
+            It is available for download at this address (<a href="https://github.com/ClementineCttn/MetaZipf">https://github.com/ClementineCttn/MetaZipf</a>) and the user of this application
+            is strongly invited to enrich this database by submitting their own empirical estimates using the \'Contribute !\' tab on the left.'), br(),   br(),
             "Before starting, choose a regression form into which all subsequent results will be expressed."),
                       
             tags$hr(),
             
             fluidRow(column(6,selectInput("alpha", "I prefer results to be expressed in the regression form of:", choices=c("Lotka", "Pareto"), multiple=FALSE)),
             column(6,
-             h6("The Lotka form : log(Pi) ~ alpha * log(Ri) + b + e(i)"),
-             h6("The Pareto form : log(Ri) ~ alpha' * log(Pi) + b' + e'(i)"),
-             h6("with: Pi the population of city i, Ri its rank in the urban hierarchy and alpha' = (1 / alpha)"))),
+                   withMathJax(h6("The Lotka form : $$\\log(P_i) = \\alpha \\times \\log(R_i) + \\beta + \\epsilon_i$$")),
+                   withMathJax(h6("The Pareto form : $$\\log(R_i) = \\alpha' \\times \\log(P_i) + \\beta' + \\epsilon'_i$$")),
+             withMathJax(h6("with: \\(P_i\\) the population of city \\(i\\),
+                            \\(R_i\\) its rank in the urban hierarchy,
+                            \\(\\alpha' = \\frac{1}{\\alpha}\\) and
+                            \\(\\beta' = -\\frac{\\beta}{\\alpha}\\)")))),
             tags$hr(),
            h5("Clementine Cottineau, 2016, University College London (CASA)."),
           h5("For any information / comment / suggestion, contact: c.cottineau@ucl.ac.uk"),

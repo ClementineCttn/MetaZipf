@@ -3,6 +3,8 @@ library(ggplot2)
 library(RColorBrewer)
 library(plyr)
 library(shiny)
+library(sendmailR)
+
 
 SubsetMeta = function(table, attribute, value, operator="=="){
   tab = table
@@ -57,11 +59,6 @@ stdDev = function(x){sd(as.numeric(x), na.rm=TRUE)}
 meta = read.csv("data/zipf_meta.csv", sep=",", dec=".")
 meta$TOTAL_POP = as.numeric(meta$TOTAL_POP)
 refs = read.csv("data/zipf_refs.csv", sep=",", dec=".")
-
-
-metaToAdd = data.frame()
-refsToAdd = data.frame()
-
 
 
 
@@ -399,50 +396,42 @@ shinyServer(function(input, output, session) {
     
   })
   
+  observeEvent(input$sendMail,{
+    req(input$from, input$comment)
+    from <- paste("<",input$from, ">", sep="") # strange format right
+    to <- "<c.cottineau@ucl.ac.uk>"
+    subject <- "My contribution to MetaZipf"
+    msg = paste("Dear Clementine, I have added some estimations to MetaZipf.", input$comment , sep = "\n")
+    sendmail(input$from, to, subject, msg)
+  })
  
- observe({
-   if(is.null(input$send) || input$send==0) return(NULL)
-   from <- isolate(input$from)
-   to <- "c.cottineau@ucl.ac.uk"
-   subject <- "My contribution to MetaZipf"
-   comment <- isolate(input$comment)
-   msg = paste("Dear Clementine, I have added some estimations to MetaZipf.", comment , sep = "\n")
-   sendmail(from, to, subject, msg)
- })
- 
- 
- observe({
-   refsToAdd = refsToAdd
-   if(is.null(input$addest) || input$addest==0) return(NULL)
-   line = dim(refsToAdd)[1]
-   refsToAdd[1, 1] = input$author
-   refsToAdd[1, 2] = input$year
-   refsToAdd[1, 3] = input$page
-   if (input$type != "Thesis") refsToAdd[1, 4] = input$journal
-   if (input$type == "Thesis") refsToAdd[1, 4] = "Dissertation"
-   refsToAdd[1, 5] = input$nestimates
-   refsToAdd[1, 6] = input$regression
-   refsToAdd[1, 7] = input$url
-   colnames(refsToAdd) = c("author", "year", "p", "journal", "n", "form", "url")
-   
-    refName = paste(input$author, input$year, "p.", input$page, sep="")
+  observeEvent(input$addest,{
+    req(input$author, input$year)
+    refToAdd <- data.frame("author" = input$author,  year = input$year, "p" = input$page,
+                            "journal" = ifelse(input$type == "Thesis",
+                                               "Dissertation", input$journal),
+                            "n" = input$nestimates, "form" = input$regression,
+                            "url" = input$url, stringsAsFactors = FALSE)
+    refName <- paste(input$author, input$year, "p.", input$page, sep="")
     
-   r = input$nestimates
-   
-    estimToAdd <- lapply(1:r, function(i) {c(input[[paste0("alphaestim_",i)]],
-       input[[paste0("territoryestim_",i)]],input[[paste0("urbandefestim_",i)]],
-       input[[paste0("truncestim_",i)]],input[[paste0("dateestim_",i)]],
-       input[[paste0("nCitiesestim_",i)]],input[[paste0("r2estim_",i)]])})
-   
-    metaToAdd = as.data.frame(t(as.data.frame(estimToAdd)))
-     colnames(metaToAdd) = c("alpha", "where", "what", "truncation", "when", "n", "r2")
-    rownames(metaToAdd) = 1:r
+    estimToAdd <- lapply(1:input$nestimates, function(i) {
+      c(input[[paste0("alphaestim_",i)]],
+        input[[paste0("territoryestim_",i)]],
+        input[[paste0("urbandefestim_",i)]],
+        input[[paste0("truncestim_",i)]],
+        input[[paste0("dateestim_",i)]],
+        input[[paste0("nCitiesestim_",i)]],
+        input[[paste0("r2estim_",i)]]
+        )
+      })
+    metaToAdd <- as.data.frame(t(as.data.frame(estimToAdd, stringsAsFactors = FALSE)), stringsAsFactors = FALSE)
+    colnames(metaToAdd) <- c("alpha", "where", "what", "truncation", "when", "n", "r2")
     metaToAdd$ref = refName
-     
-   s = as.character(Sys.time())
-   write.csv(refsToAdd, paste("data/ToAdd/refToAdd_session", s, ".csv", sep=""))
-   write.csv(metaToAdd, paste("data/ToAdd/metaToAdd_session", s, ".csv", sep=""))
- })
+    
+    s = as.character(Sys.time())
+    write.csv(refToAdd, paste("data/ToAdd/refToAdd_session", s, ".csv", sep=""), row.names = FALSE)
+    write.csv(metaToAdd, paste("data/ToAdd/metaToAdd_session", s, ".csv", sep=""), row.names = FALSE)
+  }) 
  
  
 })
