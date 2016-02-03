@@ -399,7 +399,7 @@ shinyServer(function(input, output, session) {
   observeEvent(input$sendMail,{
     req(input$from, input$comment)
     from <- paste("<",input$from, ">", sep="") # strange format right
-    to <- "<robin.cura@gmail.com>"
+    to <- "<c.cottineau@ucl.ac.uk>"
     subject <- "My contribution to MetaZipf"
     msg = paste("Dear Clementine, I have added some estimations to MetaZipf.", input$comment , sep = "\n")
     sendmail(input$from, to, subject, msg)
