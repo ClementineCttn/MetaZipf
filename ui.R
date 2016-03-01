@@ -29,7 +29,7 @@ Following the work of V. Nitsch (2005), it extends the pool of papers reviewed (
         considers urban characteristics (age of the system, total population), the specifications of the regression used (urban definitions,
               truncation points, number of cities) and meta-informations (discipline of the journal publishing the paper) 
             to unveil systematic deviations from the iconic -1 value.", br(),   br(),
-             HTML('The current database covers 1135 estimations from 61 studies, spanning more than 80 countries over 400 years. 
+             HTML('The current database covers 1152 estimations from 62 studies, spanning more than 80 countries over 400 years. 
             It is available for download at this address (<a href="https://github.com/ClementineCttn/MetaZipf">https://github.com/ClementineCttn/MetaZipf</a>) and the user of this application
             is strongly invited to enrich this database by submitting their own empirical estimates using the \'Contribute !\' tab on the left.'), br(),   br(),
             "Before starting, choose a regression form into which all subsequent results will be expressed."),
