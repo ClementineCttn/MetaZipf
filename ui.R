@@ -36,7 +36,8 @@ Following the work of V. Nitsch (2005), it extends the pool of papers reviewed (
                       
             tags$hr(),
             
-            fluidRow(column(6,selectInput("alpha", "I prefer results to be expressed in the regression form of:", choices=c("Lotka", "Pareto"), multiple=FALSE)),
+            fluidRow(column(6,selectInput("alpha", "I prefer results to be expressed in the regression form of:", 
+                                          choices=c("Lotka", "Pareto"), multiple=FALSE)),
             column(6,
                    withMathJax(h6("The Lotka form : $$\\log(P_i) = \\alpha \\times \\log(R_i) + \\beta + \\epsilon_i$$")),
                    withMathJax(h6("The Pareto form : $$\\log(R_i) = \\alpha' \\times \\log(P_i) + \\beta' + \\epsilon'_i$$")),
@@ -134,7 +135,8 @@ Following the work of V. Nitsch (2005), it extends the pool of papers reviewed (
                              min = 1, max = 1000000, value = c(10000, 100000)))),
              
                textOutput('REFS'),
-               h6("N.B. 'Old' continents refer to zones of early urbanisation, in Europe, South-East Asia and the Middle East. America, Oceania, Africa and central Asia are considered 'New' in that respect.")
+               h6("N.B. 'Old' continents refer to zones of early urbanisation, in Europe, South-East Asia and the Middle East. America, Oceania, Africa and central Asia are considered 'New' in that respect.
+                  \n 'ECO' refers to estimations published in journals classified in Economics according to the Chicago Journal Ranking. 'SOC' stands for Social Science and 'PHYS' for environmental and physical sciences journals. A journal can belong to one or more categories.")
                
              )),
     
@@ -175,13 +177,13 @@ Following the work of V. Nitsch (2005), it extends the pool of papers reviewed (
           
              fluidRow(column(6,sliderInput("nestimates", "Number of estimates",
                                            min = 1, max = 100, value = 1)), 
-             column(6,textInput("url", "URL of document", value = ""))),
+             column(6,textInput("contributor", "Your Name", value = ""))),
              tags$hr(),
-             uiOutput(outputId = "nestimateRows"),
-             tags$hr(),
-             column(4,textInput("comment", NULL, value = "Any Comment?")),
-             column(4,textInput("from", NULL, value = "Your E-mail")),
-             column(4,actionButton("sendMail", "Report your additions"))
+             uiOutput(outputId = "nestimateRows")#,
+          #   tags$hr(),
+          #   column(4,textInput("comment", NULL, value = "Any Comment?")),
+          #   column(4,textInput("from", NULL, value = "Your E-mail")),
+           #  column(4,actionButton("sendMail", "Report your additions"))
      )
 )
       )

@@ -273,6 +273,7 @@ shinyServer(function(input, output, session) {
      tab = subset(tab, URBANISATION != "")
      regressants = paste(regressants, " + URBANISATION", sep="")}
    if ('countrySize' %in% TopicalSpecs == "TRUE") {
+     tab = subset(tab, !is.na(TOTAL_POP))
      tab = subset(tab, TOTAL_POP > 0)
      tab$COUNTRY_SIZE = as.factor(ifelse(tab$TOTAL_POP <= input$PopVal[[1]], " Small", ifelse(tab$TOTAL_POP >= input$PopVal[[2]], " Large", " Medium")))
      regressants = paste(regressants, " + COUNTRY_SIZE", sep="")}
@@ -380,77 +381,121 @@ shinyServer(function(input, output, session) {
   observe({
     req(input$nestimates)
     estRows <- lapply(1:input$nestimates,FUN = generateEstimRows)
-    if (input$nestimates > 1){
       estbutton <- fluidRow(
-        column(4,' '),
-        column(4,actionButton("addest", "Add Estimates and Save")),
-        column(4,' ')    
-      )
-    } else {
-      estbutton <- fluidRow(
-        column(4,' '),
-        column(4,actionButton("addest", "Add Estimate and Save")),
-        column(4,' ')    
-      )
-    }
-    estRows <- list(estRows, estbutton)
+       column(2,actionButton("addest", "Save")),
+        conditionalPanel(
+          condition = "input.addest == 1", 
+           column(10,downloadButton("downloadTables", "Download and THEN PLEASE send the file to: c.cottineau@ucl.ac.uk"))))
+     estRows <- list(estRows, estbutton)
     output$nestimateRows <- renderUI({
       do.call(fluidPage, estRows)
     })
     
   })
+ #  
+ # 
+ # observe({
+ #   if(is.null(input$send) || input$send==0) return(NULL)
+ #   from <- isolate(input$from)
+ #   to <- "c.cottineau@ucl.ac.uk"
+ #   subject <- "My contribution to MetaZipf"
+ #   comment <- isolate(input$comment)
+ #   msg = paste("Dear Clementine, I have added some estimations to MetaZipf.", comment , sep = "\n")
+ #   sendmail(from, to, subject, msg)
+ # })
+ # 
+ # 
   
- 
- observe({
-   if(is.null(input$send) || input$send==0) return(NULL)
-   from <- isolate(input$from)
-   to <- "c.cottineau@ucl.ac.uk"
-   subject <- "My contribution to MetaZipf"
-   comment <- isolate(input$comment)
-   msg = paste("Dear Clementine, I have added some estimations to MetaZipf.", comment , sep = "\n")
-   sendmail(from, to, subject, msg)
- })
- 
- 
- observe({
-   refsToAdd = refsToAdd
-   if(is.null(input$addest) || input$addest==0) return(NULL)
-   line = dim(refsToAdd)[1]
-   refsToAdd[1, 1] = input$author
-   refsToAdd[1, 2] = input$year
-   refsToAdd[1, 3] = input$page
-   if (input$type != "Thesis") refsToAdd[1, 4] = input$journal
-   if (input$type == "Thesis") refsToAdd[1, 4] = "Dissertation"
-   refsToAdd[1, 5] = input$nestimates
-   refsToAdd[1, 6] = input$regression
-   refsToAdd[1, 7] = input$url
-   colnames(refsToAdd) = c("author", "year", "p", "journal", "n", "form", "url")
-   
+  datasetInput <- reactive({
+    refsToAdd = refsToAdd
+    if(is.null(input$addest) || input$addest==0) return(NULL)
+    line = dim(refsToAdd)[1]
+    refsToAdd[1, 1] = input$author
+    refsToAdd[1, 2] = input$year
+    refsToAdd[1, 3] = input$page
+    if (input$type != "Thesis") refsToAdd[1, 4] = input$journal
+    if (input$type == "Thesis") refsToAdd[1, 4] = "Dissertation"
+    refsToAdd[1, 5] = input$nestimates
+    refsToAdd[1, 6] = input$regression
+    colnames(refsToAdd) = c("author", "year", "p", "journal", "n", "form")
+    
     refName = paste(input$author, input$year, "p.", input$page, sep="")
     
-   r = input$nestimates
-   
+    r = input$nestimates
+    
     estimToAdd <- lapply(1:r, function(i) {c(input[[paste0("alphaestim_",i)]],
-       input[[paste0("territoryestim_",i)]],input[[paste0("urbandefestim_",i)]],
-       input[[paste0("truncestim_",i)]],input[[paste0("dateestim_",i)]],
-       input[[paste0("nCitiesestim_",i)]],input[[paste0("r2estim_",i)]])})
-   
+                                             input[[paste0("territoryestim_",i)]],input[[paste0("urbandefestim_",i)]],
+                                             input[[paste0("truncestim_",i)]],input[[paste0("dateestim_",i)]],
+                                             input[[paste0("nCitiesestim_",i)]],input[[paste0("r2estim_",i)]])})
+    
     metaToAdd = as.data.frame(t(as.data.frame(estimToAdd)))
-     colnames(metaToAdd) = c("alpha", "where", "what", "truncation", "when", "n", "r2")
+    if(input$alpha == "Lotka") {
+    colnames(metaToAdd) = c("alphaLOTKA", "where", "what", "truncation", "when", "n", "r2")
+    metaToAdd$alphaPARETO = 1/metaToAdd$alphaLOTKA
+    } else {
+      colnames(metaToAdd) = c("alphaPARETO", "where", "what", "truncation", "when", "n", "r2")
+      metaToAdd$alphaLOTKA  = 1/metaToAdd$alphaPARETO
+    }
     rownames(metaToAdd) = 1:r
     metaToAdd$ref = refName
-     
-   s = as.character(Sys.time())
-#   gs_copy(refsToAdd, to = paste0("Ref", s))
-#   gs_copy(metaToAdd, to = paste0("Meta", s))   
-   
-   write.csv(refsToAdd, paste("data/ToAdd/refToAdd_session", s, ".csv", sep=""))
-   write.csv(metaToAdd, paste("data/ToAdd/metaToAdd_session", s, ".csv", sep=""))
- })
- 
- 
-})
+    return(metaToAdd)
+   # write.csv(refsToAdd, paste("data/ToAdd/refToAdd_session", s, ".csv", sep=""))
+   # write.csv(metaToAdd, paste("data/ToAdd/metaToAdd_session", s, ".csv", sep=""))
+    
+  })
   
+#  observe({
+#    refsToAdd = refsToAdd
+#    if(is.null(input$addest) || input$addest==0) return(NULL)
+#    line = dim(refsToAdd)[1]
+#    refsToAdd[1, 1] = input$author
+#    refsToAdd[1, 2] = input$year
+#    refsToAdd[1, 3] = input$page
+#    if (input$type != "Thesis") refsToAdd[1, 4] = input$journal
+#    if (input$type == "Thesis") refsToAdd[1, 4] = "Dissertation"
+#    refsToAdd[1, 5] = input$nestimates
+#    refsToAdd[1, 6] = input$regression
+#    refsToAdd[1, 7] = input$url
+#    colnames(refsToAdd) = c("author", "year", "p", "journal", "n", "form", "url")
+#    
+#     refName = paste(input$author, input$year, "p.", input$page, sep="")
+#     
+#    r = input$nestimates
+#    
+#     estimToAdd <- lapply(1:r, function(i) {c(input[[paste0("alphaestim_",i)]],
+#        input[[paste0("territoryestim_",i)]],input[[paste0("urbandefestim_",i)]],
+#        input[[paste0("truncestim_",i)]],input[[paste0("dateestim_",i)]],
+#        input[[paste0("nCitiesestim_",i)]],input[[paste0("r2estim_",i)]])})
+#    
+#     metaToAdd = as.data.frame(t(as.data.frame(estimToAdd)))
+#      colnames(metaToAdd) = c("alpha", "where", "what", "truncation", "when", "n", "r2")
+#     rownames(metaToAdd) = 1:r
+#     metaToAdd$ref = refName
+#      
+#    s = as.character(Sys.time())
+# #   gs_copy(refsToAdd, to = paste0("Ref", s))
+# #   gs_copy(metaToAdd, to = paste0("Meta", s))   
+#    write.csv(refsToAdd, paste("data/ToAdd/refToAdd_session", s, ".csv", sep=""))
+#    write.csv(metaToAdd, paste("data/ToAdd/metaToAdd_session", s, ".csv", sep=""))
+#  })
+#  
+#  
+#  
+#  
+ output$downloadTables <- downloadHandler(
+   filename = function() {
+     s = as.character(Sys.time())
+     you = input$contributor
+     paste("metaToAdd_", you, "_session", s, ".csv", sep='')
+   },
+   content = function(file) {
+    write.csv(datasetInput(), file)
+   }
+ )
+
+ })
+
+
 generateEstimRows <- function(i){
   list(
     fluidRow(
