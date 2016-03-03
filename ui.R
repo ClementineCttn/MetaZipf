@@ -19,17 +19,16 @@ shinyUI(
     
     tabPanel("Presentation",
              column(3, img(src = "favicon.png",class="img-responsive")),
-             column(9, h1("Interactive Meta-analysis of Empirical Zipf's Estimates")), br(),
+             column(9, h1("Interactive and Open Meta-analysis of Empirical Zipf's Estimates")), br(),
             tags$p(class="text-justify",
-            "This application aims at presenting a meta-analysis of Zipf's law estimations from the literature in an interactive way. 
-Following the work of V. Nitsch (2005), it extends the pool of papers reviewed (initially and through crowdsourcing) and gives access 
-            to the database used.",  br(),   br(),  
+            "This application aims at presenting a crowdsourced meta-analysis of Zipf's law estimations from the literature in an interactive way. 
+Following the work of V. Nitsch (2005), it extends the pool of papers reviewed (initially and through crowdsourcing) and shares access 
+            to the database collectively created to enhance its representativity across dates, areas and study fields.",  br(),   br(),  
              "The idea is to allow interactive queries into this pool of papers, to represent and to model the variation of empiricial estimations of Zipf's 
                   law's exponent in the literature, with respect to the systems of cities studied. Indeed, this meta-analysis 
         considers urban characteristics (age of the system, total population), the specifications of the regression used (urban definitions,
-              truncation points, number of cities) and meta-informations (discipline of the journal publishing the paper) 
-            to unveil systematic deviations from the iconic -1 value.", br(),   br(),
-             HTML('The current database covers 1152 estimations from 62 studies, spanning more than 80 countries over 400 years. 
+              truncation points, number of cities) and meta-informations (discipline of the journal publishing the paper) to unveil systematic deviations from the iconic -1 value.", br(),   br(),
+             HTML('The current database covers 1152 estimations from 62 studies, spanning over more than 80 countries over 400 years. 
             It is available for download at this address (<a href="https://github.com/ClementineCttn/MetaZipf">https://github.com/ClementineCttn/MetaZipf</a>) and the user of this application
             is strongly invited to enrich this database by submitting their own empirical estimates using the \'Contribute !\' tab on the left.'), br(),   br(),
             "Before starting, choose a regression form into which all subsequent results will be expressed."),
@@ -53,7 +52,7 @@ Following the work of V. Nitsch (2005), it extends the pool of papers reviewed (
     
     tabPanel("Meta-Analysis",
              tabsetPanel(
-      tabPanel("Literature Overview",
+      tabPanel("1. Literature Overview",
              h4('TOP journals where the estimations* are drawn from:'),  
             dataTableOutput('topjournals'),
             '*Each reference count as one, irrespective of the number of estimations',  tags$hr(),
@@ -67,7 +66,7 @@ Following the work of V. Nitsch (2005), it extends the pool of papers reviewed (
             h6("Nitsch, V. (2005). Zipf zipped. Journal of Urban Economics, 57(1), 86-100. Total population in thousands, from UN estimates (1950-2015) <http://esa.un.org/unpd/wpp/DVD/Files/1_Excel%20(Standard)/EXCEL_FILES/1_Population/WPP2015_POP_F01_1_TOTAL_POPULATION_BOTH_SEXES.XLS.>")
             ),
     
-     tabPanel("Estimates Summary", 
+     tabPanel("2. Estimates Summary", 
               h4("Summarise estimations by:"),
                  fluidRow(
                    column(4,selectInput("territorys", "Country", choices=c("ALL",
@@ -101,7 +100,7 @@ Following the work of V. Nitsch (2005), it extends the pool of papers reviewed (
               )),
               
              
-               tabPanel("Meta Analysis",
+               tabPanel("3. Meta Analysis",
              h4("Select Features to Test in the Meta Analysis"),
              fluidRow(
                column(4,checkboxGroupInput("technicalSpecs", "Technical Specifications", 
@@ -140,7 +139,7 @@ Following the work of V. Nitsch (2005), it extends the pool of papers reviewed (
                
              )),
     
-    tabPanel("Raw Meta Data", 
+    tabPanel("4. Raw Meta Data", 
              h4("Subset Table by:"),
              fluidRow(
                column(4,selectInput("territory", "Country", choices=c("ALL","Algeria", "Argentina", "Australia", "Austria", "Bangladesh", "Belgium", "Brazil", "Bulgaria",
