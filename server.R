@@ -482,7 +482,7 @@ metaTableSelected <- reactive({
   output$downloadData <- downloadHandler(
     filename = "MetaZipf_Selection.csv",
     content = function(file) {
-      write.csv(metaTableSelected(), filename)
+      write.csv(metaTableSelected(), file)
     }
   )
   
@@ -494,7 +494,7 @@ metaTableSelected <- reactive({
      paste("metaToAdd_", you, "_session", s, ".csv", sep='')
    },
    content = function(file) {
-    write.csv(datasetInput(), filename)
+    write.csv(datasetInput(), file)
    }
  )
 
