@@ -81,7 +81,7 @@ shinyServer(function(input, output, session) {
     d = refs[refs$IN_HERE == 1,c("AUTHOR", "YEAR", "JOURNAL", "PAGE", "N_ESTIM", "REGRESSIONFORM")]
     colnames(d) = c("Author", "Year", "Journal", "Page", "Estimations", "Regression")
     return(d)
-  }, options = list(pageLength = 10))
+  }, options = list(pageLength = 10, paging = FALSE))
   
   output$topjournals= renderDataTable({
     ntop = input$top

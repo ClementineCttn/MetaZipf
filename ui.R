@@ -131,6 +131,18 @@ h3("References:"), dataTableOutput('references')),
                    ),
              
                tabPanel("4. Meta Analysis",
+                        br(),
+                        "Let's test quantitatively some assumptions about the relation between estimated alphas
+                        with some characteristics of the urban system (territory, population, age, type of cities) 
+                        and with potential biases (city definition, discipline, etc.).",
+                        
+                        tags$hr(),
+                        "We use a multiple linear regression which regresses the value of alpha against the value of these other characteristics Y of the estimation i.",
+                        withMathJax(h6("$$\\alpha_i = Intercept + b * Y_i $$")),
+                        "We then analyse the values of the coefficients b. For comparability reasons,
+                        most of the characteristics Y that we consider have been discretised (you can define the bounds of the different categories at the bottom of the page).",
+                        tags$hr(),
+                        
              h4("Select Features to Test in the Meta Analysis"),
              fluidRow(
                column(4,checkboxGroupInput("technicalSpecs", "Technical Specifications", 
