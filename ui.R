@@ -54,7 +54,7 @@ h3("References:"), dataTableOutput('references')),
     tabPanel("Meta-Analysis",
              tabsetPanel(
                
-               tabPanel("1. Raw Data", 
+               tabPanel("1. Data", 
                         h4("What is the Data for a MetaAnalysis?"),
                         "In a MetaAnalysis of Zipf for cities, we do not work directly with the cities' data.
   Instead, we use the estimations made by other researchers in published papers. The data is thus made by the result of their 
@@ -63,26 +63,28 @@ h3("References:"), dataTableOutput('references')),
                          withMathJax(h6("$$\\log(P_i) = \\alpha \\times \\log(R_i) + \\beta + \\epsilon_i$$ $$\\log(R_i) = \\alpha' \\times \\log(P_i) + \\beta' + \\epsilon'_i$$ ")),  
                         h2("TERRITORY"), "The geographical extent from which cities were selected. For example: The Netherlands in Brakman et al. (1999). When available (i.e. between 1950 and 2015 for countries), the population of the territory was added.", br(),
                         h2("DATE & DECADE"), "The date (and decade) to which the cities' population refer.  For example: 1600 in Bretagnolle et al. (2000).", br(), 
-                        h2("AGE OF URBANISATION"), "An indication whether urbanisation is a relatively recent or ancient phenomenon in the territory.  For example: 'OLD' for China.", 
+                        h2("URBAN AGE"), "An indication whether urbanisation is a relatively recent or ancient phenomenon in the territory.  For example: 'OLD' for China.", 
                         " 'OLD' continents refer to zones of early urbanisation, in Europe, South-East Asia and the Middle East. America, Oceania, Africa and central Asia are considered 'NEW' in that respect.",
-                        h2("N CITIES"), "The number of cities used to estimate Zipf's coefficient. For example: 60 cities in Lepetit (1990).", br(),  
+                        h2("NUMBER OF CITIES"), "The number of cities used to estimate Zipf's coefficient. For example: 60 cities in Lepetit (1990).", br(),  
                         h2("CITY DEFINITION"), "The criteria used to identify cities. For example: MorphoCity in Guerin-Pace (1995).", br(), 
                         "LocalUnits correspond to administrative units. MorphoCities are aggregations of Local units based on density orthe built-up area. 
                         MetroAreas correspond to functional aggregations of Local units based on flows (typically commuters). 
                         VariaMixed indicate that the definition is either not uniform either uncommon.", br(), 
                         h2("POPULATION CUTOFF"), "The minimum population of the cities selected. For example: 5000 residents in Parr (1985).", br(),  
-                        h2("R2"), "The coefficient of Determination of the regression, indicating the quality of the fit. For example: 99% in Bretagnolle et al. (2008).", br(),  
-                        h2("REFERENCE"), "The reference from which the estimation is taken. For example: Singer (1936).", br(),  
-                        h2("JOURNAL SUBJECT"), "The disciplines in which the journal is recognised, according to the Chicago Journal Ranking SJR. For example: 'ECO' for the Quarterly Journal of Economics.", br(),  
-                        "ECO' refers to estimations published in journals classified in Economics, 'SOC' stands for Social Science and 'PHYS' for environmental and physical sciences journals. A journal can belong to one or more categories.",br(), br(), 
-                        h4("Raw Data"),
+                        h2("DISCIPLINE"), "The disciplines in which the journal is recognised, according to the Chicago Journal Ranking SJR. For example: 'ECO' for the Quarterly Journal of Economics.", br(),  
+                        "ECO' refers to estimations published in journals classified in Economics, 'SOC' stands for Social Science and 'PHYS' for environmental and physical sciences journals. A journal can belong to one or more categories.",br(), 
+                        h2("R2"), "The coefficient of Determination of the regression, indicating the quality of the fit. For example: 99% in Bretagnolle et al. (2008).", br(),  br(), 
+                        #h2("REFERENCE"), "The reference from which the estimation is taken. For example: Singer (1936).", br(),  
+                        h4("Data"),
                         h2("Subset Table by:"),
                         fluidRow(
                           column(4,selectizeInput("territory", "Country", "", multiple=T)),
                           column(4,selectizeInput("scale", "Urban Definition*", "", multiple=T)),
-                          column(4,selectizeInput("decade", "Decade", "", multiple=T))),
-                        
+                          column(4,selectizeInput("decade", "Decade", "", multiple=T)),
+                          column(3,downloadButton("downloadData", "Download")), 
+                                 column(9, HTML('N.B. This table is a simplified version. You can find the full version here <a href="here">https://github.com/ClementineCttn/MetaZipf</a>'))),
                         dataTableOutput('review')
+                                     
                         
                ),    
 
@@ -138,7 +140,7 @@ h3("References:"), dataTableOutput('references')),
                                              "Country Population" = "countrySize"), selected = NULL, inline = FALSE)),
                column(4,checkboxGroupInput("otherSpecs", "Other Specifications", 
                                            c("All" = "allother",
-                                             "Journal Subject" = "discipline", "", ""), selected = NULL, inline = FALSE)),
+                                             "Discipline" = "discipline", "", ""), selected = NULL, inline = FALSE)),
                tags$hr(),h4("Results of the Regression of Alpha by the Selected Features."),
                tableOutput('modelparameters'),
                tags$hr(), h4("Estimated Coefficients on the Variation of Alpha"),

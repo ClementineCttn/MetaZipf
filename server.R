@@ -127,7 +127,7 @@ shinyServer(function(input, output, session) {
   })
   
   
-  output$review = renderDataTable({
+metaTableSelected <- reactive({
     tab = meta
     if (input$alpha == "Lotka") tab$ALPHA = tab$ALPHALOTKA
     if (input$alpha  == "Pareto") tab$ALPHA = tab$ALPHAPARETO
@@ -135,20 +135,37 @@ shinyServer(function(input, output, session) {
     terr = input$territory
     dec = input$decade
     def = input$scale
- 
+    
     if(length(terr) >= 1) tab = tab[tab$TERRITORY %in% terr,]
     if(length(dec) >= 1) tab = tab[tab$DECADE %in% dec,]
     if(length(def) >= 1) tab = tab[tab$URBANSCALE %in% def,]
     
     tab = tab[order(tab$DATE),]
     
-    tab = tab[,c("ALPHA", "TERRITORY", "DATE", "N", "URBANSCALE", "R2", "REFERENCE", "URBANDEF", "TRUNCATION", "GEOZONE")]
+    tab[tab$ECO == 1 & tab$SOC == 0 & tab$PHYS == 0, "DISCIPLINE"] = "ECO"
+    tab[tab$ECO == 1 & tab$SOC == 1 & tab$PHYS == 0, "DISCIPLINE"] = "ECO & SOC"
+    tab[tab$ECO == 1 & tab$SOC == 0 & tab$PHYS == 1, "DISCIPLINE"] = "ECO & PHYS"
+    tab[tab$ECO == 1 & tab$SOC == 1 & tab$PHYS == 1, "DISCIPLINE"] = "ECO, SOC & PHYS"
+    tab[tab$ECO == 0 & tab$SOC == 1 & tab$PHYS == 0, "DISCIPLINE"] = "SOC"
+    tab[tab$ECO == 0 & tab$SOC == 1 & tab$PHYS == 1, "DISCIPLINE"] = "SOC & PHYS"
+    tab[tab$ECO == 0 & tab$SOC == 0 & tab$PHYS == 1, "DISCIPLINE"] = "PHYS"
+    
+    tab$ALPHA = round(tab$ALPHA, 3)
+    tab = tab[,c("ALPHA", "TERRITORY", "DATE", "URBANISATION",
+                 "N", "URBANSCALE", "TRUNCATION", "DISCIPLINE", "R2", "REFERENCE")]
+    colnames(tab) = c("Alpha", "Territory", "Date", "Urban Age", 
+                      "Number of Cities", "City Definition", "Population Cutoff", 
+                      "Discipline", "R2", "Reference")
     return(tab)
-  }, options = list(paging = FALSE))
+  })
   
- 
- 
- 
+  
+  output$review = renderDataTable({
+    tab = metaTableSelected()
+     return(tab)
+  }, options = list(paging = FALSE, searching = FALSE))
+  
+
  
  
   output$summary = renderDataTable({
@@ -461,6 +478,15 @@ shinyServer(function(input, output, session) {
 #  
 #  
 #  
+  
+  output$downloadData <- downloadHandler(
+    filename = "MetaZipf_Selection.csv",
+    content = function(file) {
+      write.csv(metaTableSelected(), filename)
+    }
+  )
+  
+  
  output$downloadTables <- downloadHandler(
    filename = function() {
      s = as.character(Sys.time())
@@ -468,7 +494,7 @@ shinyServer(function(input, output, session) {
      paste("metaToAdd_", you, "_session", s, ".csv", sep='')
    },
    content = function(file) {
-    write.csv(datasetInput(), file)
+    write.csv(datasetInput(), filename)
    }
  )
 
