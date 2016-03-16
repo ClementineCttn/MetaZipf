@@ -416,20 +416,12 @@ shinyServer(function(input, output, session) {
      if(is.null(inFile))
       return(NULL)
     updateSelectInput(session, "territorys", choices = c(sort(unique(as.character(inFile$TERRITORY)))))
-  })
-  observe({
-    inFile<-meta
-    if(is.null(inFile))
-      return(NULL)
     updateSelectInput(session, "scales", choices = c(sort(unique(as.character(inFile$URBANSCALE)))))
+    updateSelectInput(session, "scales", choices = c(sort(unique(as.character(inFile$URBANSCALE)))))
+    updateSelectInput(session, "territory", choices = c(sort(unique(as.character(inFile$TERRITORY)))))
+    updateSelectInput(session, "scale", choices = c(sort(unique(as.character(inFile$URBANSCALE)))))
+    updateSelectInput(session, "scale", choices = c(sort(unique(as.character(inFile$URBANSCALE)))))
   })
-  observe({
-    inFile<-meta
-    if(is.null(inFile))
-      return(NULL)
-    updateSelectInput(session, "decades", choices = c(sort(unique(as.character(inFile$DECADE)))))
-  })
-  
 #  observe({
 #    refsToAdd = refsToAdd
 #    if(is.null(input$addest) || input$addest==0) return(NULL)
