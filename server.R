@@ -43,10 +43,10 @@ SummaryMetaMeta = function(table, regression = "Lotka"){
   medianTruncation = median(t2$TRUNCATION_POINT)
   
   names = c("Number of references", "Number of years covered", 
-             "% of estimations with Built-up areas (MorphoCity)", 
-            "% of estimations with Functional Areas (MetroArea)",
-            "Median Number of observations", 
-            "Median Truncation Point for population")
+             "% of estimations with MorphoCity", 
+            "% of estimations with MetroArea",
+            "Median Number of Cities", 
+            "Median Population Cutoff")
   summ = data.frame(references, duration, 
                     pct_Agglo, pct_Metro,
                     medianN, medianTruncation)

@@ -104,25 +104,31 @@ h3("References:"), dataTableOutput('references')),
              
             ),
     
-     tabPanel("3. Estimates Summary", 
+     tabPanel("3. Estimates Summary",
+              
+              br(),
+              "Although Zipf's Law states that alpha should be equal to 1,
+              empirical estimations are found to be distributed widely around this value. 
+              Our meta analysis precisely looks for explanations for this diversity, by relating the value
+              of alpha to some characteristics of the urban system (territory, population, age, type of cities) 
+              and to potential biases (city definition, discipline, etc.).",
+              
+              tags$hr(),
+              h4("Distribution of estimations"),
               h2("Subset by:"),
               fluidRow(
                 column(4,selectizeInput("territorys", "Territory", "", multiple=T)),
                 column(4,selectizeInput("scales", "City Definition", "", multiple=T)),
                 column(4,selectizeInput("decades", "Decade", "", multiple=T)),
-                  tags$hr(),
-                
-              h4("Distribution of estimations"),
-              plotOutput('histalpha'),
+                        plotOutput('histalpha')), br(), 
+              tags$hr(),
               tags$hr(),
                     h4("Summary Statistics"),
-              column(6,dataTableOutput('summaryAlpha')),
-              column(6,dataTableOutput('summaryMeta')),
-              
-                   tags$hr()
+              fluidRow( 
+                column(6,dataTableOutput('summaryAlpha')),
+              column(6,dataTableOutput('summaryMeta')))
+            
                    ),
-              tags$hr()),
-              
              
                tabPanel("4. Meta Analysis",
              h4("Select Features to Test in the Meta Analysis"),
@@ -160,14 +166,14 @@ h3("References:"), dataTableOutput('references')),
                textOutput('REFS'),
                h6("N.B. 'Old' continents refer to zones of early urbanisation, in Europe, South-East Asia and the Middle East. America, Oceania, Africa and central Asia are considered 'New' in that respect.
                   \n 'ECO' refers to estimations published in journals classified in Economics according to the Chicago Journal Ranking. 'SOC' stands for Social Science and 'PHYS' for environmental and physical sciences journals. A journal can belong to one or more categories.")
-               ,
-               h4("Visualise variation of alpha with:"),
-               fluidRow(
-                 column(4,selectInput("quanti", "Continuous variable (y)", choices=c("N", "TRUNCATION_POINT", "DATE"), multiple=FALSE)),
-                 column(4,checkboxInput("log", "Log(y)", value=TRUE)),
-                 column(4,selectInput("quali", "Categorical variable (colour)", choices=c("URBANSCALE", "COUNTRY", "DECADE", "ECO", "SOC", "PHYS"), multiple=FALSE)),
-                 plotOutput('plot')
-               )
+               # ,
+               # h4("Visualise variation of alpha with:"),
+               # fluidRow(
+               #   column(4,selectInput("quanti", "Continuous variable (y)", choices=c("N", "TRUNCATION_POINT", "DATE"), multiple=FALSE)),
+               #   column(4,checkboxInput("log", "Log(y)", value=TRUE)),
+               #   column(4,selectInput("quali", "Categorical variable (colour)", choices=c("URBANSCALE", "COUNTRY", "DECADE", "ECO", "SOC", "PHYS"), multiple=FALSE)),
+               #   plotOutput('plot')
+               # )
              ))
      )),
     
