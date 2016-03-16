@@ -28,7 +28,7 @@ shinyUI(
                   law's exponent in the literature, with respect to the systems of cities studied. Indeed, this meta-analysis 
         considers urban characteristics (age of the system, total population), the specifications of the regression used (urban definitions,
               truncation points, number of cities) and meta-informations (discipline of the journal publishing the paper) to unveil systematic deviations from the iconic -1 value.", br(),   br(),
-             HTML('The current database covers 1152 estimations from 62 studies, spanning over more than 80 countries over 400 years. 
+             HTML('The current database covers 1151 estimations from 59 studies, spanning over more than 80 countries over 400 years. 
             It is available for download at this address (<a href="https://github.com/ClementineCttn/MetaZipf">https://github.com/ClementineCttn/MetaZipf</a>) and the user of this application
             is strongly invited to enrich this database by submitting their own empirical estimates using the \'Contribute !\' tab on the left.'), br(),   br(),
             "Before starting, choose a regression form into which all subsequent results will be expressed."),
@@ -46,15 +46,16 @@ shinyUI(
                             \\(\\beta' = -\\frac{\\beta}{\\alpha}\\)")))),
             tags$hr(),
            h5("Clementine Cottineau, 2016, University College London (CASA)."),
-          h5("For any information / comment / suggestion, contact: c.cottineau@ucl.ac.uk"),
-           tags$hr(),
-           h6("Credits: T. Park from bootswatch.com for Flatly css file. R. Cura for technical help. E. Arcaute and M. Batty for overall design.")),
+          h6("For any information / comment / suggestion, contact: c.cottineau@ucl.ac.uk"),
+h6("Credits: T. Park from bootswatch.com for Flatly css file. R. Cura for technical help. E. Arcaute and M. Batty for overall design."),
+tags$hr(),
+h3("References:"), dataTableOutput('references')),
     
     tabPanel("Meta-Analysis",
              tabsetPanel(
                
                tabPanel("1. Raw Data", 
-                        h4("What is the Data for s MetaAnalysis?"),
+                        h4("What is the Data for a MetaAnalysis?"),
                         "In a MetaAnalysis of Zipf for cities, we do not work directly with the cities' data.
   Instead, we use the estimations made by other researchers in published papers. The data is thus made by the result of their 
                         analysis along with the description of how they made the analysis. Each observation in our case is thus
@@ -73,7 +74,7 @@ shinyUI(
                         h2("R2"), "The coefficient of Determination of the regression, indicating the quality of the fit. For example: 99% in Bretagnolle et al. (2008).", br(),  
                         h2("REFERENCE"), "The reference from which the estimation is taken. For example: Singer (1936).", br(),  
                         h2("JOURNAL SUBJECT"), "The disciplines in which the journal is recognised, according to the Chicago Journal Ranking SJR. For example: 'ECO' for the Quarterly Journal of Economics.", br(),  
-                        "ECO' refers to estimations published in journals classified in Economics, 'SOC' stands for Social Science and 'PHYS' for environmental and physical sciences journals. A journal can belong to one or more categories.",
+                        "ECO' refers to estimations published in journals classified in Economics, 'SOC' stands for Social Science and 'PHYS' for environmental and physical sciences journals. A journal can belong to one or more categories.",br(), br(), 
                         h4("Raw Data"),
                         h2("Subset Table by:"),
                         fluidRow(
@@ -81,7 +82,9 @@ shinyUI(
                           column(4,selectizeInput("scale", "Urban Definition*", "", multiple=T)),
                           column(4,selectizeInput("decade", "Decade", "", multiple=T))),
                         
-                        dataTableOutput('review')),    
+                        dataTableOutput('review')
+                        
+               ),    
 
                
       tabPanel("2. Literature Overview",
@@ -94,7 +97,6 @@ shinyUI(
             h4('TOP countries for the dispersion of results*:'),
             dataTableOutput('topcountries'),
             '*measured by the standard deviation of alpha for countries with more than 5 estimations.',  tags$hr(),
-            h4("Complete list of references:"), dataTableOutput('references'),
             h6("Nitsch, V. (2005). Zipf zipped. Journal of Urban Economics, 57(1), 86-100. Total population in thousands, from UN estimates (1950-2015) <http://esa.un.org/unpd/wpp/DVD/Files/1_Excel%20(Standard)/EXCEL_FILES/1_Population/WPP2015_POP_F01_1_TOTAL_POPULATION_BOTH_SEXES.XLS.>")
             ),
     
