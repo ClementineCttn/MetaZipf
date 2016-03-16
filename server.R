@@ -4,15 +4,6 @@ library(RColorBrewer)
 library(plyr)
 library(shiny)
 
-SubsetMeta = function(table, attribute, value, operator="=="){
-  tab = table
-  tab$att = tab[,attribute]
-  #tab = subset(tab, !is.na(att))
-  if (operator=="==") sub = subset(tab, att == value)
-  if (operator==">=") sub = subset(tab, att >= value)
-  if (operator=="<=") sub = subset(tab, att <= value)
-  return(sub)
-}
 
 SummaryMeta = function(table, regression = "Lotka"){
   tab = table
@@ -144,15 +135,9 @@ shinyServer(function(input, output, session) {
     dec = input$decade
     def = input$scale
  
-    if(terr != "ALL") {
-     tab = SubsetMeta(table = tab, attribute = "TERRITORY", value = terr)
-    }
-    if(dec != "ALL") {
-      tab = SubsetMeta(table = tab, attribute = "DECADE", value = dec)
-          }
-    if(def != "ALL") {
-      tab = SubsetMeta(table = tab, attribute = "URBANSCALE", value = def)
-    }
+    if(length(terr) >= 1) tab = tab[tab$TERRITORY %in% terr,]
+    if(length(dec) >= 1) tab = tab[tab$DECADE %in% dec,]
+    if(length(def) >= 1) tab = tab[tab$URBANSCALE %in% def,]
     
     tab = tab[order(tab$DATE),]
     
@@ -176,15 +161,10 @@ shinyServer(function(input, output, session) {
     def = input$scales
     reg = input$alpha
     
-    if(terr != "ALL") {
-      tab = SubsetMeta(table = tab, attribute = "TERRITORY", value = terr)
-    }
-    if(dec != "ALL") {
-      tab = SubsetMeta(table = tab, attribute = "DECADE", value = dec)
-    }
-    if(def != "ALL") {
-      tab = SubsetMeta(table = tab, attribute = "URBANSCALE", value = def)
-    }
+    if(length(terr) >= 1) tab = tab[tab$TERRITORY %in% terr,]
+    if(length(dec) >= 1) tab = tab[tab$DECADE %in% dec,]
+    if(length(def) >= 1) tab = tab[tab$URBANSCALE %in% def,]
+    
     summaryA = SummaryMeta(table = tab, regression = reg)
     return(summaryA)
   }, options = list(paging = FALSE, searching = FALSE))
@@ -194,21 +174,14 @@ shinyServer(function(input, output, session) {
     if (input$alpha == "Lotka") tab$ALPHA = tab$ALPHALOTKA
     if (input$alpha == "Pareto") tab$ALPHA = tab$ALPHAPARETO
     
-    
     terr = input$territorys
     dec = input$decades
     def = input$scales
     reg = input$alpha
     
-    if(terr != "ALL") {
-      tab = SubsetMeta(table = tab, attribute = "TERRITORY", value = terr)
-    }
-    if(dec != "ALL") {
-      tab = SubsetMeta(table = tab, attribute = "DECADE", value = dec)
-    }
-    if(def != "ALL") {
-      tab = SubsetMeta(table = tab, attribute = "URBANSCALE", value = def)
-    }
+    if(length(terr) >= 1) tab = tab[tab$TERRITORY %in% terr,]
+    if(length(dec) >= 1) tab = tab[tab$DECADE %in% dec,]
+    if(length(def) >= 1) tab = tab[tab$URBANSCALE %in% def,]
     
     quanti = input$quanti
     quali = input$quali
@@ -354,22 +327,15 @@ shinyServer(function(input, output, session) {
     if (input$alpha == "Lotka") tab$ALPHA = tab$ALPHALOTKA
     if (input$alpha == "Pareto") tab$ALPHA = tab$ALPHAPARETO
     
-    
     terr = input$territorys
     dec = input$decades
     def = input$scales
     reg = input$alpha
-    
-    if(terr != "ALL") {
-      tab = SubsetMeta(table = tab, attribute = "TERRITORY", value = terr)
-    }
-    if(dec != "ALL") {
-      tab = SubsetMeta(table = tab, attribute = "DECADE", value = dec)
-    }
-    if(def != "ALL") {
-      tab = SubsetMeta(table = tab, attribute = "URBANSCALE", value = def)
-    }
-    
+
+    if(length(terr) >= 1) tab = tab[tab$TERRITORY %in% terr,]
+    if(length(dec) >= 1) tab = tab[tab$DECADE %in% dec,]
+    if(length(def) >= 1) tab = tab[tab$URBANSCALE %in% def,]
+
     histo = ggplot(tab, aes(x = ALPHA)) + 
       geom_histogram(binwidth = 0.05, color = "#18BC9C", fill = "#18BC9C") +  
       labs(x = "alpha", y = "frequency") +  geom_vline(xintercept=1, size=1, col="#2c3e50") 
@@ -449,7 +415,19 @@ shinyServer(function(input, output, session) {
     inFile<-meta
      if(is.null(inFile))
       return(NULL)
-    updateSelectInput(session, "scales", choices = c("ALL", unique(as.character(inFile$URBANSCALE))))
+    updateSelectInput(session, "territorys", choices = c(sort(unique(as.character(inFile$TERRITORY)))))
+  })
+  observe({
+    inFile<-meta
+    if(is.null(inFile))
+      return(NULL)
+    updateSelectInput(session, "scales", choices = c(sort(unique(as.character(inFile$URBANSCALE)))))
+  })
+  observe({
+    inFile<-meta
+    if(is.null(inFile))
+      return(NULL)
+    updateSelectInput(session, "decades", choices = c(sort(unique(as.character(inFile$DECADE)))))
   })
   
 #  observe({
