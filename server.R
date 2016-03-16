@@ -444,6 +444,14 @@ shinyServer(function(input, output, session) {
     
   })
   
+  
+  observe({
+    inFile<-meta
+     if(is.null(inFile))
+      return(NULL)
+    updateSelectInput(session, "scales", choices = c("ALL", unique(as.character(inFile$URBANSCALE))))
+  })
+  
 #  observe({
 #    refsToAdd = refsToAdd
 #    if(is.null(input$addest) || input$addest==0) return(NULL)

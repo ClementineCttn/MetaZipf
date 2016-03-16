@@ -21,9 +21,9 @@ shinyUI(
              column(3, img(src = "favicon.png",class="img-responsive")),
              column(9, h1("Interactive and Open Meta-analysis of Empirical Zipf's Estimates")), br(),
             tags$p(class="text-justify",
-            "This application aims at presenting a crowdsourced meta-analysis of Zipf's law estimations from the literature in an interactive way. 
-Following the work of V. Nitsch (2005), it extends the pool of papers reviewed (initially and through crowdsourcing) and shares access 
-            to the database collectively created to enhance its representativity across dates, areas and study fields.",  br(),   br(),  
+            "This application aims at presenting a crowdsourced meta-analysis of Zipf's law estimations from the literature in an interactive way. ",  br(), br(), 
+"Following the work of V. Nitsch (2005), it extends the pool of papers reviewed (initially and through crowdsourcing) and shares access 
+            to the database to enhance its represenjtativity across dates, areas and study fields.",  br(),   br(),  
              "The idea is to allow interactive queries into this pool of papers, to represent and to model the variation of empiricial estimations of Zipf's 
                   law's exponent in the literature, with respect to the systems of cities studied. Indeed, this meta-analysis 
         considers urban characteristics (age of the system, total population), the specifications of the regression used (urban definitions,
@@ -48,7 +48,7 @@ Following the work of V. Nitsch (2005), it extends the pool of papers reviewed (
            h5("Clementine Cottineau, 2016, University College London (CASA)."),
           h5("For any information / comment / suggestion, contact: c.cottineau@ucl.ac.uk"),
            tags$hr(),
-           h6("Credits: T. Park from bootswatch.com for Flatly css file")),
+           h6("Credits: T. Park from bootswatch.com for Flatly css file. R. Cura for technical help. E. Arcaute and M. Batty for overall design.")),
     
     tabPanel("Meta-Analysis",
              tabsetPanel(
@@ -76,8 +76,7 @@ Following the work of V. Nitsch (2005), it extends the pool of papers reviewed (
                         "Mexico", "Morocco", "Netherlands","Nigeria", "Norway", "Pakistan", "Peru", "Philippines", "Poland",
                         "Portugal", "Romania", "Russia", "South Africa", "South Korea", "Spain", "Sweden", "Switzerland", "Taiwan",
                         "Thailand", "Turkey", "Ukraine", "United Kingdom", "United States of America", "Venezuela", "Vietnam"), multiple=FALSE)),
-                   column(4,selectInput("scales", "Urban Definition*", choices=c("ALL", "Local Units" = "1_Local", "Agglomerations" = "2_Agglo", 
-                                                                               "Metropolitan Areas" = "3_Metro", "Mixed Definitions" = "4_Mixed"), multiple=FALSE)),
+                   column(4,selectizeInput("scales", "Urban Definition*", "", multiple=FALSE)),
                    column(4,selectInput("decades", "Decade", choices=c("ALL","2010s", "2000s", "1990s", "1980s", "1970s", "1960s", "1950s",
                                                                      "1940s", "1930s", "1920s", "1910s", "1900s", "1890s", "1880s",
                                                                      "1870s", "1860s", "1850s", "1840s", "1830s", "1820s", "1810s", 
