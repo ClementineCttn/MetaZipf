@@ -1,21 +1,40 @@
-
 library(ggplot2)
 library(RColorBrewer)
 library(plyr)
 library(shiny)
 
 
-SummaryMeta = function(table, regression = "Lotka"){
+
+meta = read.csv("data/zipf_meta.csv", sep=",", dec=".")
+meta$TOTAL_POP = as.numeric(meta$TOTAL_POP)
+refs = read.csv("data/zipf_refs.csv", sep=",", dec=".")
+
+metaToAdd = data.frame()
+refsToAdd = data.frame()
+
+
+SummaryMetaAlpha = function(table, regression = "Lotka"){
   tab = table
-  references = length(list(unique(tab$REFERENCE))[[1]])
-  duration = max(tab$DATE) - min(tab$DATE)
   meanAlpha = round(mean(tab$ALPHA),3)
   medianAlpha = round(median(tab$ALPHA),3)
   sdAlpha = round(sd(tab$ALPHA),3)
   minAlpha = round(min(tab$ALPHA),3)
   maxAlpha = round(max(tab$ALPHA),3)
   estimations = dim(tab)[[1]]
-  #pct_Local = round(dim(subset(tab, URBANSCALE == "1_Local"))[[1]] / estimations * 100,1)
+  names = c("Number of estimations", 
+            "Mean Alpha", "Median Alpha", "Standard Deviation Alpha", 
+            "Mininimum Alpha", "Maximum Alpha")
+  summ = data.frame(estimations,meanAlpha, medianAlpha, sdAlpha, minAlpha, maxAlpha)
+  Summary = data.frame(cbind(names,t(summ)))
+  colnames(Summary) = c("Statistics for Alpha", "Value")
+  return(Summary)
+}
+
+SummaryMetaMeta = function(table, regression = "Lotka"){
+  tab = table
+  references = length(list(unique(tab$REFERENCE))[[1]])
+  duration = max(tab$DATE) - min(tab$DATE)
+  estimations = dim(tab)[[1]]
   pct_Agglo = round(dim(subset(tab, URBANSCALE == "MorphoCity"))[[1]] / estimations * 100,1)
   pct_Metro = round(dim(subset(tab, URBANSCALE == "MetroArea"))[[1]] / estimations * 100,1)
   t1 = subset(tab, !is.na(N))
@@ -23,41 +42,37 @@ SummaryMeta = function(table, regression = "Lotka"){
   medianN = median(t1$N)
   medianTruncation = median(t2$TRUNCATION_POINT)
   
-  names = c("Number of estimations", "Number of references", "Number of years covered", 
-            "Mean Alpha", "Median Alpha", "Standard Deviation Alpha", 
-            "Mininimum Alpha", "Maximum Alpha", 
-            #"% of estimations with political Units (local)", 
-            "% of estimations with Built-up areas (MorphoCity)", 
+  names = c("Number of references", "Number of years covered", 
+             "% of estimations with Built-up areas (MorphoCity)", 
             "% of estimations with Functional Areas (MetroArea)",
             "Median Number of observations", 
             "Median Truncation Point for population")
-  summ = data.frame(estimations, references, duration, 
-                       meanAlpha, medianAlpha, sdAlpha, minAlpha, maxAlpha, 
-                       #pct_Local, 
+  summ = data.frame(references, duration, 
                     pct_Agglo, pct_Metro,
-                       medianN, medianTruncation)
+                    medianN, medianTruncation)
   Summary = data.frame(cbind(names,t(summ)))
-  colnames(Summary) = c("Descriptor", "Value")
+  colnames(Summary) = c("Meta Statistics", "Value")
   return(Summary)
 }
-
 sumNum = function(x){sum(as.numeric(x), na.rm=TRUE)}
-
 stdDev = function(x){sd(as.numeric(x), na.rm=TRUE)}
-  
+generateEstimRows <- function(i){
+  list(
+    fluidRow(
+      column(2, h5(paste("Estimation ", i, sep = ""))),
+      column(2,numericInput(paste("alphaestim", i, sep="_") , paste("Alpha ", i, sep = "_"), value = "1")),
+      column(4,textInput(paste("territoryestim", i, sep="_"), paste("Territory", i, sep = "_"), value = "Ex: France")),
+      column(4,textInput(paste("urbandefestim", i, sep="_"), paste("Urban Def.", i, sep = "_"), value = "Ex: SMA, Boroughs, UN agglomerations...")),
+      column(2, " "),
+      column(4,numericInput(paste("truncestim", i, sep="_"), paste("Min. pop of Cities", i, sep = "_"), value = "10000")),
+      column(2,numericInput(paste("dateestim", i, sep="_"), paste("Date", i, sep = "_"), value = "2000")),
+      column(2,numericInput(paste("nCitiesestim", i, sep="_"), paste("# of cities", i, sep = "_"), value = "100")),
+      column(2,numericInput(paste("r2estim", i, sep="_"), paste("R2", i, sep = "_"), value = "100"))
+    ),
+    tags$hr()
+  )
+}
 
-meta = read.csv("data/zipf_meta.csv", sep=",", dec=".")
-meta$TOTAL_POP = as.numeric(meta$TOTAL_POP)
-refs = read.csv("data/zipf_refs.csv", sep=",", dec=".")
-
-
-metaToAdd = data.frame()
-refsToAdd = data.frame()
-
-
-
-
-my_palette = colorRampPalette(c("seashell", "dodgerblue3"))(n = 299)
 
 
 shinyServer(function(input, output, session) {
@@ -131,17 +146,13 @@ metaTableSelected <- reactive({
     tab = meta
     if (input$alpha == "Lotka") tab$ALPHA = tab$ALPHALOTKA
     if (input$alpha  == "Pareto") tab$ALPHA = tab$ALPHAPARETO
-    
     terr = input$territory
     dec = input$decade
     def = input$scale
-    
     if(length(terr) >= 1) tab = tab[tab$TERRITORY %in% terr,]
     if(length(dec) >= 1) tab = tab[tab$DECADE %in% dec,]
     if(length(def) >= 1) tab = tab[tab$URBANSCALE %in% def,]
-    
     tab = tab[order(tab$DATE),]
-    
     tab[tab$ECO == 1 & tab$SOC == 0 & tab$PHYS == 0, "DISCIPLINE"] = "ECO"
     tab[tab$ECO == 1 & tab$SOC == 1 & tab$PHYS == 0, "DISCIPLINE"] = "ECO & SOC"
     tab[tab$ECO == 1 & tab$SOC == 0 & tab$PHYS == 1, "DISCIPLINE"] = "ECO & PHYS"
@@ -149,67 +160,73 @@ metaTableSelected <- reactive({
     tab[tab$ECO == 0 & tab$SOC == 1 & tab$PHYS == 0, "DISCIPLINE"] = "SOC"
     tab[tab$ECO == 0 & tab$SOC == 1 & tab$PHYS == 1, "DISCIPLINE"] = "SOC & PHYS"
     tab[tab$ECO == 0 & tab$SOC == 0 & tab$PHYS == 1, "DISCIPLINE"] = "PHYS"
-    
     tab$ALPHA = round(tab$ALPHA, 3)
+     return(tab)
+  })
+  
+metaTableSummary <- reactive({
+  tab = meta
+  if (input$alpha == "Lotka") tab$ALPHA = tab$ALPHALOTKA
+  if (input$alpha  == "Pareto") tab$ALPHA = tab$ALPHAPARETO
+  terr = input$territorys
+  dec = input$decades
+  def = input$scales
+  reg = input$alpha
+  if(length(terr) >= 1) tab = tab[tab$TERRITORY %in% terr,]
+  if(length(dec) >= 1) tab = tab[tab$DECADE %in% dec,]
+  if(length(def) >= 1) tab = tab[tab$URBANSCALE %in% def,]
+  return(tab)
+})
+
+
+
+  output$review = renderDataTable({
+    tab = metaTableSelected()
     tab = tab[,c("ALPHA", "TERRITORY", "DATE", "URBANISATION",
                  "N", "URBANSCALE", "TRUNCATION", "DISCIPLINE", "R2", "REFERENCE")]
     colnames(tab) = c("Alpha", "Territory", "Date", "Urban Age", 
                       "Number of Cities", "City Definition", "Population Cutoff", 
                       "Discipline", "R2", "Reference")
-    return(tab)
-  })
-  
-  
-  output$review = renderDataTable({
-    tab = metaTableSelected()
+    
      return(tab)
   }, options = list(paging = FALSE, searching = FALSE))
   
+ 
 
- 
- 
-  output$summary = renderDataTable({
-    tab = meta
-    if (input$alpha == "Lotka") tab$ALPHA = tab$ALPHALOTKA
-    if (input$alpha == "Pareto") tab$ALPHA = tab$ALPHAPARETO
-    
-    
-    terr = input$territorys
-    dec = input$decades
-    def = input$scales
-    reg = input$alpha
-    
-    if(length(terr) >= 1) tab = tab[tab$TERRITORY %in% terr,]
-    if(length(dec) >= 1) tab = tab[tab$DECADE %in% dec,]
-    if(length(def) >= 1) tab = tab[tab$URBANSCALE %in% def,]
-    
-    summaryA = SummaryMeta(table = tab, regression = reg)
+  output$summaryAlpha = renderDataTable({
+    tab = metaTableSummary()
+    summaryA = SummaryMetaAlpha(table = tab, regression = reg)
     return(summaryA)
   }, options = list(paging = FALSE, searching = FALSE))
   
+  output$summaryMeta = renderDataTable({
+    tab = metaTableSummary()
+    summaryA = SummaryMetaMeta(table = tab, regression = reg)
+    return(summaryA)
+  }, options = list(paging = FALSE, searching = FALSE))
+  
+  output$histalpha = renderPlot({
+    tab = metaTableSummary()
+    
+    histo = ggplot(tab, aes(x = ALPHA)) + 
+      geom_histogram(binwidth = 0.05, color = "#18BC9C", fill = "#18BC9C") +  
+      labs(x = "alpha", y = "frequency") +  
+      geom_vline(xintercept=1, size=2, col="#2c3e50") +
+      annotate("text", x = 1.01, y = dim(tab)[1] / 10, 
+               label = "Zipf's Law (alpha = 1)", hjust=0, col="#2c3e50")
+    return(histo)
+  })
+  
+  
   output$plot = renderPlot({
-    tab = meta
-    if (input$alpha == "Lotka") tab$ALPHA = tab$ALPHALOTKA
-    if (input$alpha == "Pareto") tab$ALPHA = tab$ALPHAPARETO
-    
-    terr = input$territorys
-    dec = input$decades
-    def = input$scales
-    reg = input$alpha
-    
-    if(length(terr) >= 1) tab = tab[tab$TERRITORY %in% terr,]
-    if(length(dec) >= 1) tab = tab[tab$DECADE %in% dec,]
-    if(length(def) >= 1) tab = tab[tab$URBANSCALE %in% def,]
+    tab = metaTableSummary()
     
     quanti = input$quanti
     quali = input$quali
-    
     tab$quanti = tab[,quanti]
     tab$Category = as.character(tab[,quali])
-    
     tab = subset(tab, !is.na(quanti))
     tab = subset(tab, !is.na(Category))
-    
     
     p = ggplot(tab, aes(y = quanti, x = ALPHA, fill = Category, colour = Category)) +  geom_vline(xintercept=1, size=1, col="#2c3e50") +
       geom_point() +   labs(y = quanti, x = "alpha") 
@@ -223,16 +240,9 @@ metaTableSelected <- reactive({
        }
    
     p = p + scale_fill_manual(values=cols)  + scale_colour_manual(values=cols)
-    
     if (input$log == "TRUE") p = p + scale_y_log10()
     return(p)
   })
-  
-  
-  
-  
-  bb = c("scale4model", "truncation4model","N4model")
-  'scale4model' %in% bb
   
   
   output$model = renderTable({
@@ -340,28 +350,11 @@ metaTableSelected <- reactive({
     return(Reference)
   })
     
-  output$histalpha = renderPlot({
-    tab = meta
-    if (input$alpha == "Lotka") tab$ALPHA = tab$ALPHALOTKA
-    if (input$alpha == "Pareto") tab$ALPHA = tab$ALPHAPARETO
-    
-    terr = input$territorys
-    dec = input$decades
-    def = input$scales
-    reg = input$alpha
-
-    if(length(terr) >= 1) tab = tab[tab$TERRITORY %in% terr,]
-    if(length(dec) >= 1) tab = tab[tab$DECADE %in% dec,]
-    if(length(def) >= 1) tab = tab[tab$URBANSCALE %in% def,]
-
-    histo = ggplot(tab, aes(x = ALPHA)) + 
-      geom_histogram(binwidth = 0.05, color = "#18BC9C", fill = "#18BC9C") +  
-      labs(x = "alpha", y = "frequency") +  geom_vline(xintercept=1, size=1, col="#2c3e50") 
-        
-    return(histo)
-  })
-  
  
+ 
+  
+  
+  
   observe({
     req(input$nestimates)
     estRows <- lapply(1:input$nestimates,FUN = generateEstimRows)
@@ -430,15 +423,15 @@ metaTableSelected <- reactive({
   
   
   observe({
-    inFile<-meta
+    inFile<-metaTableSelected()
      if(is.null(inFile))
       return(NULL)
     updateSelectInput(session, "territorys", choices = c(sort(unique(as.character(inFile$TERRITORY)))))
     updateSelectInput(session, "scales", choices = c(sort(unique(as.character(inFile$URBANSCALE)))))
-    updateSelectInput(session, "scales", choices = c(sort(unique(as.character(inFile$URBANSCALE)))))
+    updateSelectInput(session, "decades", choices = c(sort(unique(as.character(inFile$DECADE)))))
     updateSelectInput(session, "territory", choices = c(sort(unique(as.character(inFile$TERRITORY)))))
     updateSelectInput(session, "scale", choices = c(sort(unique(as.character(inFile$URBANSCALE)))))
-    updateSelectInput(session, "scale", choices = c(sort(unique(as.character(inFile$URBANSCALE)))))
+    updateSelectInput(session, "decade", choices = c(sort(unique(as.character(inFile$DECADE)))))
   })
 #  observe({
 #    refsToAdd = refsToAdd
@@ -482,7 +475,13 @@ metaTableSelected <- reactive({
   output$downloadData <- downloadHandler(
     filename = "MetaZipf_Selection.csv",
     content = function(file) {
-      write.csv(metaTableSelected(), file)
+      tab = metaTableSelected()
+        tab = tab[,c("ALPHA", "TERRITORY", "DATE", "URBANISATION",
+                            "N", "URBANSCALE", "TRUNCATION", "DISCIPLINE", "R2", "REFERENCE")]
+      colnames(tab) = c("Alpha", "Territory", "Date", "Urban Age", 
+                        "Number of Cities", "City Definition", "Population Cutoff", 
+                        "Discipline", "R2", "Reference")
+      write.csv(tab, file)
     }
   )
   
@@ -499,22 +498,4 @@ metaTableSelected <- reactive({
  )
 
  })
-
-
-generateEstimRows <- function(i){
-  list(
-    fluidRow(
-      column(2, h5(paste("Estimation ", i, sep = ""))),
-      column(2,numericInput(paste("alphaestim", i, sep="_") , paste("Alpha ", i, sep = "_"), value = "1")),
-      column(4,textInput(paste("territoryestim", i, sep="_"), paste("Territory", i, sep = "_"), value = "Ex: France")),
-      column(4,textInput(paste("urbandefestim", i, sep="_"), paste("Urban Def.", i, sep = "_"), value = "Ex: SMA, Boroughs, UN agglomerations...")),
-      column(2, " "),
-      column(4,numericInput(paste("truncestim", i, sep="_"), paste("Min. pop of Cities", i, sep = "_"), value = "10000")),
-      column(2,numericInput(paste("dateestim", i, sep="_"), paste("Date", i, sep = "_"), value = "2000")),
-      column(2,numericInput(paste("nCitiesestim", i, sep="_"), paste("# of cities", i, sep = "_"), value = "100")),
-      column(2,numericInput(paste("r2estim", i, sep="_"), paste("R2", i, sep = "_"), value = "100"))
-    ),
-    tags$hr()
-  )
-}
 

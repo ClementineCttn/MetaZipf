@@ -2,8 +2,8 @@ name: MetaZipf
 account: clementinegeo
 server: shinyapps.io
 appId: 56260
-bundleId: 396695
+bundleId: 396700
 url: https://clementinegeo.shinyapps.io/MetaZipf/
-when: 1458141052.03634
+when: 1458141234.96716
 asMultiple: FALSE
 asStatic: FALSE

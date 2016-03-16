@@ -91,38 +91,37 @@ h3("References:"), dataTableOutput('references')),
                
       tabPanel("2. Literature Overview",
              h4('TOP journals where the estimations* are drawn from:'),  
-            dataTableOutput('topjournals'),
             '*Each reference count as one, irrespective of the number of estimations',  tags$hr(),
+            dataTableOutput('topjournals'),
             h4('TOP authors* providing estimations:'), 
-            dataTableOutput('topauthors'),
             '*the estimations published by the same author(s) in different publications are not added.',   tags$hr(),
+            dataTableOutput('topauthors'),
             h4('TOP countries for the dispersion of results*:'),
-            dataTableOutput('topcountries'),
             '*measured by the standard deviation of alpha for countries with more than 5 estimations.',  tags$hr(),
-            h6("Nitsch, V. (2005). Zipf zipped. Journal of Urban Economics, 57(1), 86-100. Total population in thousands, from UN estimates (1950-2015) <http://esa.un.org/unpd/wpp/DVD/Files/1_Excel%20(Standard)/EXCEL_FILES/1_Population/WPP2015_POP_F01_1_TOTAL_POPULATION_BOTH_SEXES.XLS.>")
+            dataTableOutput('topcountries'),
+           HTML('Nitsch, V. (2005). Zipf zipped. Journal of Urban Economics, 57(1), 86-100. Total population in thousands, from UN estimates (1950-2015) 
+                <a href=http://esa.un.org/unpd/wpp/Download/Standard/Population/">http://esa.un.org/unpd/wpp/Download/Standard/Population/</a>')
+             
             ),
     
      tabPanel("3. Estimates Summary", 
-              h4("Summarise estimations by:"),
-                 fluidRow(
-                   column(4,selectizeInput("territorys", "Country", "", multiple=T)),
-                   column(4,selectizeInput("scales", "Urban Definition*", "", multiple=T)),
-                   column(4,selectizeInput("decades", "Decade", "", multiple=T)),
-                   dataTableOutput('summary'),
-                   h6('* The Urban Definition refers to the way cities are defined: locally as political units, morphologically as built-up agglomeration, 
-                   functionally as metropolitan areas or a mix of these.'),
-                   
-                   tags$hr(),
-                   plotOutput('histalpha')
-                   ),
-              tags$hr(),
-              h4("Visualise variation of alpha with:"),
+              h2("Subset by:"),
               fluidRow(
-                column(4,selectInput("quanti", "Continuous variable (y)", choices=c("N", "TRUNCATION_POINT", "DATE"), multiple=FALSE)),
-                column(4,checkboxInput("log", "Log(y)", value=TRUE)),
-                column(4,selectInput("quali", "Categorical variable (colour)", choices=c("URBANSCALE", "COUNTRY", "DECADE", "ECO", "SOC", "PHYS"), multiple=FALSE)),
-                plotOutput('plot')
-              )),
+                column(4,selectizeInput("territorys", "Territory", "", multiple=T)),
+                column(4,selectizeInput("scales", "City Definition", "", multiple=T)),
+                column(4,selectizeInput("decades", "Decade", "", multiple=T)),
+                  tags$hr(),
+                
+              h4("Distribution of estimations"),
+              plotOutput('histalpha'),
+              tags$hr(),
+                    h4("Summary Statistics"),
+              column(6,dataTableOutput('summaryAlpha')),
+              column(6,dataTableOutput('summaryMeta')),
+              
+                   tags$hr()
+                   ),
+              tags$hr()),
               
              
                tabPanel("4. Meta Analysis",
@@ -161,7 +160,14 @@ h3("References:"), dataTableOutput('references')),
                textOutput('REFS'),
                h6("N.B. 'Old' continents refer to zones of early urbanisation, in Europe, South-East Asia and the Middle East. America, Oceania, Africa and central Asia are considered 'New' in that respect.
                   \n 'ECO' refers to estimations published in journals classified in Economics according to the Chicago Journal Ranking. 'SOC' stands for Social Science and 'PHYS' for environmental and physical sciences journals. A journal can belong to one or more categories.")
-               
+               ,
+               h4("Visualise variation of alpha with:"),
+               fluidRow(
+                 column(4,selectInput("quanti", "Continuous variable (y)", choices=c("N", "TRUNCATION_POINT", "DATE"), multiple=FALSE)),
+                 column(4,checkboxInput("log", "Log(y)", value=TRUE)),
+                 column(4,selectInput("quali", "Categorical variable (colour)", choices=c("URBANSCALE", "COUNTRY", "DECADE", "ECO", "SOC", "PHYS"), multiple=FALSE)),
+                 plotOutput('plot')
+               )
              ))
      )),
     
