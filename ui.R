@@ -238,8 +238,8 @@ h3("References:"), dataTableOutput('references')),
                            plus the coefficients of the categories to which they belong."
                          )), 
                  tags$li("The coefficients associated with the", tags$b("Disciplines"), "(ECO, SOC & PHYS) indicate the quantity to 
-                         be added to the average alpha for studies published in journal of the given category,
-                         compared to journal non classified as such.")
+                         be added to the average alpha for studies published in journals of the given category,
+                         compared to studies published in journals non categorised as such.")
                  )
                )
              
@@ -257,8 +257,8 @@ h3("References:"), dataTableOutput('references')),
     
       tabPanel("Contribute !",
              h1("Add your own reviewed estimates:"), 
-             h5("Please remember to press buttons to add the reference and the estimates, 
-             and to send this data to the moderator for them to be added to the open database."),
+             h5("Please remember to press the button 'Save' to save the reference and the estimates, 
+             then to download and to send this data to the moderator for addition to the open database."),
              wellPanel(
              column(4,selectInput("type", "Document type",
                                   choices=c("Journal Article", "Book", "Thesis"),

@@ -246,49 +246,9 @@ metaTableSummary <- reactive({
   })
   
   
-  output$model = renderTable({
-    tab = meta
-    if (input$alpha == "Lotka") tab$ALPHA = tab$ALPHALOTKA
-    if (input$alpha == "Pareto") tab$ALPHA = tab$ALPHAPARETO
-    
-    TechnicalSpecs = input$technicalSpecs
-    TopicalSpecs = input$topicalSpecs
-    OtherSpecs = input$otherSpecs
-    
-    if ('alltech' %in% TechnicalSpecs == "TRUE") TechnicalSpecs = c("scale4model",  "truncation4model", "N4model")
-    if ('alltop' %in% TopicalSpecs == "TRUE") TopicalSpecs = c("urbanisation4model",  "countrySize", "year4model")
-    if ('allother' %in% OtherSpecs == "TRUE") OtherSpecs = c("discipline")
-    
-   regressants = "ALPHA ~ 1"
-   if ('year4model' %in% TopicalSpecs == "TRUE")  {
-     tab$NORMALIZED_DATE = tab$DATE - 1950
-     regressants = paste(regressants, " + NORMALIZED_DATE", sep="")}
-   if ('truncation4model' %in% TechnicalSpecs == "TRUE") {
-     tab$TRUNCATION_LEVEL = as.factor(ifelse(tab$TRUNCATION_POINT <= input$truncVal[[1]], " Low", ifelse(tab$TRUNCATION_POINT >= input$truncVal[[2]], " High", " Medium")))
-     regressants = paste(regressants, " + TRUNCATION_LEVEL", sep="")}
-   if ('scale4model' %in% TechnicalSpecs == "TRUE") {
-     regressants = paste(regressants, " + URBANSCALE", sep="")}
-   if ('N4model' %in% TechnicalSpecs == "TRUE") {
-     tab$N_SAMPLE = as.factor(ifelse(tab$N <= input$NVal[[1]], " Small", ifelse(tab$N >= input$NVal[[2]], " Large", " Medium")))
-     regressants = paste(regressants, " + N_SAMPLE", sep="")}
-    if ('urbanisation4model' %in% TopicalSpecs == "TRUE") {
-     tab = subset(tab, URBANISATION != "")
-     regressants = paste(regressants, " + URBANISATION", sep="")}
-   if ('countrySize' %in% TopicalSpecs == "TRUE") {
-     tab = subset(tab, !is.na(TOTAL_POP))
-     tab = subset(tab, TOTAL_POP > 0)
-     tab$COUNTRY_SIZE = as.factor(ifelse(tab$TOTAL_POP <= input$PopVal[[1]], " Small", ifelse(tab$TOTAL_POP >= input$PopVal[[2]], " Large", " Medium")))
-     regressants = paste(regressants, " + COUNTRY_SIZE", sep="")}
-   if ('discipline' %in% OtherSpecs == "TRUE") {
-     tab = subset(tab, ECO != "")
-     regressants = paste(regressants, " + ECO + SOC + PHYS", sep="")}
-   
-   model = lm(regressants, data=tab, na.action = na.omit)
-     mod = summary(model)
-     return(mod)
-  })
   
-  output$modelparameters = renderTable({
+  
+  metaModel <- reactive({
     tab = meta
     if (input$alpha == "Lotka") tab$ALPHA = tab$ALPHALOTKA
     if (input$alpha == "Pareto") tab$ALPHA = tab$ALPHAPARETO
@@ -325,7 +285,20 @@ metaTableSummary <- reactive({
       regressants = paste(regressants, " + ECO + SOC + PHYS", sep="")}
     
     model = lm(regressants, data=tab, na.action = na.omit)
-    
+    return(model)
+  })
+  
+  
+  
+  
+  output$model = renderTable({
+   model = metaModel()
+     mod = summary(model)
+     return(mod)
+  })
+  
+  output$modelparameters = renderTable({
+    model = metaModel()
     R2 = summary(model)$r.squared * 100
     Observations = summary(model)$df[[2]]
     summ = data.frame(R2, Observations)
