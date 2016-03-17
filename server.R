@@ -340,13 +340,14 @@ metaTableSummary <- reactive({
     if ('alltech' %in% TechnicalSpecs == "TRUE") TechnicalSpecs = c("scale4model",  "truncation4model", "N4model")
     if ('alltop' %in% TopicalSpecs == "TRUE") TopicalSpecs = c("urbanisation4model",  "countrySize", "year4model")
 
-    Reference = "Reference Categories: \n"
+    Reference = "\n"
     if ('urbanisation4model' %in% TopicalSpecs == "TRUE") Reference = paste(Reference, " | Age of Urbanisation: Old", sep="")
-    if ('truncation4model' %in% TechnicalSpecs == "TRUE")Reference = paste(Reference, " | Truncation Level: High", sep="")
-    if ('N4model' %in% TechnicalSpecs == "TRUE") Reference = paste(Reference, " | Sample Size: Large", sep="")
-    if ('year4model' %in% TopicalSpecs == "TRUE") Reference = paste(Reference, " | Year: 1950", sep="")
+    if ('truncation4model' %in% TechnicalSpecs == "TRUE")Reference = paste(Reference, " | Population Cutoff: High", sep="")
+    if ('N4model' %in% TechnicalSpecs == "TRUE") Reference = paste(Reference, " | Number of cities: Large", sep="")
+    if ('year4model' %in% TopicalSpecs == "TRUE") Reference = paste(Reference, " | Date of Observation: 1950", sep="")
     if ('scale4model' %in% TechnicalSpecs == "TRUE") Reference = paste(Reference, " | City Definition: 1. Local", sep="")
     if ('countrySize' %in% TopicalSpecs  == "TRUE") Reference = paste(Reference, " | Country Size: Large", sep="")
+    
     
     return(Reference)
   })
