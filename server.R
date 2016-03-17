@@ -263,26 +263,31 @@ metaTableSummary <- reactive({
     
     regressants = "ALPHA ~ 1"
     if ('year4model' %in% TopicalSpecs == "TRUE") {
-      tab$NORMALIZED_DATE = tab$DATE - 1950
-      regressants = paste(regressants, " + NORMALIZED_DATE", sep="")}
+      tab$Date_of_Observation = tab$DATE - 1950
+      regressants = paste(regressants, " + Date_of_Observation", sep="")}
     if ('truncation4model' %in% TechnicalSpecs == "TRUE"){
-      tab$TRUNCATION_LEVEL = as.factor(ifelse(tab$TRUNCATION_POINT <= input$truncVal[[1]], " Low", ifelse(tab$TRUNCATION_POINT >= input$truncVal[[2]], " High", " Medium")))
-      regressants = paste(regressants, " + TRUNCATION_LEVEL", sep="")}
+      tab$Population_Cutoff_ = as.factor(ifelse(tab$TRUNCATION_POINT <= input$truncVal[[1]], "Low", ifelse(tab$TRUNCATION_POINT >= input$truncVal[[2]], "High", "Medium")))
+      regressants = paste(regressants, " + Population_Cutoff_", sep="")}
     if ('scale4model' %in% TechnicalSpecs == "TRUE")  {
-      regressants = paste(regressants, " + URBANSCALE", sep="")}
+      tab$City_Definition_ = tab$URBANSCALE
+      regressants = paste(regressants, " + City_Definition_", sep="")}
     if ('N4model' %in% TechnicalSpecs == "TRUE")  {
-      tab$N_SAMPLE = as.factor(ifelse(tab$N <= input$NVal[[1]], " Small", ifelse(tab$N >= input$NVal[[2]], " Large", " Medium")))
-      regressants = paste(regressants, " + N_SAMPLE", sep="")}
+      tab$Number_Of_Cities_ = as.factor(ifelse(tab$N <= input$NVal[[1]], "Small", ifelse(tab$N >= input$NVal[[2]], "Large", "Medium")))
+      regressants = paste(regressants, " + Number_Of_Cities_", sep="")}
     if ('urbanisation4model' %in% TopicalSpecs == "TRUE"){
       tab = subset(tab, URBANISATION != "")
-      regressants = paste(regressants, " + URBANISATION", sep="")}
+      tab$Urbanisation_Age_ = tab$URBANISATION
+      regressants = paste(regressants, " + Urbanisation_Age_", sep="")}
     if ('countrySize' %in% TopicalSpecs  == "TRUE") {
       tab = subset(tab, TOTAL_POP > 0)
-      tab$COUNTRY_SIZE = as.factor(ifelse(tab$TOTAL_POP <= input$PopVal[[1]], " Small", ifelse(tab$TOTAL_POP >= input$PopVal[[2]], " Large", " Medium")))
-      regressants = paste(regressants, " + COUNTRY_SIZE", sep="")}
+      tab$Country_Size_ = as.factor(ifelse(tab$TOTAL_POP <= input$PopVal[[1]], "Small", ifelse(tab$TOTAL_POP >= input$PopVal[[2]], "Large", "Medium")))
+      regressants = paste(regressants, " + Country_Size_", sep="")}
     if ('discipline' %in% OtherSpecs == "TRUE") {
       tab = subset(tab, ECO != "")
-      regressants = paste(regressants, " + ECO + SOC + PHYS", sep="")}
+      tab$Discipline_ECO = tab$ECO
+      tab$Discipline_SOC = tab$SOC
+      tab$Discipline_PHYS = tab$PHYS
+      regressants = paste(regressants, " + Discipline_ECO + Discipline_SOC + Discipline_PHYS", sep="")}
     
     model = lm(regressants, data=tab, na.action = na.omit)
     return(model)
