@@ -24,14 +24,14 @@ shinyUI(
             tags$p(class="text-justify",
             "This application aims at presenting a crowdsourced meta-analysis of Zipf's law estimations from the literature in an interactive way. ",  br(), br(), 
 "Following the work of V. Nitsch (2005), it extends the pool of papers reviewed (initially and through crowdsourcing) and shares access 
-            to the database to enhance its represenjtativity across dates, areas and study fields.",  br(),   br(),  
+            to the database to enhance its representativity across dates, areas and study fields.",  br(),   br(),  
              "The idea is to allow interactive queries into this pool of papers, to represent and to model the variation of empiricial estimations of Zipf's 
                   law's exponent in the literature, with respect to the systems of cities studied. Indeed, this meta-analysis 
         considers urban characteristics (age of the system, total population), the specifications of the regression used (urban definitions,
               truncation points, number of cities) and meta-informations (discipline of the journal publishing the paper) to unveil systematic deviations from the iconic -1 value.", br(),   br(),
              HTML('The current database covers 1151 estimations from 59 studies, spanning over more than 80 countries over 400 years. 
-            It is available for download at this address (<a href="https://github.com/ClementineCttn/MetaZipf">https://github.com/ClementineCttn/MetaZipf</a>) and the user of this application
-            is strongly invited to enrich this database by submitting their own empirical estimates using the \'Contribute !\' tab on the left.'), br(),   br(),
+            It is open for download (<a href="https://github.com/ClementineCttn/MetaZipf">https://github.com/ClementineCttn/MetaZipf</a>) and you are
+            strongly invited to contribute by submitting your own empirical estimates using the \'Contribute !\' tab on the left.'), br(),   br(),
             h5("Before starting, choose a regression form into which all subsequent results will be expressed.")),
                       
             tags$hr(),
@@ -39,8 +39,8 @@ shinyUI(
             fluidRow(column(6,selectInput("alpha", "I prefer results to be expressed in the regression form of:", 
                                           choices=c("Lotka", "Pareto"), multiple=FALSE)),
             column(6,
-                   withMathJax(h6("The Lotka form : $$\\log(P_i) = \\alpha \\times \\log(R_i) + \\beta + \\epsilon_i$$")),
-                   withMathJax(h6("The Pareto form : $$\\log(R_i) = \\alpha' \\times \\log(P_i) + \\beta' + \\epsilon'_i$$")),
+                   withMathJax(h6("The Lotka form : $$\\log(P_i) = -\\alpha \\times \\log(R_i) + \\beta + \\epsilon_i$$")),
+                   withMathJax(h6("The Pareto form : $$\\log(R_i) = -\\alpha' \\times \\log(P_i) + \\beta' + \\epsilon'_i$$")),
              withMathJax(h6("with: \\(P_i\\) the population of city \\(i\\),
                             \\(R_i\\) its rank in the urban hierarchy,
                             \\(\\alpha' = \\frac{1}{\\alpha}\\) and
@@ -62,7 +62,7 @@ h3("References:"), dataTableOutput('references')),
                         analysis along with the description of how they made the analysis. Each observation in our case is thus
                         composed of a single estimation of alpha (if you chose the Lotka form) 
                         or alpha' (if you chose the Pareto form) and is characterized by half a dozen other variables.", 
-                         withMathJax(h6("$$\\log(P_i) = \\alpha \\times \\log(R_i) + \\beta + \\epsilon_i$$ $$\\log(R_i) = \\alpha' \\times \\log(P_i) + \\beta' + \\epsilon'_i$$ ")),  
+                         withMathJax(h6("$$\\log(P_i) = -\\alpha \\times \\log(R_i) + \\beta + \\epsilon_i$$ $$\\log(R_i) = -\\alpha' \\times \\log(P_i) + \\beta' + \\epsilon'_i$$ ")),  
                         h2("TERRITORY"), 
                         h6("For example: The Netherlands in Brakman et al. (1999)."), "The geographical extent from which cities were selected. When available (i.e. between 1950 and 2015 for countries), the population of the territory was added.
                         Given the diversity of countries with respect to economic development, culture and size, one might expect alpha to vary accordingly.", 
