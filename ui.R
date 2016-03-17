@@ -78,10 +78,10 @@ h3("References:"), dataTableOutput('references')),
                         h4("Data"),
                         h2("Subset Table by:"),
                         fluidRow(
-                          column(4,selectizeInput("territory", "Country", "", multiple=T)),
-                          column(4,selectizeInput("scale", "Urban Definition*", "", multiple=T)),
+                          column(4,selectizeInput("territory", "Territory", "", multiple=T)),
+                          column(4,selectizeInput("scale", "City Definition", "", multiple=T)),
                           column(4,selectizeInput("decade", "Decade", "", multiple=T)),
-                          column(3,downloadButton("downloadData", "Download")), 
+                             column(3,downloadButton("downloadData", "Download")), 
                                  column(9, HTML('N.B. This table is a simplified version. You can find the full version here <a href="here">https://github.com/ClementineCttn/MetaZipf</a>'))),
                         dataTableOutput('review')
                                      

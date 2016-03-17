@@ -7,6 +7,14 @@ library(shiny)
 
 meta = read.csv("data/zipf_meta.csv", sep=",", dec=".")
 meta$TOTAL_POP = as.numeric(meta$TOTAL_POP)
+meta[meta$ECO == 1 & meta$SOC == 0 & meta$PHYS == 0, "DISCIPLINE"] = "ECO"
+meta[meta$ECO == 1 & meta$SOC == 1 & meta$PHYS == 0, "DISCIPLINE"] = "ECO & SOC"
+meta[meta$ECO == 1 & meta$SOC == 0 & meta$PHYS == 1, "DISCIPLINE"] = "ECO & PHYS"
+meta[meta$ECO == 1 & meta$SOC == 1 & meta$PHYS == 1, "DISCIPLINE"] = "ECO, SOC & PHYS"
+meta[meta$ECO == 0 & meta$SOC == 1 & meta$PHYS == 0, "DISCIPLINE"] = "SOC"
+meta[meta$ECO == 0 & meta$SOC == 1 & meta$PHYS == 1, "DISCIPLINE"] = "SOC & PHYS"
+meta[meta$ECO == 0 & meta$SOC == 0 & meta$PHYS == 1, "DISCIPLINE"] = "PHYS"
+
 refs = read.csv("data/zipf_refs.csv", sep=",", dec=".")
 
 metaToAdd = data.frame()
@@ -153,14 +161,7 @@ metaTableSelected <- reactive({
     if(length(dec) >= 1) tab = tab[tab$DECADE %in% dec,]
     if(length(def) >= 1) tab = tab[tab$URBANSCALE %in% def,]
     tab = tab[order(tab$DATE),]
-    tab[tab$ECO == 1 & tab$SOC == 0 & tab$PHYS == 0, "DISCIPLINE"] = "ECO"
-    tab[tab$ECO == 1 & tab$SOC == 1 & tab$PHYS == 0, "DISCIPLINE"] = "ECO & SOC"
-    tab[tab$ECO == 1 & tab$SOC == 0 & tab$PHYS == 1, "DISCIPLINE"] = "ECO & PHYS"
-    tab[tab$ECO == 1 & tab$SOC == 1 & tab$PHYS == 1, "DISCIPLINE"] = "ECO, SOC & PHYS"
-    tab[tab$ECO == 0 & tab$SOC == 1 & tab$PHYS == 0, "DISCIPLINE"] = "SOC"
-    tab[tab$ECO == 0 & tab$SOC == 1 & tab$PHYS == 1, "DISCIPLINE"] = "SOC & PHYS"
-    tab[tab$ECO == 0 & tab$SOC == 0 & tab$PHYS == 1, "DISCIPLINE"] = "PHYS"
-    tab$ALPHA = round(tab$ALPHA, 3)
+        tab$ALPHA = round(tab$ALPHA, 3)
      return(tab)
   })
   
@@ -423,15 +424,21 @@ metaTableSummary <- reactive({
   
   
   observe({
-    inFile<-metaTableSelected()
+    inFile<-metaTableSummary()
      if(is.null(inFile))
+      return(NULL)
+    updateSelectInput(session, "territory", choices = c(sort(unique(as.character(inFile$TERRITORY)))))
+    updateSelectInput(session, "scale", choices = c(sort(unique(as.character(inFile$URBANSCALE)))))
+    updateSelectInput(session, "decade", choices = c(sort(unique(as.character(inFile$DECADE)))))
+  })
+  
+  observe({
+    inFile<-metaTableSelected()
+    if(is.null(inFile))
       return(NULL)
     updateSelectInput(session, "territorys", choices = c(sort(unique(as.character(inFile$TERRITORY)))))
     updateSelectInput(session, "scales", choices = c(sort(unique(as.character(inFile$URBANSCALE)))))
     updateSelectInput(session, "decades", choices = c(sort(unique(as.character(inFile$DECADE)))))
-    updateSelectInput(session, "territory", choices = c(sort(unique(as.character(inFile$TERRITORY)))))
-    updateSelectInput(session, "scale", choices = c(sort(unique(as.character(inFile$URBANSCALE)))))
-    updateSelectInput(session, "decade", choices = c(sort(unique(as.character(inFile$DECADE)))))
   })
 #  observe({
 #    refsToAdd = refsToAdd
