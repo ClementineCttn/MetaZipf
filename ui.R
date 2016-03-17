@@ -160,7 +160,7 @@ h3("References:"), dataTableOutput('references')),
                           full spectrum of city sizes are considered, even cities with a population of 10,000 residents
                                      (or less)")), 
                           tags$li(h6("Estimations where the minimum population for cities is comprised between 10,000 and 100,000 
-                          resident")), 
+                          residents")), 
                           tags$li(h6("Estimations where the rank-size relation is applied to large cities only 
                             (with a population cutoff over 100,000)."))),
                         
@@ -210,7 +210,7 @@ h3("References:"), dataTableOutput('references')),
                          an urban system characterized by the reference categories selected. If no
                          characteristics are selected, this value is the mean alpha measured over all studies.",
                         
-                 textOutput('REFS'),  h6(
+                         htmlOutput('REFS'),  h6(
                    "For example, if 'Population cutoff' is selected, it will give the average
                    value of alpha expected for studies using a high population cutoff, i.e. studies
                    of large cities only."
