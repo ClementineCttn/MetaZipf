@@ -67,15 +67,15 @@ stdDev = function(x){sd(as.numeric(x), na.rm=TRUE)}
 generateEstimRows <- function(i){
   list(
     fluidRow(
-      column(2, h5(paste("Estimation ", i, sep = ""))),
-      column(2,numericInput(paste("alphaestim", i, sep="_") , paste("Alpha ", i, sep = "_"), value = "1")),
-      column(4,textInput(paste("territoryestim", i, sep="_"), paste("Territory", i, sep = "_"), value = "Ex: France")),
-      column(4,textInput(paste("urbandefestim", i, sep="_"), paste("Urban Def.", i, sep = "_"), value = "Ex: SMA, Boroughs, UN agglomerations...")),
+      column(2, h5(paste("Estimate ", i, sep = ""))),
+      column(2,numericInput(paste("alphaestim", i, sep="_") , paste("Alpha ", i, sep = " "), value = "1")),
+      column(4,textInput(paste("territoryestim", i, sep="_"), paste("Territory", i, sep = " "), value = "Ex: France")),
+      column(4,textInput(paste("urbandefestim", i, sep="_"), paste("City Def.", i, sep = " "), value = "Ex: SMA, Boroughs, UN agglomerations...")),
       column(2, " "),
-      column(4,numericInput(paste("truncestim", i, sep="_"), paste("Min. pop of Cities", i, sep = "_"), value = "10000")),
-      column(2,numericInput(paste("dateestim", i, sep="_"), paste("Date", i, sep = "_"), value = "2000")),
-      column(2,numericInput(paste("nCitiesestim", i, sep="_"), paste("# of cities", i, sep = "_"), value = "100")),
-      column(2,numericInput(paste("r2estim", i, sep="_"), paste("R2", i, sep = "_"), value = "100"))
+      column(4,numericInput(paste("truncestim", i, sep="_"), paste("Pop. Cutoff", i, sep = " "), value = "10000")),
+      column(2,numericInput(paste("dateestim", i, sep="_"), paste("Date", i, sep = " "), value = "2000")),
+      column(2,numericInput(paste("nCitiesestim", i, sep="_"), paste("# of cities", i, sep = " "), value = "100")),
+      column(2,numericInput(paste("r2estim", i, sep="_"), paste("R2", i, sep = " "), value = "100"))
     ),
     tags$hr()
   )

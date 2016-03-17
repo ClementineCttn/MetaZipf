@@ -19,7 +19,8 @@ shinyUI(
     
     tabPanel("Presentation",
              column(3, img(src = "favicon.png",class="img-responsive")),
-             column(9, h1("Interactive and Open Meta-analysis of Empirical Zipf's Estimates")), br(),
+             column(9, h1("Interactive and Open Meta-analysis of Empirical Zipf's Estimates")), br(),br(),
+             tags$hr(), 
             tags$p(class="text-justify",
             "This application aims at presenting a crowdsourced meta-analysis of Zipf's law estimations from the literature in an interactive way. ",  br(), br(), 
 "Following the work of V. Nitsch (2005), it extends the pool of papers reviewed (initially and through crowdsourcing) and shares access 
@@ -31,7 +32,7 @@ shinyUI(
              HTML('The current database covers 1151 estimations from 59 studies, spanning over more than 80 countries over 400 years. 
             It is available for download at this address (<a href="https://github.com/ClementineCttn/MetaZipf">https://github.com/ClementineCttn/MetaZipf</a>) and the user of this application
             is strongly invited to enrich this database by submitting their own empirical estimates using the \'Contribute !\' tab on the left.'), br(),   br(),
-            "Before starting, choose a regression form into which all subsequent results will be expressed."),
+            h5("Before starting, choose a regression form into which all subsequent results will be expressed.")),
                       
             tags$hr(),
             
@@ -55,25 +56,44 @@ h3("References:"), dataTableOutput('references')),
              tabsetPanel(
                
                tabPanel("1. Data", 
-                        h4("What is the Data for a MetaAnalysis?"),
-                        "In a MetaAnalysis of Zipf for cities, we do not work directly with the cities' data.
+                        h4("Data and Hypotheses for a MetaAnalysis of Zipf"),
+                        "In a meta-analysis of Zipf for cities, we do not work directly with the cities' data.
   Instead, we use the estimations made by other researchers in published papers. The data is thus made by the result of their 
                         analysis along with the description of how they made the analysis. Each observation in our case is thus
-                        composed of a single estimation of alpha (if you chose the Lotka form) or alpha' (if you chose the Pareto form) and is characterized by a dozen other variables.", 
+                        composed of a single estimation of alpha (if you chose the Lotka form) 
+                        or alpha' (if you chose the Pareto form) and is characterized by half a dozen other variables.", 
                          withMathJax(h6("$$\\log(P_i) = \\alpha \\times \\log(R_i) + \\beta + \\epsilon_i$$ $$\\log(R_i) = \\alpha' \\times \\log(P_i) + \\beta' + \\epsilon'_i$$ ")),  
-                        h2("TERRITORY"), "The geographical extent from which cities were selected. For example: The Netherlands in Brakman et al. (1999). When available (i.e. between 1950 and 2015 for countries), the population of the territory was added.", br(),
-                        h2("DATE & DECADE"), "The date (and decade) to which the cities' population refer.  For example: 1600 in Bretagnolle et al. (2000).", br(), 
-                        h2("URBANISATION AGE"), "An indication whether urbanisation is a relatively recent or ancient phenomenon in the territory.  For example: 'OLD' for China.", 
-                        " 'OLD' continents refer to zones of early urbanisation, in Europe, South-East Asia and the Middle East. America, Oceania, Africa and central Asia are considered 'NEW' in that respect.",
-                        h2("NUMBER OF CITIES"), "The number of cities used to estimate Zipf's coefficient. For example: 60 cities in Lepetit (1990).", br(),  
-                        h2("CITY DEFINITION"), "The criteria used to identify cities. For example: MorphoCity in Guerin-Pace (1995).", br(), 
-                        "LocalUnits correspond to administrative units. MorphoCities are aggregations of Local units based on density orthe built-up area. 
+                        h2("TERRITORY"), 
+                        h6("For example: The Netherlands in Brakman et al. (1999)."), "The geographical extent from which cities were selected. When available (i.e. between 1950 and 2015 for countries), the population of the territory was added.
+                        Given the diversity of countries with respect to economic development, culture and size, one might expect alpha to vary accordingly.", 
+                        
+                        h2("DATE & DECADE"),  h6("For example: 1600 in Bretagnolle et al. (2000)."), "The date (and decade) to which the cities' 
+                        population refer. This information can be used to test the hypothesis according to which systems of cities increase
+                        their level of hierarchy over time, everything else being equal.", br(), 
+                        h2("URBANISATION AGE"), h6("For example: 'OLD' for China."), 
+                        "An indication whether urbanisation is a relatively recent or ancient phenomenon in the territory.
+                        'OLD' continents refer to zones of early urbanisation, in Europe, South-East Asia and the Middle East. 
+                        America, Oceania, Africa and central Asia are considered 'NEW' in that respect. It has been found in previous studies 
+                          (Moriconi-Ebrard, 1993) that countries of more recent urbanisation tend to generate a steeper hierarchy of cities.",
+                        h2("NUMBER OF CITIES"), h6("For example: 60 cities in Lepetit (1990)."),
+                        "The number of cities used to estimate Zipf's coefficient.", br(),  
+                        h2("CITY DEFINITION"),  h6("For example: MorphoCity in Guerin-Pace (1995)."),
+                        "The criteria used to identify cities. LocalUnits correspond to administrative units. 
+                        MorphoCities are aggregations of Local units based on density orthe built-up area. 
                         MetroAreas correspond to functional aggregations of Local units based on flows (typically commuters). 
-                        VariaMixed indicate that the definition is either not uniform either uncommon.", br(), 
-                        h2("POPULATION CUTOFF"), "The minimum population of the cities selected. For example: 5000 residents in Parr (1985).", br(),  
-                        h2("DISCIPLINE"), "The disciplines in which the journal is recognised, according to the Chicago Journal Ranking SJR. For example: 'ECO' for the Quarterly Journal of Economics.", br(),  
-                        "'ECO' refers to estimations published in journals classified in Economics, 'SOC' stands for Social Science and 'PHYS' for environmental and physical sciences journals. A journal can belong to one or more categories.",br(), 
-                        h2("R2"), "The coefficient of Determination of the regression, indicating the quality of the fit. For example: 99% in Bretagnolle et al. (2008).", br(),  br(), 
+                        VariaMixed indicate that the definition is heterogenous or uncommon.", br(), 
+                        h2("POPULATION CUTOFF"),  h6("For example: 5000 residents in Parr (1985)."),
+                        "The minimum population of the cities selected. This cutoff is know to affect other properties of cities such 
+                        as scaling behaviours.", br(),  
+                        h2("DISCIPLINE"),  h6("For example: 'ECO' for the Quarterly Journal of Economics."),
+                        "The disciplines in which the journal is recognised, according to the Chicago Journal Ranking SJR. ", br(),  
+                        "'ECO' refers to estimations published in journals classified in Economics, 
+                        'SOC' stands for Social Science and 'PHYS' for environmental and physical sciences journals. 
+                        A journal can belong to one or more categories. We include this information as a test for disciplinary biases.
+                        It could be possible for example that some journals want to validate Zipf's Law with an exponent alpha of 1, whereas
+                        another journal would be biased towards publishing more refutations of this law, etc.",br(), 
+                        h2("R2"),  h6("For example: 99% in Bretagnolle et al. (2008)."),
+                        "The coefficient of Determination of the regression, indicating the quality of the fit. ", br(),  br(), 
                         #h2("REFERENCE"), "The reference from which the estimation is taken. For example: Singer (1936).", br(),  
                         h4("Data"),
                         h2("Subset Table by:"),
@@ -256,9 +276,14 @@ h3("References:"), dataTableOutput('references')),
      )),
     
       tabPanel("Contribute !",
-             h1("Add your own reviewed estimates:"), 
-             h5("Please remember to press the button 'Save' to save the reference and the estimates, 
-             then to download and to send this data to the moderator for addition to the open database."),
+             h1("Add your estimates"), 
+             "Noone can read all the literature and this one is particularly vast and fast. 
+              You might have published or reviewed estimates which are absent from the database in its current form.
+              Please add them here improve the quality and representativity of this open database 
+             and meta analysis.",
+             h5("Please remember to press the button 'Save' to save the reference and the estimates. When you do, you will be able
+                to download the resulting formatted file. Do not forget to send this data with your potential comments
+                to the moderator if you want them to be intergrated to the meta analysis."),
              wellPanel(
              column(4,selectInput("type", "Document type",
                                   choices=c("Journal Article", "Book", "Thesis"),
@@ -269,9 +294,8 @@ h3("References:"), dataTableOutput('references')),
              column(4,textInput("journal", "Journal / Book Title", value = "")),
              column(4,numericInput("page", "Page of Results", value = "1")),
              column(4,selectInput("regression", "Regression Form*",
-                                  choices=c("LOTKA", "PARETO"), multiple=FALSE)), br(),
-             h6("*Regression forms: LOTKA = log(Pi) ~ alpha * log(Ri) + b + e(i) or PARETO = log(Ri) ~ alpha' * log(Pi) + b' + e'(i)"),
-             h6("with: Pi the population of city i, Ri its rank in the urban hierarchy and alpha' = (1 / alpha)")),
+                                  choices=c("LOTKA", "PARETO"), multiple=FALSE)), br(),br(),
+             h6("*LOTKA: Pi ~ Ri. PARETO: Ri ~ Pi.")),
           
              fluidRow(column(6,sliderInput("nestimates", "Number of estimates",
                                            min = 1, max = 100, value = 1)), 
