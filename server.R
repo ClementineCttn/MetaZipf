@@ -92,8 +92,7 @@ shinyServer(function(input, output, session) {
   }, options = list(pageLength = 10, paging = FALSE))
   
   output$topjournals= renderDataTable({
-    ntop = input$top
-    d = refs[refs$JOURNAL !="Dissertation",]
+     d = refs[refs$JOURNAL !="Dissertation",]
     d$count = 1
     ds = aggregate(d[, "count"], unique(list(d$JOURNAL)), FUN = sumNum)
     ds = subset(ds, x > 1)  
@@ -104,16 +103,14 @@ shinyServer(function(input, output, session) {
   }, options = list(pageLength = 10, paging = FALSE, searching = FALSE))
   
   output$topauthors= renderDataTable({
-    ntop = input$top
-    d = refs[,c("AUTHOR", "YEAR", "JOURNAL", "N_ESTIM")]
+     d = refs[,c("AUTHOR", "YEAR", "JOURNAL", "N_ESTIM")]
     ds = d[order(-d$N_ESTIM),]
     top = as.data.frame(ds)
-   colnames(top) = c("Author", "Year", "Journal/Book","Estimations")
+         colnames(top) = c("Author", "Year", "Journal/Book","Estimations")
     return(top)
   }, options = list(pageLength = 10))
   
   output$topcountries= renderDataTable({
-    ntop = input$top
     m = meta[meta$COUNTRY == "YES",]
     if (input$alpha == "Lotka") m$ALPHA = m$ALPHALOTKA
     if (input$alpha == "Pareto") m$ALPHA = m$ALPHAPARETO
@@ -134,7 +131,6 @@ shinyServer(function(input, output, session) {
   }, options = list(pageLength = 10))
   
   output$topextremes= renderDataTable({
-    ntop = input$top
     m = meta
     if (input$alpha == "Lotka") m$ALPHA = m$ALPHALOTKA
     if (input$alpha == "Pareto") m$ALPHA = m$ALPHAPARETO

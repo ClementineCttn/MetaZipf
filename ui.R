@@ -13,22 +13,38 @@ shinyUI(
             #   headerPanel(),
     
   titlePanel(
-             h2("Interactive and Open Meta Analysis of Zipf's law for cities")),
+             h2("Open Meta Review of Zipf's law for cities")),
   
   navlistPanel(
     
     tabPanel("Presentation",
              column(3, img(src = "favicon.png",class="img-responsive")),
-             column(9, h1("Interactive and Open Meta-analysis of Empirical Zipf's Estimates")), br(),br(),
+             column(9, h1("Open Review and Meta-analysis of Empirical Zipf's Estimates")), 
              tags$hr(), 
             tags$p(class="text-justify",
-            "This application aims at presenting a crowdsourced meta-analysis of Zipf's law estimations from the literature in an interactive way. ",  br(), br(), 
-"Following the work of V. Nitsch (2005), it extends the pool of papers reviewed (initially and through crowdsourcing) and shares access 
-            to the database to enhance its representativity across dates, areas and study fields.",  br(),   br(),  
-             "The idea is to allow interactive queries into this pool of papers, to represent and to model the variation of empiricial estimations of Zipf's 
-                  law's exponent in the literature, with respect to the systems of cities studied. Indeed, this meta-analysis 
+            "This application aims at presenting a crowdsourced review and meta-analysis of Zipf's law estimations from the literature. ",  br(), br(),
+            
+            "Indeed, this famous 'urban mystery' (Krugman, 1996) of a regular distribution of city sizes, found in many city systems at various points in history,
+            has been an on-going subject of scientific discussion for a century. Despite hundreds of empirical evidences, it is still not clear if there is a universal
+            Zipf's law,  - i.e. a power law relating city population to their rank in the system, with a exponent equal to 1 -, because in many cases, a value significantly different
+from 1 is measured. Comparative papers (Singer, 1936; Rosen, Resnick, 1980; Parr, 1985; Soo, 2005) and meta-analyses (Nitsch, 2005) provide an idea of the variation and try to
+understand why deviations are observed: is it because this law simply does not apply in some countries (where control over migration is strong for example)? 
+            Because the system is not consistently defined (Cristelli et al., 2012), in terms of territory, city definition, etc.? 
+            Because the city size inequality tends to evolve over time (Pumain, 1997)?", br(), br(),
+            
+            "Following the meta-analysis of V. Nitsch (2005), we want to",
+            tags$ul(
+              tags$li("create a much larger review of empirical papers, 
+            in particular through crowdsourcing to enhance its representativity across dates, areas and study fields."),
+              tags$li("make this database open for other researchers to build on this collective work."),
+              tags$li("test a broader pool of hypotheses regarding the variability of the exponent measured,
+so that eventually we could distinguish between the theoretical reasons for variation from the technical biases affecting the measurement of this power law."),
+              tags$li("make this meta-analysis transparent, interactive and adaptable to future additions and hypotheses.")),
+        
+            tags$b("The application allows interactive queries into a pool of empirical papers to represent the variation of empiricial estimations of Zipf's 
+                  law's exponent in the literature, with respect to the systems of cities studied and meta-information about the publication. The meta-analysis 
         considers urban characteristics (age of the system, total population), the specifications of the regression used (urban definitions,
-              truncation points, number of cities) and meta-informations (discipline of the journal publishing the paper) to unveil systematic deviations from the iconic -1 value.", br(),   br(),
+              truncation points, number of cities) and the discipline of the journal publishing the paper to unveil systematic deviations from the iconic 1 value."), br(),   br(),
              HTML('The current database covers 1151 estimations from 59 studies, spanning over more than 80 countries over 400 years. 
             It is open for download (<a href="https://github.com/ClementineCttn/MetaZipf">https://github.com/ClementineCttn/MetaZipf</a>) and you are
             strongly invited to contribute by submitting your own empirical estimates using the \'Contribute !\' tab on the left.'), br(),   br(),
@@ -46,9 +62,9 @@ shinyUI(
                             \\(\\alpha' = \\frac{1}{\\alpha}\\) and
                             \\(\\beta' = -\\frac{\\beta}{\\alpha}\\)")))),
             tags$hr(),
-           h5("Clementine Cottineau, 2016, University College London (CASA)."),
+           h5("Clémentine Cottineau, 2016, University College London (CASA)."),
           h6("For any information / comment / suggestion, contact: c.cottineau@ucl.ac.uk"),
-h6("Credits: T. Park from bootswatch.com for Flatly css file. R. Cura for technical help. E. Arcaute and M. Batty for overall design."),
+h6("Credits: T. Park from bootswatch.com for Flatly css file."),
 tags$hr(),
 h3("References:"), dataTableOutput('references')),
     
@@ -277,9 +293,9 @@ h3("References:"), dataTableOutput('references')),
     
       tabPanel("Contribute !",
              h1("Add your estimates"), 
-             "Noone can read all the literature and this one is particularly vast and fast. 
+             "Noone can read all the literature and this one is particularly vast and fast-moving. 
               You might have published or reviewed estimates which are absent from the database in its current form.
-              Please add them here improve the quality and representativity of this open database 
+              Please add them here to improve the quality and representativity of this open database 
              and meta analysis.",
              h5("Please remember to press the button 'Save' to save the reference and the estimates. When you do, you will be able
                 to download the resulting formatted file. Do not forget to send this data with your potential comments
