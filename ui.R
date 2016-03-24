@@ -19,32 +19,34 @@ shinyUI(
     
     tabPanel("Presentation",
              column(3, img(src = "favicon.png",class="img-responsive")),
-             column(9, h1("Open Review and Meta-analysis of Empirical Zipf's Estimates")), 
+             column(9, h1("Open Review and Meta Analysis of Empirical Zipf's Estimates")), 
              tags$hr(), 
             tags$p(class="text-justify",
-            "This application aims at presenting a crowdsourced review and meta-analysis of Zipf's law estimations from the literature. ",  br(), br(),
+            "This application aims at presenting a crowdsourced review and meta analysis of Zipf's law estimations from the literature. ",  br(), br(),
             
             "Indeed, this famous 'urban mystery' (Krugman, 1996) of a regular distribution of city sizes, found in many city systems at various points in history,
             has been an on-going subject of scientific discussion for a century. Despite hundreds of empirical evidences, it is still not clear if there is a universal
             Zipf's law,  - i.e. a power law relating city population to their rank in the system, with a exponent equal to 1 -, because in many cases, a value significantly different
-from 1 is measured. Comparative papers (Singer, 1936; Rosen, Resnick, 1980; Parr, 1985; Soo, 2005) and meta-analyses (Nitsch, 2005) provide an idea of the variation and try to
+from 1 is measured. Comparative papers (Singer, 1936; Rosen, Resnick, 1980; Parr, 1985; Soo, 2005) and meta analyses (Nitsch, 2005) provide a first idea of the magnitude of this variation and they try to
 understand why deviations are observed: is it because this law simply does not apply in some countries (where control over migration is strong for example)? 
-            Because the system is not consistently defined (Cristelli et al., 2012), in terms of territory, city definition, etc.? 
-            Because the city size inequality tends to evolve over time (Pumain, 1997)?", br(), br(),
+            Is it because the system is not consistently defined (Cristelli et al., 2012), in terms of territory, city definition, etc.? 
+            Is it because the city size inequality tends to evolve over time (Pumain, 1997)?", br(), br(),
             
-            "Following the meta-analysis of V. Nitsch (2005), we want to",
+            "Building on the work of V. Nitsch (2005), we bring it further by:",
             tags$ul(
-              tags$li("create a much larger review of empirical papers, 
+              tags$li("creating a much larger review of empirical papers, 
             in particular through crowdsourcing to enhance its representativity across dates, areas and study fields."),
-              tags$li("make this database open for other researchers to build on this collective work."),
-              tags$li("test a broader pool of hypotheses regarding the variability of the exponent measured,
-so that eventually we could distinguish between the theoretical reasons for variation from the technical biases affecting the measurement of this power law."),
-              tags$li("make this meta-analysis transparent, interactive and adaptable to future additions and hypotheses.")),
+              tags$li("making this database open for other researchers."),
+              tags$li("testing a broader pool of hypotheses regarding the variability of the exponent measured,
+so that eventually we could distinguish between the theoretical reasons for variations from the technical biases affecting the measurement of this power law."),
+              tags$li("making this meta analysis transparent, interactive and adaptable to future additions and hypotheses.")),
         
-            tags$b("The application allows interactive queries into a pool of empirical papers to represent the variation of empiricial estimations of Zipf's 
-                  law's exponent in the literature, with respect to the systems of cities studied and meta-information about the publication. The meta-analysis 
+            tags$b("The present application allows interactive queries into a pool of empirical papers to represent the variation of empiricial estimations of Zipf's 
+                  law's exponent in the literature, with respect to the systems of cities studied and meta-information about the publication. The meta analysis 
         considers urban characteristics (age of the system, total population), the specifications of the regression used (urban definitions,
-              truncation points, number of cities) and the discipline of the journal publishing the paper to unveil systematic deviations from the iconic 1 value."), br(),   br(),
+              truncation points, number of cities) and the discipline of the journal publishing the paper to unveil systematic deviations from the iconic 1 value
+                   (more precision in tab 
+                   'Meta-Analysis / Data')."), br(),   br(),
              HTML('The current database covers 1151 estimations from 59 studies, spanning over more than 80 countries over 400 years. 
             It is open for download (<a href="https://github.com/ClementineCttn/MetaZipf">https://github.com/ClementineCttn/MetaZipf</a>) and you are
             strongly invited to contribute by submitting your own empirical estimates using the \'Contribute !\' tab on the left.'), br(),   br(),
@@ -174,9 +176,9 @@ h3("References:"), dataTableOutput('references')),
                          potential biases (city definition, discipline, etc.).",
                         
                         tags$hr(),
-                        "To this end, we use a multiple linear regression and regress 
-                        the value of alpha against the value of these other 
-                        characteristics Y of the estimation i, 
+                        "To this end, we use a multiple linear regression. We regress 
+                        the value of alpha by the value of other 
+                        characteristics Y of i, 
                         resulting in the estimation of an intercept and a vector of 
                         coefficients b, one for each characteristic Y, indicating the
                         intensity with which the value of alpha varies following a variation
@@ -184,7 +186,7 @@ h3("References:"), dataTableOutput('references')),
                         withMathJax(h6("$$\\alpha_i = Intercept + b * Y_i $$")),
                         "For comparability reasons, most of the characteristics Y 
                         that we consider have been discretised into three ordinal categories.
-                        You can modify the suggested bounds for each such discretisation, by using
+                        You can modify the parameters of each discretisation, using
                         the sliders corresponding to the quantitative variables (when activated). 
                         The first value in blue indicates the upper bound of the first category and
                         the second value indicates the lower bound of the third category.", br(),br(),
@@ -194,9 +196,9 @@ h3("References:"), dataTableOutput('references')),
                         tags$ul(
                           tags$li(h6("Estimations where the 
                           full spectrum of city sizes are considered, even cities with a population of 10,000 residents
-                                     (or less)")), 
+                                     (or less).")), 
                           tags$li(h6("Estimations where the minimum population for cities is comprised between 10,000 and 100,000 
-                          residents")), 
+                          residents.")), 
                           tags$li(h6("Estimations where the rank-size relation is applied to large cities only 
                             (with a population cutoff over 100,000)."))),
                         
@@ -221,7 +223,7 @@ h3("References:"), dataTableOutput('references')),
                
                column(4,conditionalPanel(
                  condition = 'input.technicalSpecs.indexOf("truncation4model") != -1 || input.technicalSpecs.indexOf("alltech") != -1', 
-                 sliderInput("truncVal", "Truncation points (to define high, medium and low truncatures)",
+                 sliderInput("truncVal", "Population Cutoff (to define high, medium and low truncatures)",
                              min = 0, max = 1000000, value = c(10000, 100000)))),
                column(4,conditionalPanel(
                  condition = 'input.technicalSpecs.indexOf("N4model") != -1 || input.technicalSpecs.indexOf("alltech") != -1',
@@ -229,47 +231,49 @@ h3("References:"), dataTableOutput('references')),
                              min = 1, max = 1000, value = c(30, 300)))),
                column(4,conditionalPanel(
                  condition = 'input.topicalSpecs.indexOf("countrySize") != -1 || input.topicalSpecs.indexOf("alltop") != -1',
-                 sliderInput("PopVal", "Thousands of Residents (to define large, medium and small countries)",
+                 sliderInput("PopVal", "Country Population (x 1000, to define large, medium and small countries)",
                              min = 1, max = 1000000, value = c(10000, 100000))))),
              fluidRow(
                tags$hr(),
                h4("Model Fit"),
-               "The accuracy of the model is given by the R2 value, but also depends on the the number of estimations. 
-               However, because a consistent information is not fully available in all the papers published, 
-               the number of estimations decreases when the number of explaning variables increases.", br(), br(),
+               "The accuracy of the model is given by the R2 value, but it also depends on the the number of observations (here, the estimations from the literature). 
+               Because a consistent information is not fully available in all the papers published, 
+               the number of observations decreases when the number of explaning variables increases.", br(), br(),
                tableOutput('modelparameters'),
                tags$hr(), h4("Results"),
                tableOutput('model'),
                "To interpret the results, please note that:", br(), br(),
                tags$ul(
+                 tags$li("You should start by looking at the significance values ", tags$b("'Pr(>|t|)'"), " and interpret only
+                         the value of the estimates for which the probability of error is the lowest."), 
                  tags$li("The ", tags$b("Intercept"), " gives the average value of alpha predicted for 
                          an urban system characterized by the reference categories selected. If no
                          characteristics are selected, this value is the mean alpha measured over all studies.",
                         
                          htmlOutput('REFS'),  h6(
-                   "For example, if 'Population cutoff' is selected, it will give the average
+                   "For example, if 'Population Cutoff' is selected, it will give the average
                    value of alpha expected for studies using a high population cutoff, i.e. studies
-                   of large cities only."
+                   where only large cities are considered."
                  )), 
                  tags$li("The coefficient for ", tags$b("Discrete Variables"), " (population cutoff, 
                           city definition, etc.), when added to the 
                          intercept, gives the average value of alpha for studies belonging to the 
                          category under consideration (compared to studies using the reference category).",
                         h6(
-                           "For example and by default, if 'Population cutoff' is selected, 
-                           the estimate for 'Low' indicates that, on average, studies covering a wider range of city size
+                           "For example and by default, if 'Population Cutoff' is selected, 
+                           the estimate for 'Low' indicates that, on average, studies covering a wider range of city sizes
                            find Zipf coefficients indicating a larger size disparity than studies using data on
-                           large cities only (population cutoff > 100,000 residents)."
+                           large cities only (Population Cutoff > 100,000 residents)."
                          )), 
                  tags$li("The coefficient associated with the '", tags$b("Date of observation"), "' indicates how much alpha varies
-                         on average for each year added to the date of observation, with these dates centred on 1950. 
-                         If the rank-size characteristics of a system do not change over time, this coefficient should be
-                         equal to 0. On the contrary, significant non-zero coefficients indicate tendencies towrds hierarchisation or equalisation
-                         of city size over time.",
+                         on average for each year added to the date of observation, these dates being centred on 1950. 
+                         If the rank-size properties of a system do not change over time, this coefficient should be
+                         equal to 0. On the contrary, significant non-zero coefficients indicate tendencies towards hierarchisation or equalisation
+                         of city sizes over time.",
                          h6(
-                           "For example, alpha estimations for 1950 cities exhibit, on average, the value
-                           of the intercept plus the coefficients of the categories to which they belong, 
-                           but alpha estimations for 1970 cities exhibit, on average, the value
+                           "For example, alpha estimations for cities in 1950 exhibit, on average, the value
+                           of the intercept plus the coefficients of the categories to which they belong. 
+                          Alpha estimations for cities in 1970 exhibit, on average, the value
                            of the intercept plus twenty times the value of the 'Date of observaton' coefficient,
                            plus the coefficients of the categories to which they belong."
                          )), 
@@ -299,7 +303,7 @@ h3("References:"), dataTableOutput('references')),
              and meta analysis.",
              h5("Please remember to press the button 'Save' to save the reference and the estimates. When you do, you will be able
                 to download the resulting formatted file. Do not forget to send this data with your potential comments
-                to the moderator if you want them to be intergrated to the meta analysis."),
+                to the moderator if you want them to be integrated to the meta analysis."),
              wellPanel(
              column(4,selectInput("type", "Document type",
                                   choices=c("Journal Article", "Book", "Thesis"),
