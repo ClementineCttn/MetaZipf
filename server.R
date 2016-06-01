@@ -174,7 +174,7 @@ shinyServer(function(input, output, session) {
     ci9high = round(-confint(model)[2,1],3)
     n = m$df[1] + m$df[2]
     summary = data.frame(alpha, sd, r2, n)
-    colnames(summary) = c("Alpha", "Standard Deviation","R2", "N")
+    colnames(summary) = c("Alpha", "Standard Deviation","R2", "N Cities")
     return(summary)
     }, options = list(pageLength = 10, paging = FALSE, searching = FALSE))
   

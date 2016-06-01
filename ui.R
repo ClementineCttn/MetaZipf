@@ -74,18 +74,22 @@ so that eventually we could distinguish between the theoretical reasons for vari
    h6('Nitsch, V. (2005). Zipf zipped. Journal of Urban Economics, 57(1), 86-100')
 ),
 tabPanel("2. The References",
-         h3("References:"), dataTableOutput('references')
+         h3("Bibliographical References"), dataTableOutput('references')
 ),
 tabPanel("3. An Example",
-         h3("Explore variations of estimations with urban data"),
+         h3("Explore variations of Zipf estimations with..."),
          fluidRow(
            
          column(4,selectInput("dariusyear", "Year", choice=c(2010, 2002, 1989, 1979, 1970, 1959, 1939, 1926, 1897), multiple=F)),
          column(4,sliderInput("dariuscutoff", "Minimum Population", min = 10000, max = 1000000, value = 10000)),
          column(4,selectInput("dariusdef", "Urban Definition", choices = c("Local", "Morpho"), selected = "Morpho")),
-         column(12, plotOutput('DARIUSgraph')), 
-         column(12,dataTableOutput('DARIUSestim')),
-         column(12, plotOutput('DARIUSmap'))
+         column(12,dataTableOutput('DARIUSestim')),column(12, plotOutput('DARIUSgraph')), 
+         
+         column(12, plotOutput('DARIUSmap')),
+         column(12, h6(HTML('DARIUS Dataset, 
+                               Cottineau C. (2014), figshare.
+<a href=https://dx.doi.org/10.6084/m9.figshare.1108081.v1">https://dx.doi.org/10.6084/m9.figshare.1108081.v1</a>')
+         ))
 ))
 )),
     
