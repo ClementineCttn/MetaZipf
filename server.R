@@ -2,6 +2,8 @@ library(ggplot2)
 library(RColorBrewer)
 library(plyr)
 library(shiny)
+library(rgdal) 
+library(rgeos) 
 
 
 
@@ -19,6 +21,9 @@ refs = read.csv("data/zipf_refs.csv", sep=",", dec=".")
 
 metaToAdd = data.frame()
 refsToAdd = data.frame()
+
+DARIUS<-readOGR(dsn = "data/DARIUS_points.shp" , layer = "DARIUS_points", encoding = "utf8", stringsAsFactors = FALSE, verbose = FALSE)
+DARIUSBack<-readOGR(dsn = "data/DARIUS_background2.shp" , layer = "DARIUS_background2", encoding = "utf8", stringsAsFactors = FALSE, verbose = FALSE)
 
 
 SummaryMetaAlpha = function(table, regression = "Lotka"){
@@ -90,6 +95,61 @@ shinyServer(function(input, output, session) {
     colnames(d) = c("Author", "Year", "Journal", "Page", "Estimations", "Regression")
     return(d)
   }, options = list(pageLength = 10, paging = FALSE))
+  
+  
+  
+  DARIUSSubset <- reactive({
+    DARIUSsub = DARIUS
+    year4darius = paste0("Pop",input$dariusyear)
+    DARIUSsub@data$Population = DARIUSsub@data[,year4darius]
+    dariuscutoff = input$dariuscutoff / 1000
+    DARIUSsub@data$Population = ifelse(DARIUSsub@data$Population >= dariuscutoff, DARIUSsub@data$Population, NA)
+    return(DARIUSsub)
+  })
+  
+  output$DARIUSgraph = renderPlot({
+    DARIUSsub = DARIUSSubset()
+    DARIUSdf = DARIUSsub@data
+    size = DARIUSdf[order(-DARIUSdf$Population) , "Population"]
+    rank = 1:length(size)
+    zipf = data.frame(size, rank)
+    par(mar = c(2,2,3,2))
+    p <-ggplot(zipf, aes(x=rank, y=size)) 
+    p + scale_y_log10(breaks=c(10, 100, 1000, 10000)) +
+      scale_x_log10(breaks=c(1, 10, 100, 1000)) + 
+      xlab("Rank") + ylab("Size (Population in thousands)") +
+      geom_point(color = "#1e90ff" ) + geom_line(color = "#1e90ff" ) +
+      theme(axis.text=element_text(size=12) ,
+            axis.title=element_text(size=14),
+            axis.text.x = element_text(angle = 45, hjust = 1))
+  })
+    
+  output$DARIUSmap = renderPlot({
+    DARIUSsub = DARIUSSubset()
+    par(mar = c(0,0,1,0))
+     plot(DARIUSBack, border="white", col="grey90")
+    plot(DARIUSsub, pch=16, col="#1e90ff", add=T,
+    cex=0.05 * sqrt(DARIUSsub@data$Population/ pi))
+    leg <- c(15000, 1000, 100, 10)
+    legend("topleft",legend = leg, pch = 21,
+           col = "gray30", pt.bg = "dodgerblue",
+           pt.cex = 0.05 * sqrt(leg / pi),
+           bty = "n", cex=0.8, title = "Population in agglomerations (* 1000)")
+    arrows(par()$usr[1] + 100000, 
+           par()$usr[3] + 100000,
+           par()$usr[1] + 1000000, 
+           par()$usr[3] + 100000,
+           lwd = 2, code = 3,
+           angle = 90, length = 0.05)
+    text(par()$usr[1] + 505000, 
+         par()$usr[3] + 270000, 
+         "1000 km", cex = 0.8)  
+  })
+  
+  output$DARIUSestim= renderDataTable({
+    
+  })
+  
   
   output$topjournals= renderDataTable({
      d = refs[refs$JOURNAL !="Dissertation",]

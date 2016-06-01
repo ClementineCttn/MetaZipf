@@ -16,8 +16,11 @@ shinyUI(
              h2("Open Meta Review of Zipf's law for cities")),
   
   navlistPanel(
-    
+   
+      
     tabPanel("Presentation",
+      tabsetPanel(
+      tabPanel("1. The Project",
              column(3, img(src = "favicon.png",class="img-responsive")),
              column(9, h1("Open Review and Meta Analysis of Empirical Zipf's Estimates")), 
              tags$hr(), 
@@ -47,7 +50,7 @@ so that eventually we could distinguish between the theoretical reasons for vari
               truncation points, number of cities) and the discipline of the journal publishing the paper to unveil systematic deviations from the iconic 1 value
                    (more precision in tab 
                    'Meta-Analysis / Data')."), br(),   br(),
-             HTML('The current database covers 1151 estimations from 59 studies, spanning over more than 80 countries over 400 years. 
+             HTML('The current database covers 1187 estimations from 66 studies, spanning over more than 80 countries over 400 years. 
             It is open for download (<a href="https://github.com/ClementineCttn/MetaZipf">https://github.com/ClementineCttn/MetaZipf</a>) and you are
             strongly invited to contribute by submitting your own empirical estimates using the \'Contribute !\' tab on the left.'), br(),   br(),
             h5("Before starting, choose a regression form into which all subsequent results will be expressed.")),
@@ -63,12 +66,28 @@ so that eventually we could distinguish between the theoretical reasons for vari
                             \\(R_i\\) its rank in the urban hierarchy,
                             \\(\\alpha' = \\frac{1}{\\alpha}\\) and
                             \\(\\beta' = -\\frac{\\beta}{\\alpha}\\)")))),
-            tags$hr(),
-           h5("Clémentine Cottineau, 2016, University College London (CASA)."),
-          h6("For any information / comment / suggestion, contact: c.cottineau@ucl.ac.uk"),
-h6("Credits: T. Park from bootswatch.com for Flatly css file."),
-tags$hr(),
-h3("References:"), dataTableOutput('references')),
+           
+   tags$hr(),
+   h5("Clémentine Cottineau, 2016, University College London (CASA)."),
+   h6("For any information / comment / suggestion, contact: c.cottineau@ucl.ac.uk"),
+   h6("Credits: T. Park from bootswatch.com for Flatly css file."),
+   h6('Nitsch, V. (2005). Zipf zipped. Journal of Urban Economics, 57(1), 86-100')
+),
+tabPanel("2. The References",
+         h3("References:"), dataTableOutput('references')
+),
+tabPanel("3. An Example",
+         h3("Explore variations of estimations with urban data"),
+         fluidRow(
+           
+         column(4,selectInput("dariusyear", "Year", choice=c(2010, 2002, 1989, 1979, 1970, 1959, 1939, 1926, 1897), multiple=F)),
+         column(4,sliderInput("dariuscutoff", "Minimum Population", min = 10000, max = 1000000, value = 10000)),
+         column(4,selectInput("dariusset", "Urban Definition", "", multiple=T)),
+         column(10, plotOutput('DARIUSgraph')), 
+         column(2,dataTableOutput('DARIUSestim')),
+         column(12, plotOutput('DARIUSmap'))
+))
+)),
     
     tabPanel("Meta-Analysis",
              tabsetPanel(
@@ -121,9 +140,12 @@ h3("References:"), dataTableOutput('references')),
                           column(4,selectizeInput("decade", "Decade", "", multiple=T)),
                              column(3,downloadButton("downloadData", "Download")), 
                                  column(9, HTML('N.B. This table is a simplified version. You can find the full version here <a href="here">https://github.com/ClementineCttn/MetaZipf</a>'))),
-                        dataTableOutput('review')
-                                     
-                        
+                        dataTableOutput('review'),
+                        tags$hr(),
+                        h6(HTML('Total population in thousands, from UN estimates (1950-2015) 
+                                <a href=http://esa.un.org/unpd/wpp/Download/Standard/Population/">http://esa.un.org/unpd/wpp/Download/Standard/Population/</a>')
+                        )
+                            
                ),    
 
                
@@ -136,10 +158,7 @@ h3("References:"), dataTableOutput('references')),
             dataTableOutput('topauthors'),
             h4('TOP countries for the dispersion of results*:'),
             '*measured by the standard deviation of alpha for countries with more than 5 estimations.',  tags$hr(),
-            dataTableOutput('topcountries'),
-           HTML('Nitsch, V. (2005). Zipf zipped. Journal of Urban Economics, 57(1), 86-100. Total population in thousands, from UN estimates (1950-2015) 
-                <a href=http://esa.un.org/unpd/wpp/Download/Standard/Population/">http://esa.un.org/unpd/wpp/Download/Standard/Population/</a>')
-             
+            dataTableOutput('topcountries')   
             ),
     
      tabPanel("3. Estimates Summary",

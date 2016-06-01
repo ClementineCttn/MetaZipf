@@ -1,4 +1,5 @@
-my_packages = c("ggplot2", "RColorBrewer", "plyr", "shiny")
+my_packages = c("ggplot2", "RColorBrewer", "plyr", "shiny",
+                "rgdal", "rgeos")
 
 ###########################################################
 
