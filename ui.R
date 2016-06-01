@@ -83,8 +83,8 @@ tabPanel("3. An Example",
          column(4,selectInput("dariusyear", "Year", choice=c(2010, 2002, 1989, 1979, 1970, 1959, 1939, 1926, 1897), multiple=F)),
          column(4,sliderInput("dariuscutoff", "Minimum Population", min = 10000, max = 1000000, value = 10000)),
          column(4,selectInput("dariusset", "Urban Definition", "", multiple=T)),
-         column(10, plotOutput('DARIUSgraph')), 
-         column(2,dataTableOutput('DARIUSestim')),
+         column(12, plotOutput('DARIUSgraph')), 
+         column(12,dataTableOutput('DARIUSestim')),
          column(12, plotOutput('DARIUSmap'))
 ))
 )),

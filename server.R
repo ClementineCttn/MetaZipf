@@ -107,12 +107,16 @@ shinyServer(function(input, output, session) {
     return(DARIUSsub)
   })
   
-  output$DARIUSgraph = renderPlot({
+  DARIUSzipf <- reactive({
     DARIUSsub = DARIUSSubset()
     DARIUSdf = DARIUSsub@data
     size = DARIUSdf[order(-DARIUSdf$Population) , "Population"]
     rank = 1:length(size)
     zipf = data.frame(size, rank)
+  })
+  
+  output$DARIUSgraph = renderPlot({
+    zipf = DARIUSzipf()
     par(mar = c(2,2,3,2))
     p <-ggplot(zipf, aes(x=rank, y=size)) 
     p + scale_y_log10(breaks=c(10, 100, 1000, 10000)) +
@@ -134,7 +138,7 @@ shinyServer(function(input, output, session) {
     legend("topleft",legend = leg, pch = 21,
            col = "gray30", pt.bg = "dodgerblue",
            pt.cex = 0.05 * sqrt(leg / pi),
-           bty = "n", cex=0.8, title = "Population in agglomerations (* 1000)")
+           bty = "n", cex=0.8, title = "Population in thousands")
     arrows(par()$usr[1] + 100000, 
            par()$usr[3] + 100000,
            par()$usr[1] + 1000000, 
@@ -146,9 +150,25 @@ shinyServer(function(input, output, session) {
          "1000 km", cex = 0.8)  
   })
   
-  output$DARIUSestim= renderDataTable({
-    
-  })
+  output$DARIUSestim = renderDataTable({
+    zipf = DARIUSzipf()
+    if (input$alpha == "Lotka") {
+      model = lm(log(size) ~ log(rank), data = zipf)
+    }
+    if (input$alpha  == "Pareto") {
+      model = lm(log(rank) ~ log(size), data = zipf)
+    }
+    m = summary(model)
+    alpha = round(-m$coefficients[2,1],3)
+    sd = round(m$coefficients[2,2],3)
+    r2 = round(m$r.squared,3) * 100
+    ci9low = round(-confint(model)[2,2],3)
+    ci9high = round(-confint(model)[2,1],3)
+    n = m$df[1] + m$df[2]
+    summary = data.frame(alpha, sd, r2, n)
+    colnames(summary) = c("Alpha", "Standard Deviation","R2", "N")
+    return(summary)
+    }, options = list(pageLength = 10, paging = FALSE, searching = FALSE))
   
   
   output$topjournals= renderDataTable({
