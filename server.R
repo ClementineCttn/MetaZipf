@@ -4,7 +4,7 @@ library(plyr)
 library(shiny)
 library(rgdal) 
 library(rgeos) 
-
+library(sp)
 
 
 meta = read.csv("data/zipf_meta.csv", sep=",", dec=".")
@@ -22,9 +22,10 @@ refs = read.csv("data/zipf_refs.csv", sep=",", dec=".")
 metaToAdd = data.frame()
 refsToAdd = data.frame()
 
-DARIUS<-readOGR(dsn = "data/DARIUS_points.shp" , layer = "DARIUS_points", encoding = "utf8", stringsAsFactors = FALSE, verbose = FALSE)
+DARIUS_A<-readOGR(dsn = "data/DARIUS_points.shp" , layer = "DARIUS_points", encoding = "utf8", stringsAsFactors = FALSE, verbose = FALSE)
 DARIUSBack<-readOGR(dsn = "data/DARIUS_background2.shp" , layer = "DARIUS_background2", encoding = "utf8", stringsAsFactors = FALSE, verbose = FALSE)
-
+DARIUS_L<-readOGR(dsn = "data/LocalDARIUS_points.shp" , layer = "LocalDARIUS_points", encoding = "utf8", stringsAsFactors = FALSE, verbose = FALSE)
+LocalUnits = read.csv("data/DARIUS_LocalUnits.csv", sep=",", dec=".", header=T)
 
 SummaryMetaAlpha = function(table, regression = "Lotka"){
   tab = table
@@ -86,8 +87,6 @@ generateEstimRows <- function(i){
   )
 }
 
-
-
 shinyServer(function(input, output, session) {
    
   output$references = renderDataTable({
@@ -99,6 +98,8 @@ shinyServer(function(input, output, session) {
   
   
   DARIUSSubset <- reactive({
+    if (input$dariusdef == "Local") DARIUS = DARIUS_L
+    if (input$dariusdef == "Morpho") DARIUS = DARIUS_A
     DARIUSsub = DARIUS
     year4darius = paste0("Pop",input$dariusyear)
     DARIUSsub@data$Population = DARIUSsub@data[,year4darius]
@@ -108,8 +109,15 @@ shinyServer(function(input, output, session) {
   })
   
   DARIUSzipf <- reactive({
+    if (input$dariusdef == "Morpho") {
     DARIUSsub = DARIUSSubset()
     DARIUSdf = DARIUSsub@data
+    }
+    if (input$dariusdef == "Local") {
+      DARIUSdf = LocalUnits
+      DARIUSdf$Population = DARIUSdf[,paste0("Pop",input$dariusyear)]
+      DARIUSdf$Population = ifelse(DARIUSdf$Population >= input$dariuscutoff / 1000, DARIUSdf$Population, NA)
+    }
     size = DARIUSdf[order(-DARIUSdf$Population) , "Population"]
     rank = 1:length(size)
     zipf = data.frame(size, rank)
