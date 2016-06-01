@@ -4,7 +4,6 @@ library(plyr)
 library(shiny)
 library(rgdal) 
 library(rgeos) 
-library(sp)
 
 
 meta = read.csv("data/zipf_meta.csv", sep=",", dec=".")

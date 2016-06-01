@@ -88,7 +88,7 @@ tabPanel("3. An Example",
          column(12, plotOutput('DARIUSmap')),
          column(12, h6(HTML('DARIUS Dataset, 
                                Cottineau C. (2014), figshare.
-<a href=https://dx.doi.org/10.6084/m9.figshare.1108081.v1">https://dx.doi.org/10.6084/m9.figshare.1108081.v1</a>')
+<a href=https://figshare.com/articles/DARIUS_Database/1108081/1">https://figshare.com/articles/DARIUS_Database/1108081/1</a>')
          ))
 ))
 )),
