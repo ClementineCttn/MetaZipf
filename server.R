@@ -408,9 +408,9 @@ metaTableSummary <- reactive({
       tab$Discipline_PHYS = tab$PHYS
       regressants = paste(regressants, " + Discipline_ECO + Discipline_SOC + Discipline_PHYS", sep="")}
     if ('country' %in% OtherSpecs  == "TRUE") {
-      tab = subset(tab, COUNTRY != "")
-      tab$National_Territory_ = tab$COUNTRY
-      regressants = paste(regressants, " + National_Territory_", sep="")}
+      tab = subset(tab, TERRITORY_TYPE != "")
+      tab$Territory_ = tab$TERRITORY_TYPE
+      regressants = paste(regressants, " + Territory_", sep="")}
     
     model = lm(regressants, data=tab, na.action = na.omit)
     return(model)
@@ -451,7 +451,7 @@ metaTableSummary <- reactive({
     if ('scale4model' %in% TechnicalSpecs == "TRUE") Reference = paste(Reference, " | City Definition: LocalUnit", sep="")
     if ('countrySize' %in% TopicalSpecs  == "TRUE") Reference = paste(Reference, " | Country Size: Large", sep="")
     if ('discipline' %in% OtherSpecs == "TRUE") Reference = paste(Reference, " | Discipline: none", sep="")
-    if ('country' %in% OtherSpecs  == "TRUE") Reference = paste(Reference, " | Territory: not a country", sep="")
+    if ('country' %in% OtherSpecs  == "TRUE") Reference = paste(Reference, " | Territory: National State", sep="")
       
     if (Reference != "") Reference = paste0("Reference Categories ", Reference)
     h5(Reference)
