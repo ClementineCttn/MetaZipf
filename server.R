@@ -8,6 +8,21 @@ library(rgeos)
 
 meta = read.csv("data/zipf_meta.csv", sep=",", dec=".")
 meta$TOTAL_POP = as.numeric(meta$TOTAL_POP)
+
+refs = read.csv("data/zipf_refs.csv", sep=",", dec=".")
+head(meta)
+metaToAdd = data.frame()
+refsToAdd = data.frame()
+
+meta = data.frame(meta, refs[match(meta$REFID,refs$REFID),])
+rownames(meta) = 1:dim(meta)[1]
+meta$REFID.1 = NULL
+meta$REGRESSIONFORM = NULL
+meta$AUTHOR = NULL
+meta$YEAR = NULL
+meta$PAGE = NULL
+meta$SOURCE = NULL
+
 meta[meta$ECO == 1 & meta$SOC == 0 & meta$PHYS == 0, "DISCIPLINE"] = "ECO"
 meta[meta$ECO == 1 & meta$SOC == 1 & meta$PHYS == 0, "DISCIPLINE"] = "ECO & SOC"
 meta[meta$ECO == 1 & meta$SOC == 0 & meta$PHYS == 1, "DISCIPLINE"] = "ECO & PHYS"
@@ -15,11 +30,6 @@ meta[meta$ECO == 1 & meta$SOC == 1 & meta$PHYS == 1, "DISCIPLINE"] = "ECO, SOC &
 meta[meta$ECO == 0 & meta$SOC == 1 & meta$PHYS == 0, "DISCIPLINE"] = "SOC"
 meta[meta$ECO == 0 & meta$SOC == 1 & meta$PHYS == 1, "DISCIPLINE"] = "SOC & PHYS"
 meta[meta$ECO == 0 & meta$SOC == 0 & meta$PHYS == 1, "DISCIPLINE"] = "PHYS"
-
-refs = read.csv("data/zipf_refs.csv", sep=",", dec=".")
-
-metaToAdd = data.frame()
-refsToAdd = data.frame()
 
 DARIUS_A<-readOGR(dsn = "data/DARIUS_points.shp" , layer = "DARIUS_points", encoding = "utf8", stringsAsFactors = FALSE, verbose = FALSE)
 DARIUSBack<-readOGR(dsn = "data/DARIUS_background2.shp" , layer = "DARIUS_background2", encoding = "utf8", stringsAsFactors = FALSE, verbose = FALSE)
