@@ -182,12 +182,12 @@ shinyServer(function(input, output, session) {
      d = refs[refs$JOURNAL !="Dissertation",]
     d$count = 1
     ds = aggregate(d[, "count"], unique(list(d$JOURNAL)), FUN = sumNum)
-    ds = subset(ds, x > 1)  
+    ds = subset(ds, x >= 1)  
     ds = ds[order(-ds$x),]
     top = as.data.frame(ds)
     colnames(top) = c("Journal","References")
     return(top)
-  }, options = list(pageLength = 10, paging = FALSE, searching = FALSE))
+  }, options = list(pageLength = 10,searching = FALSE))
   
   output$topauthors= renderDataTable({
      d = refs[,c("AUTHOR", "YEAR", "JOURNAL", "N_ESTIM")]
@@ -209,12 +209,19 @@ shinyServer(function(input, output, session) {
     ds = d[order(-d$x),]
     top = as.data.frame(ds)
     top$x = round(top$x, 3)
-    top = join(top, keep, by = "Group.1")
-    rownames(top) = top$Group.1
+    mn = aggregate(m[, "ALPHA"], unique(list(m$TERRITORY)), FUN = mean)
+    mean = as.data.frame(mn)
+    mean$x = round(mean$x, 3)
+    topC = join( top,mean, by = "Group.1")
+    topC = join( topC,keep, by = "Group.1")
+   
+    rownames(topC) = topC$Group.1
  #  top$Group.1 = NULL
-    colnames(top) = c("Country", "Diversity* of Alpha", "Estimations")
-    top$Estimations = as.integer(top$Estimations)
-    return(top)
+    colnames(topC) = c("Country", "Alpha Diversity*", "Mean Alpha", "Estimations")
+    topC$Estimations = as.integer(topC$Estimations)
+    topC = topC[order(-topC[,2]),]
+    
+    return(topC)
   }, options = list(pageLength = 10))
   
   output$topextremes= renderDataTable({
@@ -232,7 +239,36 @@ shinyServer(function(input, output, session) {
     return(top)
   })
   
+  output$continent = renderDataTable({
+    m = meta
+    if (input$alpha == "Lotka") m$ALPHA = m$ALPHALOTKA
+    if (input$alpha == "Pareto") m$ALPHA = m$ALPHAPARETO
+    
+    d = m[,c("ALPHA", "CONTINENT", "REFERENCE")]
+    d$count = 1
+    
+    macro = aggregate(d[, "count"], unique(list(d$CONTINENT)), FUN = sumNum)
+    colnames(macro) = c("Continent", "Estimations")
+    meanalpha = aggregate(d[, "ALPHA"], unique(list(d$CONTINENT)), FUN = mean)
+    
+    refTable = as.data.frame(table(d$CONTINENT, d$REFERENCE))
+    refTable[refTable == 0] <- NA
+    r = refTable[!is.na(refTable$Freq),]
+    r$Freq = 1
+    r[,2] = NULL
+    colnames(r) = c("CONTINENT", "count")
+    studies = aggregate(r[, "count"], unique(list(r$CONTINENT)), FUN = sumNum)
+    macro$Studies = studies$x
+    macro$A = round(meanalpha$x,3)
+    colnames(macro) = c("CONTINENT", "Estimations", "Studies", "Mean Alpha")
+    macroO = macro[order(-macro$Estimations),]
+    return(macroO)
+  }, options = list(paging = FALSE, searching = FALSE))
   
+    
+    
+    
+    
 metaTableSelected <- reactive({
     tab = meta
     if (input$alpha == "Lotka") tab$ALPHA = tab$ALPHALOTKA
