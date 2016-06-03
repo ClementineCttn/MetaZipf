@@ -208,7 +208,7 @@ shinyServer(function(input, output, session) {
   }, options = list(pageLength = 10))
   
   output$topcountries= renderDataTable({
-    m = meta[meta$COUNTRY == "YES",]
+    m = meta[meta$TERRITORY_TYPE == "Country",]
     if (input$alpha == "Lotka") m$ALPHA = m$ALPHALOTKA
     if (input$alpha == "Pareto") m$ALPHA = m$ALPHAPARETO
     m$count = 1
