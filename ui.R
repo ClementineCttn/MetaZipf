@@ -246,7 +246,8 @@ tabPanel("3. An Example",
                                              "Country Population" = "countrySize"), selected = NULL, inline = FALSE)),
                column(4,checkboxGroupInput("otherSpecs", "Other Specifications", 
                                            c("All" = "allother",
-                                             "Discipline" = "discipline", "", ""), selected = NULL, inline = FALSE)),
+                                             "Discipline" = "discipline", 
+                                             "Type of territory" = "country",""), selected = NULL, inline = FALSE)),
                
                column(4,conditionalPanel(
                  condition = 'input.technicalSpecs.indexOf("truncation4model") != -1 || input.technicalSpecs.indexOf("alltech") != -1', 

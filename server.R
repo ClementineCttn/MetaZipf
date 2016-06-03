@@ -378,7 +378,7 @@ metaTableSummary <- reactive({
     
     if ('alltech' %in% TechnicalSpecs == "TRUE") TechnicalSpecs = c("scale4model",  "truncation4model", "N4model")
     if ('alltop' %in% TopicalSpecs == "TRUE") TopicalSpecs = c("urbanisation4model",  "countrySize", "year4model")
-    if ('allother' %in% OtherSpecs == "TRUE") OtherSpecs = c("discipline")
+    if ('allother' %in% OtherSpecs == "TRUE") OtherSpecs = c("discipline", "country")
     
     regressants = "ALPHA ~ 1"
     if ('year4model' %in% TopicalSpecs == "TRUE") {
@@ -407,6 +407,10 @@ metaTableSummary <- reactive({
       tab$Discipline_SOC = tab$SOC
       tab$Discipline_PHYS = tab$PHYS
       regressants = paste(regressants, " + Discipline_ECO + Discipline_SOC + Discipline_PHYS", sep="")}
+    if ('country' %in% OtherSpecs  == "TRUE") {
+      tab = subset(tab, COUNTRY != "")
+      tab$National_Territory_ = tab$COUNTRY
+      regressants = paste(regressants, " + National_Territory_", sep="")}
     
     model = lm(regressants, data=tab, na.action = na.omit)
     return(model)
@@ -433,10 +437,12 @@ metaTableSummary <- reactive({
   output$REFS = renderUI({
     TechnicalSpecs = input$technicalSpecs
     TopicalSpecs = input$topicalSpecs
+    OtherSpecs = input$otherSpecs
     
     if ('alltech' %in% TechnicalSpecs == "TRUE") TechnicalSpecs = c("scale4model",  "truncation4model", "N4model")
     if ('alltop' %in% TopicalSpecs == "TRUE") TopicalSpecs = c("urbanisation4model",  "countrySize", "year4model")
-
+    if ('allother' %in% OtherSpecs == "TRUE") OtherSpecs = c("discipline", "country")
+    
     Reference = ""
     if ('urbanisation4model' %in% TopicalSpecs == "TRUE") Reference = paste(Reference, " | Age of Urbanisation: Old", sep="")
     if ('truncation4model' %in% TechnicalSpecs == "TRUE")Reference = paste(Reference, " | Population Cutoff: High", sep="")
@@ -444,7 +450,9 @@ metaTableSummary <- reactive({
     if ('year4model' %in% TopicalSpecs == "TRUE") Reference = paste(Reference, " | Date of Observation: 1950", sep="")
     if ('scale4model' %in% TechnicalSpecs == "TRUE") Reference = paste(Reference, " | City Definition: LocalUnit", sep="")
     if ('countrySize' %in% TopicalSpecs  == "TRUE") Reference = paste(Reference, " | Country Size: Large", sep="")
-  
+    if ('discipline' %in% OtherSpecs == "TRUE") Reference = paste(Reference, " | Discipline: none", sep="")
+    if ('country' %in% OtherSpecs  == "TRUE") Reference = paste(Reference, " | Territory: not a country", sep="")
+      
     if (Reference != "") Reference = paste0("Reference Categories ", Reference)
     h5(Reference)
   })
