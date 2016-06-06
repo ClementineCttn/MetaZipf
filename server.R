@@ -10,6 +10,7 @@ library(RColorBrewer)
 
 meta = read.csv("data/zipf_meta.csv", sep=",", dec=".")
 meta$TOTAL_POP = as.numeric(meta$TOTAL_POP)
+meta$REFERENCE = as.character(meta$REFERENCE)
 
 lkp = meta[,c("TERRITORY", "CNTR_ID")]
 lookupCNTR = lkp[lkp$CNTR_ID  != "",]
@@ -145,12 +146,10 @@ shinyServer(function(input, output, session) {
   })
   
   
-  alphaSummaryByCountry = reactive({
-    m = meta[meta$TERRITORY_TYPE == "Country",]
-    if (input$alpha == "Lotka") m$ALPHA = m$ALPHALOTKA
-    if (input$alpha == "Pareto") m$ALPHA = m$ALPHAPARETO
-    m$REFERENCE = as.character(m$REFERENCE)
-    m$count = 1
+  alphaSummaryByCountryForMap = reactive({
+    m1 = metaTableSummary()
+    m = m1[m1$TERRITORY_TYPE == "Country",]
+       m$count = 1
      keep = aggregate(m[, "count"], unique(list(m$CNTR_ID)), FUN = sumNum)
     keep = subset(keep, x >= 5)
     keep = subset(keep, Group.1 != "")
@@ -168,13 +167,11 @@ shinyServer(function(input, output, session) {
     m$ALPHA_REFERENCE = paste(m$REFERENCE,m$ALPHA,  sep=": ")
     mRefs = aggregate(m[,"ALPHA_REFERENCE"], unique(list(m$CNTR_ID)), FUN = collapseRefs)
     mRefs = as.data.frame(mRefs)
-    str(mRefs)
-    topC = join(topC,mRefs, by = "Group.1")
+     topC = join(topC,mRefs, by = "Group.1")
    
       rownames(topC) = topC$Group.1
     colnames(topC) = c("CNTR_ID","a", "b", "Estimations", "vals")
     topCN = merge(topC, lookupCNTR_ID, by = "CNTR_ID", all.x=T, all.y=F)
-    #colnames(topCN) = c("CNTR_ID","Country", "Alpha Diversity*", "Mean Alpha", "Estimations")
     topCN$Estimations = as.integer(topCN$Estimations)
     topCN = topCN[order(-topCN[,2]),]
     finalTop = topCN[,c("CNTR_ID", "TERRITORY", "a", "b", "Estimations", "vals")]
@@ -182,6 +179,39 @@ shinyServer(function(input, output, session) {
     finalTop= finalTop[finalTop$Country != "Taiwan",]
     return(finalTop)
   })
+  
+  alphaSummaryByCountryForTable = reactive({
+    m = meta[meta$TERRITORY_TYPE == "Country",]
+    if (input$alpha == "Lotka") m$ALPHA = m$ALPHALOTKA
+    if (input$alpha == "Pareto") m$ALPHA = m$ALPHAPARETO
+    m$count = 1
+    keep = aggregate(m[, "count"], unique(list(m$CNTR_ID)), FUN = sumNum)
+    keep = subset(keep, x >= 5)
+    keep = subset(keep, Group.1 != "")
+    m = m[m$CNTR_ID %in% keep[,1],]
+    d = aggregate(m[, "ALPHA"], unique(list(m$CNTR_ID)), FUN = stdDev)
+    ds = d[order(-d$x),]
+    top = as.data.frame(ds)
+    top$x = round(top$x, 3)
+    mn = aggregate(m[, "ALPHA"], unique(list(m$CNTR_ID)), FUN = mean)
+    mean = as.data.frame(mn)
+    mean$x = round(mean$x, 3)
+    topC = join( top,mean, by = "Group.1")
+    topC = join( topC,keep, by = "Group.1")
+    
+      rownames(topC) = topC$Group.1
+    colnames(topC) = c("CNTR_ID","a", "b", "Estimations")
+    topCN = merge(topC, lookupCNTR_ID, by = "CNTR_ID", all.x=T, all.y=F)
+    topCN$Estimations = as.integer(topCN$Estimations)
+    topCN = topCN[order(-topCN[,2]),]
+    finalTop = topCN[,c("CNTR_ID", "TERRITORY", "a", "b", "Estimations")]
+    colnames(finalTop) = c("CNTR_ID","Country", "Alpha Diversity*", "Mean Alpha","Estimations")
+    finalTop= finalTop[finalTop$Country != "Taiwan",]
+    finalTop$CNTR_ID = NULL
+    return(finalTop)
+  })
+  
+  
   
   output$DARIUSgraph = renderPlot({
     zipf = DARIUSzipf()
@@ -237,9 +267,7 @@ shinyServer(function(input, output, session) {
   }, options = list(pageLength = 10))
   
   output$topcountries= renderDataTable({
-    df = alphaSummaryByCountry()
-    df$CNTR_ID = NULL
-    df$Values = NULL
+    df = alphaSummaryByCountryForTable()
     return(df)
   }, options = list(pageLength = 10))
   
@@ -369,7 +397,8 @@ metaTableSummary <- reactive({
   
      ZipfCountries <- reactive({
     c_shp <- full_countries#[full_countries$CNTR_ID == input$Country_name, ]
-    data = alphaSummaryByCountry()
+     data = alphaSummaryByCountryForMap()
+    
     colnames(data) = c("CNTR_ID", "Name", "Diversity", "Alpha", "Estimation", "Values")
     c_shp@data = data.frame(c_shp@data, data[match(c_shp@data$CNTR_ID,data$CNTR_ID), ])
     return(c_shp)
