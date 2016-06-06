@@ -83,8 +83,11 @@ SummaryMetaMeta = function(table, regression = "Lotka"){
   colnames(Summary) = c("Meta Statistics", "Value")
   return(Summary)
 }
+x=meta$ALPHALOTKA
 sumNum = function(x){sum(as.numeric(x), na.rm=TRUE)}
 stdDev = function(x){sd(as.numeric(x), na.rm=TRUE)}
+collapseRefs = function(x){paste(as.list(as.character(x), na.rm=TRUE), sep=" ", collapse = " | ")}
+
 generateEstimRows <- function(i){
   list(
     fluidRow(
@@ -146,6 +149,7 @@ shinyServer(function(input, output, session) {
     m = meta[meta$TERRITORY_TYPE == "Country",]
     if (input$alpha == "Lotka") m$ALPHA = m$ALPHALOTKA
     if (input$alpha == "Pareto") m$ALPHA = m$ALPHAPARETO
+    m$REFERENCE = as.character(m$REFERENCE)
     m$count = 1
      keep = aggregate(m[, "count"], unique(list(m$CNTR_ID)), FUN = sumNum)
     keep = subset(keep, x >= 5)
@@ -161,14 +165,20 @@ shinyServer(function(input, output, session) {
     topC = join( top,mean, by = "Group.1")
     topC = join( topC,keep, by = "Group.1")
     
-    rownames(topC) = topC$Group.1
-    colnames(topC) = c("CNTR_ID","a", "b", "Estimations")
+    m$ALPHA_REFERENCE = paste(m$REFERENCE,m$ALPHA,  sep=": ")
+    mRefs = aggregate(m[,"ALPHA_REFERENCE"], unique(list(m$CNTR_ID)), FUN = collapseRefs)
+    mRefs = as.data.frame(mRefs)
+    str(mRefs)
+    topC = join(topC,mRefs, by = "Group.1")
+   
+      rownames(topC) = topC$Group.1
+    colnames(topC) = c("CNTR_ID","a", "b", "Estimations", "vals")
     topCN = merge(topC, lookupCNTR_ID, by = "CNTR_ID", all.x=T, all.y=F)
     #colnames(topCN) = c("CNTR_ID","Country", "Alpha Diversity*", "Mean Alpha", "Estimations")
     topCN$Estimations = as.integer(topCN$Estimations)
     topCN = topCN[order(-topCN[,2]),]
-    finalTop = topCN[,c("CNTR_ID", "TERRITORY", "a", "b", "Estimations")]
-    colnames(finalTop) = c("CNTR_ID","Country", "Alpha Diversity*", "Mean Alpha","Estimations")
+    finalTop = topCN[,c("CNTR_ID", "TERRITORY", "a", "b", "Estimations", "vals")]
+    colnames(finalTop) = c("CNTR_ID","Country", "Alpha Diversity*", "Mean Alpha","Estimations", "Values")
     finalTop= finalTop[finalTop$Country != "Taiwan",]
     return(finalTop)
   })
@@ -229,6 +239,7 @@ shinyServer(function(input, output, session) {
   output$topcountries= renderDataTable({
     df = alphaSummaryByCountry()
     df$CNTR_ID = NULL
+    df$Values = NULL
     return(df)
   }, options = list(pageLength = 10))
   
@@ -359,13 +370,17 @@ metaTableSummary <- reactive({
      ZipfCountries <- reactive({
     c_shp <- full_countries#[full_countries$CNTR_ID == input$Country_name, ]
     data = alphaSummaryByCountry()
-    colnames(data) = c("CNTR_ID", "Name", "Diversity", "Alpha", "Estimation")
+    colnames(data) = c("CNTR_ID", "Name", "Diversity", "Alpha", "Estimation", "Values")
     c_shp@data = data.frame(c_shp@data, data[match(c_shp@data$CNTR_ID,data$CNTR_ID), ])
     return(c_shp)
     
   })
   
   output$worldmap <- renderLeaflet({
+    tab = meta
+    if (input$alpha == "Lotka") tab$ALPHA = tab$ALPHALOTKA
+    if (input$alpha == "Pareto") tab$ALPHA = tab$ALPHAPARETO
+    
     countriesToMap = ZipfCountries()
     toMap = input$alphaVarToMap
     if (toMap == "meanAlpha") {
@@ -398,70 +413,29 @@ metaTableSummary <- reactive({
                                             breaks = Breaks,
                                             include.lowest = TRUE,
                                             right = FALSE)))
-      countriesToMap@data$VarToMap = ifelse( is.na(countriesToMap@data$VarToMap), "#e3e3e3", countriesToMap@data$VarToMap )
-        leaflet(countriesToMap) %>% addProviderTiles("CartoDB.Positron") %>%
+      countriesToMap@data$VarToMap = ifelse( is.na(countriesToMap@data$VarToMap), "white", countriesToMap@data$VarToMap )
+      
+     #  countriesToMap@data$vals = paste(countriesToMap@data$Name,"  ",
+     #                                   countriesToMap@data$Values,sep = " ", collapse="\n")
+     #  
+     # countriesToMap@data$popup = ifelse(is.na(countriesToMap@data$VarToMap), "Insufficient Data",
+     #                                      paste(countriesToMap@data$Name,"  ",
+     #                                     countriesToMap@data$Values,sep = " ", collapse="\n")
+     #                                     )
+     # 
+     
+     leaflet(countriesToMap) %>% addProviderTiles("CartoDB.Positron") %>%
       clearShapes() %>% setView(lng=10, lat=20, zoom=2) %>% 
       addPolygons(stroke = FALSE, smoothFactor = 0, 
                   fillColor = ~VarToMap, fillOpacity = 0.7, 
-                  layerId = ~CNTR_ID) %>%
+                  layerId = ~CNTR_ID, popup = ~Values) %>%
            addLegend("bottomright", colors= vPal6, labels=vLegendBox, title=t)
     
   })
   
-  click_country <- eventReactive(input$map_shape_click, {
-    x <- input$map_shape_click
-    y <- x$id
-    return(y)
-  })
-  
-  sub <- reactive({
-    eventdata <- event_data('plotly_selected', source = 'source')
-    if (is.null(eventdata)) {
-      return(NULL) # do nothing
-    } else {
-      cntrs <- eventdata[['key']]
-      if (length(cntrs) == 0) {
-        cntrs <- 'abcdefg' # a hack but it's working - set to something that can't be selected
-      }
-      if (!(cntrs %in% ZipfCountries()$CNTR_ID)) {
-        return(NULL) # if there is not a match, do nothing as well
-      } else {
-                # Give back a sp data frame of the selected tracts
-        sub <- ZipfCountries()[ZipfCountries()$CNTR_ID %in% cntrs, ]
-        return(sub)
-      }
-    }
-  })
+ 
   
   
-  
-  observe({
-    req(sub()) # Do this if sub() is not null
-    proxy <- leafletProxy('worldmap')
-    proxy %>%
-      clearGroup(group = 'sub') %>%
-      addPolygons(data = sub(), fill = FALSE, color = '#FFFF00',
-                  opacity = 1, group = 'sub') %>%
-      fitBounds(lng1 = bbox(sub())[1],
-                lat1 = bbox(sub())[2],
-                lng2 = bbox(sub())[3],
-                lat2 = bbox(sub())[4])
-  })
-  
-  
-  observe({
-    req(click_country()) # do this if click_tract() is not null
-    worldmap <- leafletProxy('worldmap') %>%
-      removeShape('htract') %>%
-      addPolygons(data = full_countries[full_countries$CNTR_ID == click_country(), ], fill = FALSE,
-                  color = '#00FFFF', opacity = 1, layerId = 'htract')
-  })
-  
-  
-  country_data <- reactive({
-    return(ZipfCountries()@data[ZipfCountries()@data$CNTR_ID == click_country(), ])
-  })
-   
   
   output$plot = renderPlot({
     tab = metaTableSummary()
