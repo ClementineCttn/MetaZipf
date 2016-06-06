@@ -4,6 +4,7 @@ library(plyr)
 library(shiny)
 library(rgdal) 
 library(rgeos) 
+library(leaflet)
 
 
 meta = read.csv("data/zipf_meta.csv", sep=",", dec=".")
@@ -95,6 +96,10 @@ generateEstimRows <- function(i){
     tags$hr()
   )
 }
+
+r_colors <- rgb(t(col2rgb(colors()) / 255))
+names(r_colors) <- colors()
+
 
 shinyServer(function(input, output, session) {
    
@@ -322,7 +327,29 @@ metaTableSummary <- reactive({
   }, options = list(paging = FALSE, searching = FALSE))
   
  
+  
+  points <- eventReactive(input$recalc, {
+    cbind(rnorm(40) * 2 + 13, rnorm(40) + 48)
+  }, ignoreNULL = FALSE)
+  
+  output$DARIUS <- renderLeaflet({
+    DARIUSsub = DARIUSSubset()
+      cities = DARIUSsub@data
+    leaflet() %>% addProviderTiles("CartoDB.Positron") %>%
+    #  setView(lng=85, lat=55, zoom=2) %>%
+      addCircleMarkers(data=cities, radius = ~sqrt(0.1*Population), lat = ~lat,
+                        color = "#1e90ff", stroke=FALSE, fillOpacity=0.5, layerId = ~AROKATO)
+  })
 
+  # output$mymap <- renderLeaflet({
+  #   leaflet() %>%
+  #     addProviderTiles("Stamen.TonerLite",
+  #                      options = providerTileOptions(noWrap = TRUE)
+  #     ) %>%
+  #     addMarkers(data = points())
+  # })
+  summary(LocalUnits)
+  
   output$summaryAlpha = renderDataTable({
     tab = metaTableSummary()
     summaryA = SummaryMetaAlpha(table = tab, regression = reg)

@@ -1,5 +1,5 @@
 library(shiny)
-
+library(leaflet)
 shinyUI(
   fluidPage(theme = "flatly_bootstrap.css",
             tags$head(tags$link(rel="shortcut icon", href="favicon.png")),
@@ -21,6 +21,7 @@ shinyUI(
     tabPanel("Presentation",
       tabsetPanel(
       tabPanel("1. The Project",
+            
              column(3, img(src = "favicon.png",class="img-responsive")),
              column(9, h1("Open Review and Meta Analysis of Empirical Zipf's Estimates")), 
              tags$hr(), 
@@ -85,7 +86,7 @@ tabPanel("3. An Example",
          column(4,selectInput("dariusdef", "Urban Definition", choices = c("Local", "Morpho"), selected = "Morpho")),
          column(12,dataTableOutput('DARIUSestim')),column(12, plotOutput('DARIUSgraph')), 
          
-         column(12, plotOutput('DARIUSmap')),
+         column(12,    leafletOutput("DARIUS")),#plotOutput('DARIUSmap')),
          column(12, h6(HTML('DARIUS Dataset, 
                                Cottineau C. (2014), figshare.
 <a href=https://figshare.com/articles/DARIUS_Database/1108081/1">https://figshare.com/articles/DARIUS_Database/1108081/1</a>')
@@ -179,6 +180,7 @@ tabPanel("3. An Example",
               and to potential biases (city definition, discipline, etc.).",
               
               tags$hr(),
+             
               h4("Distribution of estimations"),
               h2("Subset by:"),
               fluidRow(
