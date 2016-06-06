@@ -10,6 +10,10 @@ library(plotly)
 meta = read.csv("data/zipf_meta.csv", sep=",", dec=".")
 meta$TOTAL_POP = as.numeric(meta$TOTAL_POP)
 
+lkp = meta[,c("TERRITORY", "CNTR_ID")]
+lookupCNTR = lkp[lkp$CNTR_ID  != "",]
+lookupCNTR_ID = lookupCNTR[!duplicated(lookupCNTR), ]
+
 refs = read.csv("data/zipf_refs.csv", sep=",", dec=".")
 head(meta)
 metaToAdd = data.frame()
@@ -140,25 +144,30 @@ shinyServer(function(input, output, session) {
     if (input$alpha == "Lotka") m$ALPHA = m$ALPHALOTKA
     if (input$alpha == "Pareto") m$ALPHA = m$ALPHAPARETO
     m$count = 1
-    keep = aggregate(m[, "count"], unique(list(m$TERRITORY)), FUN = sumNum)
+     keep = aggregate(m[, "count"], unique(list(m$CNTR_ID)), FUN = sumNum)
     keep = subset(keep, x >= 5)
-    m = m[m$TERRITORY %in% keep[,1],]
-    d = aggregate(m[, "ALPHA"], unique(list(m$TERRITORY)), FUN = stdDev)
+    keep = subset(keep, Group.1 != "")
+    m = m[m$CNTR_ID %in% keep[,1],]
+    d = aggregate(m[, "ALPHA"], unique(list(m$CNTR_ID)), FUN = stdDev)
     ds = d[order(-d$x),]
     top = as.data.frame(ds)
     top$x = round(top$x, 3)
-    mn = aggregate(m[, "ALPHA"], unique(list(m$TERRITORY)), FUN = mean)
+    mn = aggregate(m[, "ALPHA"], unique(list(m$CNTR_ID)), FUN = mean)
     mean = as.data.frame(mn)
     mean$x = round(mean$x, 3)
     topC = join( top,mean, by = "Group.1")
     topC = join( topC,keep, by = "Group.1")
     
     rownames(topC) = topC$Group.1
-    #  top$Group.1 = NULL
-    colnames(topC) = c("Country", "Alpha Diversity*", "Mean Alpha", "Estimations")
-    topC$Estimations = as.integer(topC$Estimations)
-    topC = topC[order(-topC[,2]),]
-    return(topC)
+    colnames(topC) = c("CNTR_ID","a", "b", "Estimations")
+    topCN = merge(topC, lookupCNTR_ID, by = "CNTR_ID", all.x=T, all.y=F)
+    #colnames(topCN) = c("CNTR_ID","Country", "Alpha Diversity*", "Mean Alpha", "Estimations")
+    topCN$Estimations = as.integer(topCN$Estimations)
+    topCN = topCN[order(-topCN[,2]),]
+    finalTop = topCN[,c("CNTR_ID", "TERRITORY", "a", "b", "Estimations")]
+    colnames(finalTop) = c("CNTR_ID","Country", "Alpha Diversity*", "Mean Alpha","Estimations")
+    finalTop= finalTop[finalTop$Country != "Taiwan",]
+    return(finalTop)
   })
   
   output$DARIUSgraph = renderPlot({
@@ -216,6 +225,7 @@ shinyServer(function(input, output, session) {
   
   output$topcountries= renderDataTable({
     df = alphaSummaryByCountry()
+    df$CNTR_ID = NULL
     return(df)
   }, options = list(pageLength = 10))
   
@@ -354,20 +364,22 @@ metaTableSummary <- reactive({
   
   ZipfCountries <- reactive({
     c_shp <- full_countries#[full_countries$CNTR_ID == input$Country_name, ]
-    data = alphaSummaryByCountry
+    data = alphaSummaryByCountry()
+    colnames(data) = c("CNTR_ID", "Name", "Diversity", "Alpha", "Estimation")
+    c_shp@data = data.frame(c_shp@data, data[match(c_shp@data$CNTR_ID,data$CNTR_ID), ])
     return(c_shp)
   })
   
   
   output$worldmap <- renderLeaflet({
- 
+
         leaflet(ZipfCountries()) %>% addProviderTiles("CartoDB.Positron") %>%
       clearShapes() %>% setView(lng=10, lat=20, zoom=2) %>% 
       addPolygons(stroke = FALSE, smoothFactor = 0, 
-                  fillColor = ~pal(SHAPE_AREA), fillOpacity = 0.7, 
+                  fillColor = ~pal(Alpha), fillOpacity = 0.7, 
                   layerId = ~CNTR_ID) %>%
       addLegend(position = 'bottomright', pal = pal, 
-                values = ZipfCountries()$SHAPE_AREA, title = 'Area')
+                values = ZipfCountries()$Alpha, title = 'Mean Alpha')
     
   })
   
