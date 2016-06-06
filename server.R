@@ -394,14 +394,17 @@ metaTableSummary <- reactive({
                                                    labels = vPal6,
                                                    include.lowest = TRUE,
                                                    right = FALSE))
+      vLegendBox <- as.character(levels(cut(countriesToMap@data$VarToCut,
+                                            breaks = Breaks,
+                                            include.lowest = TRUE,
+                                            right = FALSE)))
       countriesToMap@data$VarToMap = ifelse( is.na(countriesToMap@data$VarToMap), "#e3e3e3", countriesToMap@data$VarToMap )
         leaflet(countriesToMap) %>% addProviderTiles("CartoDB.Positron") %>%
       clearShapes() %>% setView(lng=10, lat=20, zoom=2) %>% 
       addPolygons(stroke = FALSE, smoothFactor = 0, 
                   fillColor = ~VarToMap, fillOpacity = 0.7, 
-                  layerId = ~CNTR_ID)# %>%
-     # addLegend(position = 'bottomright', pal = vPal6, 
-     #           values = countriesToMap@data$VarToMap, title = t)
+                  layerId = ~CNTR_ID) %>%
+           addLegend("bottomright", colors= vPal6, labels=vLegendBox, title=t)
     
   })
   

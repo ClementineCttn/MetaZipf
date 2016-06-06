@@ -97,89 +97,18 @@ tabPanel("3. An Example",
     tabPanel("Meta-Analysis",
              tabsetPanel(
                
-               tabPanel("1. Data", 
-                        h4("Data and Hypotheses for a MetaAnalysis of Zipf"),
-                        "In a meta-analysis of Zipf for cities, we do not work directly with the cities' data.
-  Instead, we use the estimations made by other researchers in published papers. The data is thus made by the result of their 
-                        analysis along with the description of how they made the analysis. Each observation in our case is thus
-                        composed of a single estimation of alpha (if you chose the Lotka form) 
-                        or alpha' (if you chose the Pareto form) and is characterized by half a dozen other variables.", 
-                         withMathJax(h6("$$\\log(P_i) = -\\alpha \\times \\log(R_i) + \\beta + \\epsilon_i$$ $$\\log(R_i) = -\\alpha' \\times \\log(P_i) + \\beta' + \\epsilon'_i$$ ")),  
-                        h2("TERRITORY"), 
-                        h6("For example: The Netherlands in Brakman et al. (1999)."), "The geographical extent from which cities were selected. When available (i.e. between 1950 and 2015 for countries), the population of the territory was added.
-                        Given the diversity of countries with respect to economic development, culture and size, one might expect alpha to vary accordingly.", 
-                        
-                        h2("DATE & DECADE"),  h6("For example: 1600 in Bretagnolle et al. (2000)."), "The date (and decade) to which the cities' 
-                        population refer. This information can be used to test the hypothesis according to which systems of cities increase
-                        their level of hierarchy over time, everything else being equal.", br(), 
-                        h2("URBANISATION AGE"), h6("For example: 'OLD' for China."), 
-                        "An indication whether urbanisation is a relatively recent or ancient phenomenon in the territory.
-                        'OLD' continents refer to zones of early urbanisation, in Europe, South-East Asia and the Middle East. 
-                        America, Oceania, Africa and central Asia are considered 'NEW' in that respect. It has been found in previous studies 
-                          (Moriconi-Ebrard, 1993) that countries of more recent urbanisation tend to generate a steeper hierarchy of cities.",
-                        h2("NUMBER OF CITIES"), h6("For example: 60 cities in Lepetit (1990)."),
-                        "The number of cities used to estimate Zipf's coefficient.", br(),  
-                        h2("CITY DEFINITION"),  h6("For example: MorphoCity in Guerin-Pace (1995)."),
-                        "The criteria used to identify cities. LocalUnits correspond to administrative units. 
-                        MorphoCities are aggregations of Local units based on density orthe built-up area. 
-                        MetroAreas correspond to functional aggregations of Local units based on flows (typically commuters). 
-                        VariaMixed indicate that the definition is heterogenous or uncommon.", br(), 
-                        h2("POPULATION CUTOFF"),  h6("For example: 5000 residents in Parr (1985)."),
-                        "The minimum population of the cities selected. This cutoff is know to affect other properties of cities such 
-                        as scaling behaviours.", br(),  
-                        h2("DISCIPLINE"),  h6("For example: 'ECO' for the Quarterly Journal of Economics."),
-                        "The disciplines in which the journal is recognised, according to the Chicago Journal Ranking SJR. ", br(),  
-                        "'ECO' refers to estimations published in journals classified in Economics, 
-                        'SOC' stands for Social Science and 'PHYS' for environmental and physical sciences journals. 
-                        A journal can belong to one or more categories. We include this information as a test for disciplinary biases.
-                        It could be possible for example that some journals want to validate Zipf's Law with an exponent alpha of 1, whereas
-                        another journal would be biased towards publishing more refutations of this law, etc.",br(), 
-                        h2("R2"),  h6("For example: 99% in Bretagnolle et al. (2008)."),
-                        "The coefficient of Determination of the regression, indicating the quality of the fit. ", br(),  br(), 
-                        #h2("REFERENCE"), "The reference from which the estimation is taken. For example: Singer (1936).", br(),  
-                        h4("Data"),
-                        h2("Subset Table by:"),
-                        fluidRow(
-                          column(4,selectizeInput("territory", "Territory", "", multiple=T)),
-                          column(4,selectizeInput("scale", "City Definition", "", multiple=T)),
-                          column(4,selectizeInput("decade", "Decade", "", multiple=T)),
-                             column(3,downloadButton("downloadData", "Download")), 
-                                 column(9, HTML('N.B. This table is a simplified version. You can find the full version here <a href="here">https://github.com/ClementineCttn/MetaZipf</a>'))),
-                        dataTableOutput('review'),
-                        tags$hr(),
-                        h6(HTML('Total population in thousands, from UN estimates (1950-2015) 
-                                <a href=http://esa.un.org/unpd/wpp/Download/Standard/Population/">http://esa.un.org/unpd/wpp/Download/Standard/Population/</a>')
-                        )
-                            
-               ),    
-
-               
-      tabPanel("2. Literature Overview",
-               h4('Coverage by Continent:'),
-               dataTableOutput('continent'),
-             h4('TOP journals where the estimations* are drawn from:'),  
-            '*Each reference count as one, irrespective of the number of estimations',  tags$hr(),
-            dataTableOutput('topjournals'),
-            h4('TOP authors* providing estimations:'), 
-            '*the estimations published by the same author(s) in different publications are not added.',   tags$hr(),
-            dataTableOutput('topauthors'),
-            
-            h4('TOP countries for the dispersion of results*:'),
-            '*measured by the standard deviation of alpha for countries with more than 5 estimations.',  tags$hr(),
-            dataTableOutput('topcountries')
-            
-            ),
+              
     
-     tabPanel("3. Estimates Summary",
+     tabPanel("1. Estimates Summary",
               
               br(),
               fluidRow(
-                column(8,"Although Zipf's Law states that alpha should be equal to 1,
+                column(9,"Although Zipf's Law states that alpha should be equal to 1,
               empirical estimations are found to be distributed widely around this value. 
               Our meta analysis precisely looks for explanations for this diversity, by relating the value
               of alpha to some characteristics of the urban system (territory, population, age, type of cities) 
               and to potential biases (city definition, discipline, etc.)."),
-                column(4,selectInput('alphaVarToMap', 'Alpha Statistics', 
+                column(3,selectInput('alphaVarToMap', 'Alpha Statistics', 
                                      choices = c("Mean Alpha" = 'meanAlpha',
                                                  "Standard Deviation" = 'diversity',
                                                  "Number of Estimations" = 'n'),
@@ -203,6 +132,78 @@ tabPanel("3. An Example",
             
                    ),
              
+     
+     tabPanel("2. Literature Overview",
+              h4('Coverage by Continent:'),
+              dataTableOutput('continent'),
+              h4('TOP journals where the estimations* are drawn from:'),  
+              '*Each reference count as one, irrespective of the number of estimations',  tags$hr(),
+              dataTableOutput('topjournals'),
+              h4('TOP authors* providing estimations:'), 
+              '*the estimations published by the same author(s) in different publications are not added.',   tags$hr(),
+              dataTableOutput('topauthors'),
+              
+              h4('TOP countries for the dispersion of results*:'),
+              '*measured by the standard deviation of alpha for countries with more than 5 estimations.',  tags$hr(),
+              dataTableOutput('topcountries')
+              
+     ),
+     tabPanel("3. Data", 
+              h4("Data and Hypotheses for a MetaAnalysis of Zipf"),
+              "In a meta-analysis of Zipf for cities, we do not work directly with the cities' data.
+              Instead, we use the estimations made by other researchers in published papers. The data is thus made by the result of their 
+              analysis along with the description of how they made the analysis. Each observation in our case is thus
+              composed of a single estimation of alpha (if you chose the Lotka form) 
+              or alpha' (if you chose the Pareto form) and is characterized by half a dozen other variables.", 
+              withMathJax(h6("$$\\log(P_i) = -\\alpha \\times \\log(R_i) + \\beta + \\epsilon_i$$ $$\\log(R_i) = -\\alpha' \\times \\log(P_i) + \\beta' + \\epsilon'_i$$ ")),  
+              h2("TERRITORY"), 
+              h6("For example: The Netherlands in Brakman et al. (1999)."), "The geographical extent from which cities were selected. When available (i.e. between 1950 and 2015 for countries), the population of the territory was added.
+              Given the diversity of countries with respect to economic development, culture and size, one might expect alpha to vary accordingly.", 
+              
+              h2("DATE & DECADE"),  h6("For example: 1600 in Bretagnolle et al. (2000)."), "The date (and decade) to which the cities' 
+              population refer. This information can be used to test the hypothesis according to which systems of cities increase
+              their level of hierarchy over time, everything else being equal.", br(), 
+              h2("URBANISATION AGE"), h6("For example: 'OLD' for China."), 
+              "An indication whether urbanisation is a relatively recent or ancient phenomenon in the territory.
+              'OLD' continents refer to zones of early urbanisation, in Europe, South-East Asia and the Middle East. 
+              America, Oceania, Africa and central Asia are considered 'NEW' in that respect. It has been found in previous studies 
+              (Moriconi-Ebrard, 1993) that countries of more recent urbanisation tend to generate a steeper hierarchy of cities.",
+              h2("NUMBER OF CITIES"), h6("For example: 60 cities in Lepetit (1990)."),
+              "The number of cities used to estimate Zipf's coefficient.", br(),  
+              h2("CITY DEFINITION"),  h6("For example: MorphoCity in Guerin-Pace (1995)."),
+              "The criteria used to identify cities. LocalUnits correspond to administrative units. 
+              MorphoCities are aggregations of Local units based on density orthe built-up area. 
+              MetroAreas correspond to functional aggregations of Local units based on flows (typically commuters). 
+              VariaMixed indicate that the definition is heterogenous or uncommon.", br(), 
+              h2("POPULATION CUTOFF"),  h6("For example: 5000 residents in Parr (1985)."),
+              "The minimum population of the cities selected. This cutoff is know to affect other properties of cities such 
+              as scaling behaviours.", br(),  
+              h2("DISCIPLINE"),  h6("For example: 'ECO' for the Quarterly Journal of Economics."),
+              "The disciplines in which the journal is recognised, according to the Chicago Journal Ranking SJR. ", br(),  
+              "'ECO' refers to estimations published in journals classified in Economics, 
+              'SOC' stands for Social Science and 'PHYS' for environmental and physical sciences journals. 
+              A journal can belong to one or more categories. We include this information as a test for disciplinary biases.
+              It could be possible for example that some journals want to validate Zipf's Law with an exponent alpha of 1, whereas
+              another journal would be biased towards publishing more refutations of this law, etc.",br(), 
+              h2("R2"),  h6("For example: 99% in Bretagnolle et al. (2008)."),
+              "The coefficient of Determination of the regression, indicating the quality of the fit. ", br(),  br(), 
+              #h2("REFERENCE"), "The reference from which the estimation is taken. For example: Singer (1936).", br(),  
+              h4("Data"),
+              h2("Subset Table by:"),
+              fluidRow(
+                column(4,selectizeInput("territory", "Territory", "", multiple=T)),
+                column(4,selectizeInput("scale", "City Definition", "", multiple=T)),
+                column(4,selectizeInput("decade", "Decade", "", multiple=T)),
+                column(3,downloadButton("downloadData", "Download")), 
+                column(9, HTML('N.B. This table is a simplified version. You can find the full version here <a href="here">https://github.com/ClementineCttn/MetaZipf</a>'))),
+              dataTableOutput('review'),
+              tags$hr(),
+              h6(HTML('Total population in thousands, from UN estimates (1950-2015) 
+                      <a href=http://esa.un.org/unpd/wpp/Download/Standard/Population/">http://esa.un.org/unpd/wpp/Download/Standard/Population/</a>')
+              )
+              
+              ),    
+     
                tabPanel("4. Meta Analysis",
                         br(),
                         "Let's test quantitatively some assumptions about the relation between 
