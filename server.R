@@ -362,7 +362,7 @@ metaTableSummary <- reactive({
   output$worldmap <- renderLeaflet({
  
         leaflet(ZipfCountries()) %>% addProviderTiles("CartoDB.Positron") %>%
-      clearShapes() %>% setView(lng=-50, lat=0, zoom=2) %>% 
+      clearShapes() %>% setView(lng=10, lat=20, zoom=2) %>% 
       addPolygons(stroke = FALSE, smoothFactor = 0, 
                   fillColor = ~pal(SHAPE_AREA), fillOpacity = 0.7, 
                   layerId = ~CNTR_ID) %>%
