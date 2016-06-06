@@ -6,6 +6,7 @@ library(rgdal)
 library(rgeos) 
 library(leaflet)
 library(plotly)
+library(RColorBrewer)
 
 meta = read.csv("data/zipf_meta.csv", sep=",", dec=".")
 meta$TOTAL_POP = as.numeric(meta$TOTAL_POP)
@@ -38,6 +39,8 @@ meta[meta$ECO == 0 & meta$SOC == 0 & meta$PHYS == 1, "DISCIPLINE"] = "PHYS"
 
 DARIUS_A<-read.csv("data/DARIUS_A.csv", sep=",", dec=".")
 DARIUS_L<-read.csv("data/DARIUS_L.csv", sep=",", dec=".")
+full_countries <- readOGR(dsn='data/world_SimplifiedGeom.shp', layer = "world_SimplifiedGeom", 
+                          verbose = F,encoding = "utf8")
 
 SummaryMetaAlpha = function(table, regression = "Lotka"){
   tab = table
@@ -353,33 +356,52 @@ metaTableSummary <- reactive({
     return(histo)
   })
   
-  
-  
-  
-  
-  full_countries <- readOGR(dsn='data/world_SimplifiedGeom.shp', layer = "world_SimplifiedGeom", 
-                         verbose = F,encoding = "utf8")
-  
-  pal <- colorNumeric('Reds', NULL)
-  
-  ZipfCountries <- reactive({
+     ZipfCountries <- reactive({
     c_shp <- full_countries#[full_countries$CNTR_ID == input$Country_name, ]
     data = alphaSummaryByCountry()
     colnames(data) = c("CNTR_ID", "Name", "Diversity", "Alpha", "Estimation")
     c_shp@data = data.frame(c_shp@data, data[match(c_shp@data$CNTR_ID,data$CNTR_ID), ])
     return(c_shp)
+    
   })
   
-  
   output$worldmap <- renderLeaflet({
+    countriesToMap = ZipfCountries()
+    toMap = input$alphaVarToMap
+    if (toMap == "meanAlpha") {
+      countriesToMap@data$VarToCut = as.numeric(countriesToMap@data$Alpha)
+      ColorRamp = "BrBG" #colorRampPalette(c("#18BC9C", "#e3e3e3", "#2c3e50"))(n = 299)
+      #pal <- colorNumeric('Blues', NULL)
+      Breaks = c(0, 0.9, 0.95, 1, 1.05, 1.1, 2)
+      t = "Mean Alpha"
+    }
+    if (toMap == "diversity") {
+      countriesToMap@data$VarToCut = as.numeric(countriesToMap@data$Diversity)
+      ColorRamp = 'Blues'#  colorRampPalette(c("#e3e3e3","#2c3e50"))(n = 299)
+      Breaks = c(0, 0.1, 0.2, 0.3, 0.4, 0.5, 1) 
+      t = "Standard Deviation of Alpha"
+    }
+    if (toMap == "n") {
+      countriesToMap@data$VarToCut = as.numeric(countriesToMap@data$Estimation)
+      ColorRamp = 'Greys'# colorRampPalette(c("#e3e3e3","#18BC9C"))(n = 299)
+      Breaks = c(5, 10, 20, 50, 100, 500, 1000) 
+      t = "Number of Estimations"
+    } 
 
-        leaflet(ZipfCountries()) %>% addProviderTiles("CartoDB.Positron") %>%
+      vPal6 <- brewer.pal(n = 6, name = ColorRamp)
+      countriesToMap@data$VarToMap<- as.character(cut(countriesToMap@data$VarToCut,
+                                                   breaks = Breaks,
+                                                   labels = vPal6,
+                                                   include.lowest = TRUE,
+                                                   right = FALSE))
+      countriesToMap@data$VarToMap = ifelse( is.na(countriesToMap@data$VarToMap), "#e3e3e3", countriesToMap@data$VarToMap )
+        leaflet(countriesToMap) %>% addProviderTiles("CartoDB.Positron") %>%
       clearShapes() %>% setView(lng=10, lat=20, zoom=2) %>% 
       addPolygons(stroke = FALSE, smoothFactor = 0, 
-                  fillColor = ~pal(Alpha), fillOpacity = 0.7, 
-                  layerId = ~CNTR_ID) %>%
-      addLegend(position = 'bottomright', pal = pal, 
-                values = ZipfCountries()$Alpha, title = 'Mean Alpha')
+                  fillColor = ~VarToMap, fillOpacity = 0.7, 
+                  layerId = ~CNTR_ID)# %>%
+     # addLegend(position = 'bottomright', pal = vPal6, 
+     #           values = countriesToMap@data$VarToMap, title = t)
     
   })
   

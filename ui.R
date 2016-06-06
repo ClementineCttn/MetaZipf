@@ -173,11 +173,17 @@ tabPanel("3. An Example",
      tabPanel("3. Estimates Summary",
               
               br(),
-              "Although Zipf's Law states that alpha should be equal to 1,
+              fluidRow(
+                column(8,"Although Zipf's Law states that alpha should be equal to 1,
               empirical estimations are found to be distributed widely around this value. 
               Our meta analysis precisely looks for explanations for this diversity, by relating the value
               of alpha to some characteristics of the urban system (territory, population, age, type of cities) 
-              and to potential biases (city definition, discipline, etc.).",
+              and to potential biases (city definition, discipline, etc.)."),
+                column(4,selectInput('alphaVarToMap', 'Alpha Statistics', 
+                                     choices = c("Mean Alpha" = 'meanAlpha',
+                                                 "Standard Deviation" = 'diversity',
+                                                 "Number of Estimations" = 'n'),
+                                     selected = "Mean Alpha", multiple = F))),
               
               tags$hr(),
               leafletOutput('worldmap') ,  tags$hr(),
