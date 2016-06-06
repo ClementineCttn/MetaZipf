@@ -1,5 +1,5 @@
 my_packages = c("ggplot2", "RColorBrewer", "plyr", "shiny",
-                "rgdal", "rgeos")
+                "rgdal", "rgeos", "leaflet")
 
 ###########################################################
 

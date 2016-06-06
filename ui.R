@@ -180,7 +180,7 @@ tabPanel("3. An Example",
               and to potential biases (city definition, discipline, etc.).",
               
               tags$hr(),
-             
+              leafletOutput('worldmap') ,  tags$hr(),
               h4("Distribution of estimations"),
               h2("Subset by:"),
               fluidRow(

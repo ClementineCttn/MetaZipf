@@ -5,7 +5,7 @@ library(shiny)
 library(rgdal) 
 library(rgeos) 
 library(leaflet)
-
+library(plotly)
 
 meta = read.csv("data/zipf_meta.csv", sep=",", dec=".")
 meta$TOTAL_POP = as.numeric(meta$TOTAL_POP)
@@ -32,10 +32,8 @@ meta[meta$ECO == 0 & meta$SOC == 1 & meta$PHYS == 0, "DISCIPLINE"] = "SOC"
 meta[meta$ECO == 0 & meta$SOC == 1 & meta$PHYS == 1, "DISCIPLINE"] = "SOC & PHYS"
 meta[meta$ECO == 0 & meta$SOC == 0 & meta$PHYS == 1, "DISCIPLINE"] = "PHYS"
 
-DARIUS_A<-readOGR(dsn = "data/DARIUS_points.shp" , layer = "DARIUS_points", encoding = "utf8", stringsAsFactors = FALSE, verbose = FALSE)
-DARIUSBack<-readOGR(dsn = "data/DARIUS_background2.shp" , layer = "DARIUS_background2", encoding = "utf8", stringsAsFactors = FALSE, verbose = FALSE)
-DARIUS_L<-readOGR(dsn = "data/LocalDARIUS_points.shp" , layer = "LocalDARIUS_points", encoding = "utf8", stringsAsFactors = FALSE, verbose = FALSE)
-LocalUnits = read.csv("data/DARIUS_LocalUnits.csv", sep=",", dec=".", header=T)
+DARIUS_A<-read.csv("data/DARIUS_A.csv", sep=",", dec=".")
+DARIUS_L<-read.csv("data/DARIUS_L.csv", sep=",", dec=".")
 
 SummaryMetaAlpha = function(table, regression = "Lotka"){
   tab = table
@@ -116,17 +114,16 @@ shinyServer(function(input, output, session) {
     if (input$dariusdef == "Morpho") DARIUS = DARIUS_A
     DARIUSsub = DARIUS
     year4darius = paste0("Pop",input$dariusyear)
-    DARIUSsub@data$Population = DARIUSsub@data[,year4darius]
+    DARIUSsub$Population = DARIUSsub[,year4darius]
     dariuscutoff = input$dariuscutoff / 1000
-    DARIUSsub@data$Population = ifelse(DARIUSsub@data$Population >= dariuscutoff, DARIUSsub@data$Population, NA)
+    DARIUSsub$Population = ifelse(DARIUSsub$Population >= dariuscutoff, DARIUSsub$Population, NA)
     return(DARIUSsub)
   })
   
   DARIUSzipf <- reactive({
     if (input$dariusdef == "Morpho") {
-    DARIUSsub = DARIUSSubset()
-    DARIUSdf = DARIUSsub@data
-    }
+    DARIUSdf= DARIUSSubset()
+      }
     if (input$dariusdef == "Local") {
       DARIUSdf = LocalUnits
       DARIUSdf$Population = DARIUSdf[,paste0("Pop",input$dariusyear)]
@@ -135,6 +132,33 @@ shinyServer(function(input, output, session) {
     size = DARIUSdf[order(-DARIUSdf$Population) , "Population"]
     rank = 1:length(size)
     zipf = data.frame(size, rank)
+  })
+  
+  
+  alphaSummaryByCountry = reactive({
+    m = meta[meta$TERRITORY_TYPE == "Country",]
+    if (input$alpha == "Lotka") m$ALPHA = m$ALPHALOTKA
+    if (input$alpha == "Pareto") m$ALPHA = m$ALPHAPARETO
+    m$count = 1
+    keep = aggregate(m[, "count"], unique(list(m$TERRITORY)), FUN = sumNum)
+    keep = subset(keep, x >= 5)
+    m = m[m$TERRITORY %in% keep[,1],]
+    d = aggregate(m[, "ALPHA"], unique(list(m$TERRITORY)), FUN = stdDev)
+    ds = d[order(-d$x),]
+    top = as.data.frame(ds)
+    top$x = round(top$x, 3)
+    mn = aggregate(m[, "ALPHA"], unique(list(m$TERRITORY)), FUN = mean)
+    mean = as.data.frame(mn)
+    mean$x = round(mean$x, 3)
+    topC = join( top,mean, by = "Group.1")
+    topC = join( topC,keep, by = "Group.1")
+    
+    rownames(topC) = topC$Group.1
+    #  top$Group.1 = NULL
+    colnames(topC) = c("Country", "Alpha Diversity*", "Mean Alpha", "Estimations")
+    topC$Estimations = as.integer(topC$Estimations)
+    topC = topC[order(-topC[,2]),]
+    return(topC)
   })
   
   output$DARIUSgraph = renderPlot({
@@ -150,28 +174,6 @@ shinyServer(function(input, output, session) {
             axis.text.x = element_text(angle = 45, hjust = 1))
   })
     
-  output$DARIUSmap = renderPlot({
-    DARIUSsub = DARIUSSubset()
-    par(mar = c(0,0,1,0))
-     plot(DARIUSBack, border="white", col="grey90")
-    plot(DARIUSsub, pch=16, col="#1e90ff", add=T,
-    cex=0.05 * sqrt(DARIUSsub@data$Population/ pi))
-    leg <- c(15000, 1000, 100, 10)
-    legend("topleft",legend = leg, pch = 21,
-           col = "gray30", pt.bg = "dodgerblue",
-           pt.cex = 0.05 * sqrt(leg / pi),
-           bty = "n", cex=0.8, title = "Population in thousands")
-    arrows(par()$usr[1] + 100000, 
-           par()$usr[3] + 100000,
-           par()$usr[1] + 1000000, 
-           par()$usr[3] + 100000,
-           lwd = 2, code = 3,
-           angle = 90, length = 0.05)
-    text(par()$usr[1] + 505000, 
-         par()$usr[3] + 270000, 
-         "1000 km", cex = 0.8)  
-  })
-  
   output$DARIUSestim = renderDataTable({
     zipf = DARIUSzipf()
     if (input$alpha == "Lotka") {
@@ -213,30 +215,8 @@ shinyServer(function(input, output, session) {
   }, options = list(pageLength = 10))
   
   output$topcountries= renderDataTable({
-    m = meta[meta$TERRITORY_TYPE == "Country",]
-    if (input$alpha == "Lotka") m$ALPHA = m$ALPHALOTKA
-    if (input$alpha == "Pareto") m$ALPHA = m$ALPHAPARETO
-    m$count = 1
-    keep = aggregate(m[, "count"], unique(list(m$TERRITORY)), FUN = sumNum)
-    keep = subset(keep, x >= 5)
-    m = m[m$TERRITORY %in% keep[,1],]
-    d = aggregate(m[, "ALPHA"], unique(list(m$TERRITORY)), FUN = stdDev)
-    ds = d[order(-d$x),]
-    top = as.data.frame(ds)
-    top$x = round(top$x, 3)
-    mn = aggregate(m[, "ALPHA"], unique(list(m$TERRITORY)), FUN = mean)
-    mean = as.data.frame(mn)
-    mean$x = round(mean$x, 3)
-    topC = join( top,mean, by = "Group.1")
-    topC = join( topC,keep, by = "Group.1")
-   
-    rownames(topC) = topC$Group.1
- #  top$Group.1 = NULL
-    colnames(topC) = c("Country", "Alpha Diversity*", "Mean Alpha", "Estimations")
-    topC$Estimations = as.integer(topC$Estimations)
-    topC = topC[order(-topC[,2]),]
-    
-    return(topC)
+    df = alphaSummaryByCountry()
+    return(df)
   }, options = list(pageLength = 10))
   
   output$topextremes= renderDataTable({
@@ -328,27 +308,16 @@ metaTableSummary <- reactive({
   
  
   
-  points <- eventReactive(input$recalc, {
-    cbind(rnorm(40) * 2 + 13, rnorm(40) + 48)
-  }, ignoreNULL = FALSE)
-  
   output$DARIUS <- renderLeaflet({
-    DARIUSsub = DARIUSSubset()
-      cities = DARIUSsub@data
+    cities = DARIUSSubset()
+    
     leaflet() %>% addProviderTiles("CartoDB.Positron") %>%
-    #  setView(lng=85, lat=55, zoom=2) %>%
+    #  setView(lng=75, lat=58, zoom=3) %>% 
       addCircleMarkers(data=cities, radius = ~sqrt(0.1*Population), lat = ~lat,
-                        color = "#1e90ff", stroke=FALSE, fillOpacity=0.5, layerId = ~AROKATO)
+                        color = "#1e90ff", stroke=FALSE, fillOpacity=0.5, layerId = ~AROKATO, lng = ~long)
   })
 
-  # output$mymap <- renderLeaflet({
-  #   leaflet() %>%
-  #     addProviderTiles("Stamen.TonerLite",
-  #                      options = providerTileOptions(noWrap = TRUE)
-  #     ) %>%
-  #     addMarkers(data = points())
-  # })
-  summary(LocalUnits)
+  
   
   output$summaryAlpha = renderDataTable({
     tab = metaTableSummary()
@@ -374,6 +343,88 @@ metaTableSummary <- reactive({
     return(histo)
   })
   
+  
+  
+  
+  
+  full_countries <- readOGR(dsn='data/world_SimplifiedGeom.shp', layer = "world_SimplifiedGeom", 
+                         verbose = F,encoding = "utf8")
+  
+  pal <- colorNumeric('Reds', NULL)
+  
+  ZipfCountries <- reactive({
+    c_shp <- full_countries#[full_countries$CNTR_ID == input$Country_name, ]
+    data = alphaSummaryByCountry
+    return(c_shp)
+  })
+  
+  
+  output$worldmap <- renderLeaflet({
+ 
+        leaflet(ZipfCountries()) %>% addProviderTiles("CartoDB.Positron") %>%
+      clearShapes() %>% setView(lng=-50, lat=0, zoom=2) %>% 
+      addPolygons(stroke = FALSE, smoothFactor = 0, 
+                  fillColor = ~pal(SHAPE_AREA), fillOpacity = 0.7, 
+                  layerId = ~CNTR_ID) %>%
+      addLegend(position = 'bottomright', pal = pal, 
+                values = ZipfCountries()$SHAPE_AREA, title = 'Area')
+    
+  })
+  
+  click_country <- eventReactive(input$map_shape_click, {
+    x <- input$map_shape_click
+    y <- x$id
+    return(y)
+  })
+  
+  sub <- reactive({
+    eventdata <- event_data('plotly_selected', source = 'source')
+    if (is.null(eventdata)) {
+      return(NULL) # do nothing
+    } else {
+      cntrs <- eventdata[['key']]
+      if (length(cntrs) == 0) {
+        cntrs <- 'abcdefg' # a hack but it's working - set to something that can't be selected
+      }
+      if (!(cntrs %in% ZipfCountries()$CNTR_ID)) {
+        return(NULL) # if there is not a match, do nothing as well
+      } else {
+                # Give back a sp data frame of the selected tracts
+        sub <- ZipfCountries()[ZipfCountries()$CNTR_ID %in% cntrs, ]
+        return(sub)
+      }
+    }
+  })
+  
+  
+  
+  observe({
+    req(sub()) # Do this if sub() is not null
+    proxy <- leafletProxy('worldmap')
+    proxy %>%
+      clearGroup(group = 'sub') %>%
+      addPolygons(data = sub(), fill = FALSE, color = '#FFFF00',
+                  opacity = 1, group = 'sub') %>%
+      fitBounds(lng1 = bbox(sub())[1],
+                lat1 = bbox(sub())[2],
+                lng2 = bbox(sub())[3],
+                lat2 = bbox(sub())[4])
+  })
+  
+  
+  observe({
+    req(click_country()) # do this if click_tract() is not null
+    worldmap <- leafletProxy('worldmap') %>%
+      removeShape('htract') %>%
+      addPolygons(data = full_countries[full_countries$CNTR_ID == click_country(), ], fill = FALSE,
+                  color = '#00FFFF', opacity = 1, layerId = 'htract')
+  })
+  
+  
+  country_data <- reactive({
+    return(ZipfCountries()@data[ZipfCountries()@data$CNTR_ID == click_country(), ])
+  })
+   
   
   output$plot = renderPlot({
     tab = metaTableSummary()
