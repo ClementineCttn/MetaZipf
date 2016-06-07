@@ -126,7 +126,9 @@ tabPanel("2. An Example of Zipf's law for cities",
                                      selected = "meanAlpha", multiple = F))),
               
               tags$hr(), 
-              leafletOutput('worldmap'), tags$hr(), 
+              leafletOutput('worldmap'),
+              h6('Click on the countries to see all the estimated values'),
+              tags$hr(), 
               h4('Temporal Coverage'),
               plotOutput('temporal')
             
@@ -184,7 +186,7 @@ tabPanel("2. An Example of Zipf's law for cities",
                         h2("6. The minimum population used to define cities affects the measure"),
                         h6("Because some empirical rank-size distributions are convex or concave"),
                         h6("references: Rosen & Resnick, 1980; Moriconi-Ebrard, 1993; Soo, 2005"),
-                        h2("7. Systems of cities tend to evolve towards more unevenness over time"),
+                        h2("7. Systems of cities tend to be more uneven with time"),
                         h6("Because larger cities grow faster on average, due to first-mover advantages in innovations."),
                         h6("references: Pumain, 1997; Nitsch, 2005")
                          ),
