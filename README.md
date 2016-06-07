@@ -82,6 +82,8 @@ Guérin-Pace, France 1995Rank-Size Distribution and the Process of Urban Growth. 
 
 Gulden, Timothy R., and Ross A. Hammond 2012Beyond Zipf: An Agent-Based Understanding of City Size Distributions. In Agent-Based Models of Geographical Systems Pp. 677?704. Springer. http://link.springer.com/chapter/10.1007/978-90-481-8927-4_34, accessed August 18, 2015.
 
+Holmes, Thomas J., and Sanghoon Lee 2010Cities as Six-by-Six-Mile Squares: Zipf?s Law? NBER: 105?131.
+
 Hongying, G., and W. Kangping 2008Zipf?s Law and Influential Factors of the Pareto Exponent of the City Size Distribution: Evidence from China. Frontiers of Economics in China 3(1): 137?149.
 
 Iyer, Seema D. 2003Increasing Unevenness in the Distribution of City Sizes in Post-Soviet Russia. Eurasian Geography and Economics 44(5): 348?367.
