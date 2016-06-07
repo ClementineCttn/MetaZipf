@@ -18,7 +18,7 @@ shinyUI(
   navlistPanel(
    
       
-    tabPanel("Presentation",
+    tabPanel("About",
       tabsetPanel(
       tabPanel("1. The Project",
             
@@ -124,12 +124,13 @@ tabPanel("2. An Example of Zipf's law for cities",
                                      choices = c("Mean Alpha" = 'meanAlpha',
                                                  "Standard Deviation" = 'diversity',
                                                  "Number of Estimations" = 'n'),
-                                     selected = "Mean Alpha", multiple = F))),
+                                     selected = "meanAlpha", multiple = F))),
               
               tags$hr(), 
+              h4("Geographical Distribution of estimations"),
               h6('!! It might take a few seconds to load and update !!'),
               leafletOutput('worldmap') ,  tags$hr(),
-              h4("Distribution of estimations"),
+              h4("Statistical Distribution of estimations"),
               h2("Subset by:"),
               fluidRow(
                 column(4,selectizeInput("territorys", "Territory", "", multiple=T)),
