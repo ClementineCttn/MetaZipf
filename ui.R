@@ -13,7 +13,7 @@ shinyUI(
             #   headerPanel(),
     
   titlePanel(
-             h2("Open Meta Review of Zipf's law for cities")),
+             h2("Open Meta Review of Zipf's law with open urban data")),
   
   navlistPanel(
    
@@ -74,10 +74,8 @@ so that eventually we could distinguish between the theoretical reasons for vari
    h6("Credits: T. Park from bootswatch.com for Flatly css file."),
    h6('Nitsch, V. (2005). Zipf zipped. Journal of Urban Economics, 57(1), 86-100')
 ),
-tabPanel("2. The References",
-         h3("Bibliographical References"), dataTableOutput('references')
-),
-tabPanel("3. An Example",
+
+tabPanel("2. An Example of Zipf's law for cities",
          h3("Explore variations of Zipf estimations with..."),
          fluidRow(
            
@@ -94,12 +92,26 @@ tabPanel("3. An Example",
 ))
 )),
     
-    tabPanel("Meta-Analysis",
+    tabPanel("100 years of publication",
              tabsetPanel(
                
-              
+               tabPanel("1. Literature Overview",
+                        h4('Coverage by Continent:'),
+                        dataTableOutput('continent'),
+                        h4('TOP journals where the estimations* are drawn from:'),  
+                        '*Each reference count as one, irrespective of the number of estimations',  tags$hr(),
+                        dataTableOutput('topjournals'),
+                        h4('TOP authors* providing estimations:'), 
+                        '*the estimations published by the same author(s) in different publications are not added.',   tags$hr(),
+                        dataTableOutput('topauthors'),
+                        
+                        h4('TOP countries for the dispersion of results*:'),
+                        '*measured by the standard deviation of alpha for countries with more than 5 estimations.',  tags$hr(),
+                        dataTableOutput('topcountries')
+                        
+               ),
     
-     tabPanel("1. Estimates Summary",
+     tabPanel("2. Estimates distribution",
               br(),
              
               fluidRow(
@@ -132,24 +144,20 @@ tabPanel("3. An Example",
               column(6,dataTableOutput('summaryMeta')))
             
                    ),
-             
+     tabPanel("3. The References",
+              h4("Bibliographical References"), dataTableOutput('references')
+     )
+
+     )),
      
-     tabPanel("2. Literature Overview",
-              h4('Coverage by Continent:'),
-              dataTableOutput('continent'),
-              h4('TOP journals where the estimations* are drawn from:'),  
-              '*Each reference count as one, irrespective of the number of estimations',  tags$hr(),
-              dataTableOutput('topjournals'),
-              h4('TOP authors* providing estimations:'), 
-              '*the estimations published by the same author(s) in different publications are not added.',   tags$hr(),
-              dataTableOutput('topauthors'),
-              
-              h4('TOP countries for the dispersion of results*:'),
-              '*measured by the standard deviation of alpha for countries with more than 5 estimations.',  tags$hr(),
-              dataTableOutput('topcountries')
-              
-     ),
-     tabPanel("3. Data", 
+     
+     
+     tabPanel("Meta-Analysis",
+              tabsetPanel(
+                
+                
+                tabPanel("1. Hypotheses"),
+     tabPanel("2. Data", 
               h4("Data and Hypotheses for a MetaAnalysis of Zipf"),
               "In a meta-analysis of Zipf for cities, we do not work directly with the cities' data.
               Instead, we use the estimations made by other researchers in published papers. The data is thus made by the result of their 
@@ -205,7 +213,7 @@ tabPanel("3. An Example",
               
               ),    
      
-               tabPanel("4. Meta Analysis",
+               tabPanel("3. Results",
                         br(),
                         "Let's test quantitatively some assumptions about the relation between 
                           estimated alphas and some characteristics of the urban system 
