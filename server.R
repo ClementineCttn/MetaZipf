@@ -5,7 +5,6 @@ library(shiny)
 library(rgdal) 
 library(rgeos) 
 library(leaflet)
-library(RColorBrewer)
 library(data.table)
 
 
@@ -151,14 +150,7 @@ shinyServer(function(input, output, session) {
   
   
   DARIUSzipf <- reactive({
-    if (input$dariusdef == "Morpho") {
     DARIUSdf= DARIUSSubset()
-      }
-    if (input$dariusdef == "Local") {
-      DARIUSdf = LocalUnits
-      DARIUSdf$Population = DARIUSdf[,paste0("Pop",input$dariusyear)]
-      DARIUSdf$Population = ifelse(DARIUSdf$Population >= input$dariuscutoff / 1000, DARIUSdf$Population, NA)
-    }
     size = DARIUSdf[order(-DARIUSdf$Population) , "Population"]
     rank = 1:length(size)
     zipf = data.frame(size, rank)
