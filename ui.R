@@ -98,6 +98,7 @@ tabPanel("2. An Example of Zipf's law for cities",
                tabPanel("1. Literature Overview",
                         h4('Coverage by Continent:'),
                         dataTableOutput('continent'),
+                       
                         h4('TOP journals where the estimations* are drawn from:'),  
                         '*Each reference count as one, irrespective of the number of estimations',  tags$hr(),
                         dataTableOutput('topjournals'),
@@ -111,15 +112,13 @@ tabPanel("2. An Example of Zipf's law for cities",
                         
                ),
     
-     tabPanel("2. Estimates distribution",
+     tabPanel("2. Where & When",
               br(),
              
               fluidRow(
-                column(9,"Although Zipf's Law states that alpha should be equal to 1,
-              empirical estimations are found to be distributed widely around this value. 
-              Our meta analysis precisely looks for explanations for this diversity, by relating the value
-              of alpha to some characteristics of the urban system (territory, population, age, type of cities) 
-              and to potential biases (city definition, discipline, etc.)."),
+                column(9,h4("Geographical Distribution of estimations"),
+                       h6('!! It might take a few seconds to load and update !!')),
+             
                 column(3,selectInput('alphaVarToMap', 'Alpha Statistics', 
                                      choices = c("Mean Alpha" = 'meanAlpha',
                                                  "Standard Deviation" = 'diversity',
@@ -127,25 +126,32 @@ tabPanel("2. An Example of Zipf's law for cities",
                                      selected = "meanAlpha", multiple = F))),
               
               tags$hr(), 
-              h4("Geographical Distribution of estimations"),
-              h6('!! It might take a few seconds to load and update !!'),
-              leafletOutput('worldmap') ,  tags$hr(),
+              leafletOutput('worldmap'), tags$hr(), 
+              h4('Temporal Coverage'),
+              plotOutput('temporal')
+            
+                   ),
+     tabPanel("3. Distribution",
               h4("Statistical Distribution of estimations"),
+              h6("Although Zipf's Law states that alpha should be equal to 1,
+              empirical estimations are found to be distributed widely around this value.
+              Our meta analysis precisely looks for explanations for this diversity, by relating the value
+              of alpha to some characteristics of the urban system (territory, population, age, type of cities)
+              and to potential biases (city definition, discipline, etc.)."),
               h2("Subset by:"),
               fluidRow(
                 column(4,selectizeInput("territorys", "Territory", "", multiple=T)),
                 column(4,selectizeInput("scales", "City Definition", "", multiple=T)),
                 column(4,selectizeInput("decades", "Decade", "", multiple=T)),
-                        plotOutput('histalpha')), br(), 
+                plotOutput('histalpha')), br(), 
               tags$hr(),
               tags$hr(),
-                    h4("Summary Statistics"),
+              h4("Summary Statistics"),
               fluidRow( 
                 column(6,dataTableOutput('summaryAlpha')),
-              column(6,dataTableOutput('summaryMeta')))
-            
-                   ),
-     tabPanel("3. The References",
+                column(6,dataTableOutput('summaryMeta')))
+     ),
+     tabPanel("4. References",
               h4("Bibliographical References"), dataTableOutput('references')
      )
 

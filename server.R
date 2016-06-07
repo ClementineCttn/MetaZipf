@@ -11,6 +11,7 @@ library(data.table)
 
 meta = read.csv("data/zipf_meta.csv", sep=",", dec=".")
 meta$REFERENCE = as.character(meta$REFERENCE)
+meta$DECADE = as.factor(paste0(substr(meta$DATE, 1, 3), "0s"))
 
 lkp = meta[,c("TERRITORY", "CNTR_ID")]
 lookupCNTR = lkp[lkp$CNTR_ID  != "",]
@@ -319,9 +320,16 @@ shinyServer(function(input, output, session) {
     return(top)
   })
   
+  output$temporal = renderPlot({
+    m = meta
   
+    ggplot(m, aes(x = DATE)) + 
+      geom_histogram(binwidth = 10,color = "#18BC9C", fill = "#18BC9C") +  
+      labs(x = "Decade", y = "Number of Estimates")
   
+  })
   
+ 
   output$continent = renderDataTable({
     m = meta
     if (input$alpha == "Lotka") m$ALPHA = m$ALPHALOTKA
