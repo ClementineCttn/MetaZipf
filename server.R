@@ -5,7 +5,6 @@ library(shiny)
 library(rgdal) 
 library(rgeos) 
 library(leaflet)
-library(plotly)
 library(RColorBrewer)
 
 meta = read.csv("data/zipf_meta.csv", sep=",", dec=".")
@@ -84,7 +83,7 @@ SummaryMetaMeta = function(table, regression = "Lotka"){
   colnames(Summary) = c("Meta Statistics", "Value")
   return(Summary)
 }
-x=meta$ALPHALOTKA
+
 sumNum = function(x){sum(as.numeric(x), na.rm=TRUE)}
 stdDev = function(x){sd(as.numeric(x), na.rm=TRUE)}
 collapseRefs = function(x){paste(as.list(as.character(x), na.rm=TRUE), sep=" ", collapse = " | ")}
@@ -112,6 +111,8 @@ names(r_colors) <- colors()
 
 shinyServer(function(input, output, session) {
    
+  
+  
   output$references = renderDataTable({
     d = refs[refs$IN_HERE == 1,c("AUTHOR", "YEAR", "JOURNAL", "PAGE", "N_ESTIM", "REGRESSIONFORM")]
     colnames(d) = c("Author", "Year", "Journal", "Page", "Estimations", "Regression")
@@ -131,6 +132,8 @@ shinyServer(function(input, output, session) {
     return(DARIUSsub)
   })
   
+  
+  
   DARIUSzipf <- reactive({
     if (input$dariusdef == "Morpho") {
     DARIUSdf= DARIUSSubset()
@@ -144,6 +147,8 @@ shinyServer(function(input, output, session) {
     rank = 1:length(size)
     zipf = data.frame(size, rank)
   })
+  
+  
   
   
   alphaSummaryByCountryForMap = reactive({
@@ -173,12 +178,13 @@ shinyServer(function(input, output, session) {
     colnames(topC) = c("CNTR_ID","a", "b", "Estimations", "vals")
     topCN = merge(topC, lookupCNTR_ID, by = "CNTR_ID", all.x=T, all.y=F)
     topCN$Estimations = as.integer(topCN$Estimations)
-    topCN = topCN[order(-topCN[,2]),]
     finalTop = topCN[,c("CNTR_ID", "TERRITORY", "a", "b", "Estimations", "vals")]
     colnames(finalTop) = c("CNTR_ID","Country", "Alpha Diversity*", "Mean Alpha","Estimations", "Values")
     finalTop= finalTop[finalTop$Country != "Taiwan",]
     return(finalTop)
   })
+  
+  
   
   alphaSummaryByCountryForTable = reactive({
     m = meta[meta$TERRITORY_TYPE == "Country",]
@@ -210,6 +216,7 @@ shinyServer(function(input, output, session) {
     finalTop$CNTR_ID = NULL
     return(finalTop)
   })
+  
   
   
   
@@ -247,6 +254,8 @@ shinyServer(function(input, output, session) {
     }, options = list(pageLength = 10, paging = FALSE, searching = FALSE))
   
   
+  
+  
   output$topjournals= renderDataTable({
      d = refs[refs$JOURNAL !="Dissertation",]
     d$count = 1
@@ -258,6 +267,9 @@ shinyServer(function(input, output, session) {
     return(top)
   }, options = list(pageLength = 10,searching = FALSE))
   
+  
+  
+  
   output$topauthors= renderDataTable({
      d = refs[,c("AUTHOR", "YEAR", "JOURNAL", "N_ESTIM")]
     ds = d[order(-d$N_ESTIM),]
@@ -266,10 +278,16 @@ shinyServer(function(input, output, session) {
     return(top)
   }, options = list(pageLength = 10))
   
+  
+  
+  
   output$topcountries= renderDataTable({
     df = alphaSummaryByCountryForTable()
     return(df)
   }, options = list(pageLength = 10))
+  
+  
+  
   
   output$topextremes= renderDataTable({
     m = meta
@@ -285,6 +303,9 @@ shinyServer(function(input, output, session) {
   
     return(top)
   })
+  
+  
+  
   
   output$continent = renderDataTable({
     m = meta
@@ -371,6 +392,7 @@ metaTableSummary <- reactive({
 
   
   
+  
   output$summaryAlpha = renderDataTable({
     tab = metaTableSummary()
     summaryA = SummaryMetaAlpha(table = tab, regression = reg)
@@ -395,6 +417,10 @@ metaTableSummary <- reactive({
     return(histo)
   })
   
+  
+  
+  
+  
      ZipfCountries <- reactive({
     c_shp <- full_countries#[full_countries$CNTR_ID == input$Country_name, ]
      data = alphaSummaryByCountryForMap()
@@ -402,9 +428,11 @@ metaTableSummary <- reactive({
     colnames(data) = c("CNTR_ID", "Name", "Diversity", "Alpha", "Estimation", "Values")
     c_shp@data = data.frame(c_shp@data, data[match(c_shp@data$CNTR_ID,data$CNTR_ID), ])
     return(c_shp)
-    
   })
   
+     
+     
+     
   output$worldmap <- renderLeaflet({
     tab = meta
     if (input$alpha == "Lotka") tab$ALPHA = tab$ALPHALOTKA
@@ -444,22 +472,13 @@ metaTableSummary <- reactive({
                                             right = FALSE)))
       countriesToMap@data$VarToMap = ifelse( is.na(countriesToMap@data$VarToMap), "white", countriesToMap@data$VarToMap )
       
-     #  countriesToMap@data$vals = paste(countriesToMap@data$Name,"  ",
-     #                                   countriesToMap@data$Values,sep = " ", collapse="\n")
-     #  
-     # countriesToMap@data$popup = ifelse(is.na(countriesToMap@data$VarToMap), "Insufficient Data",
-     #                                      paste(countriesToMap@data$Name,"  ",
-     #                                     countriesToMap@data$Values,sep = " ", collapse="\n")
-     #                                     )
-     # 
-     
-     leaflet(countriesToMap) %>% addProviderTiles("CartoDB.Positron") %>%
+      leaflet(countriesToMap) %>% addProviderTiles("CartoDB.Positron") %>%
       clearShapes() %>% setView(lng=10, lat=20, zoom=2) %>% 
       addPolygons(stroke = FALSE, smoothFactor = 0, 
                   fillColor = ~VarToMap, fillOpacity = 0.7, 
-                  layerId = ~CNTR_ID, popup = ~Values) %>%
-           addLegend("bottomright", colors= vPal6, labels=vLegendBox, title=t)
-    
+                  layerId = ~CNTR_ID, popup = ~Values, options = popupOptions(maxWidth = 100)) %>% 
+        addLegend("bottomright", colors= vPal6, labels=vLegendBox, title=t)
+      
   })
   
  
@@ -604,20 +623,10 @@ metaTableSummary <- reactive({
     })
     
   })
- #  
- # 
- # observe({
- #   if(is.null(input$send) || input$send==0) return(NULL)
- #   from <- isolate(input$from)
- #   to <- "c.cottineau@ucl.ac.uk"
- #   subject <- "My contribution to MetaZipf"
- #   comment <- isolate(input$comment)
- #   msg = paste("Dear Clementine, I have added some estimations to MetaZipf.", comment , sep = "\n")
- #   sendmail(from, to, subject, msg)
- # })
- # 
- # 
+ 
   
+  
+   
   datasetInput <- reactive({
     refsToAdd = refsToAdd
     if(is.null(input$addest) || input$addest==0) return(NULL)
@@ -651,10 +660,10 @@ metaTableSummary <- reactive({
     rownames(metaToAdd) = 1:r
     metaToAdd$ref = refName
     return(metaToAdd)
-   # write.csv(refsToAdd, paste("data/ToAdd/refToAdd_session", s, ".csv", sep=""))
-   # write.csv(metaToAdd, paste("data/ToAdd/metaToAdd_session", s, ".csv", sep=""))
-    
-  })
+    })
+  
+  
+  
   
   
   observe({
@@ -725,6 +734,9 @@ metaTableSummary <- reactive({
       write.csv(tab, file)
     }
   )
+  
+  
+  
   
   
  output$downloadTables <- downloadHandler(

@@ -16,6 +16,7 @@ html {
   font-family: sans-serif;
   -ms-text-size-adjust: 100%;
   -webkit-text-size-adjust: 100%;
+  
 }
 body {
   margin: 0;
@@ -473,6 +474,7 @@ th {
 .glyphicon-indent-left:before {
   content: "\e057";
 }
+.leaflet-popup-content { max-height : 150px; overflow : auto; }
 .glyphicon-indent-right:before {
   content: "\e058";
 }
