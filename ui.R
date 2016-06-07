@@ -51,7 +51,7 @@ so that eventually we could distinguish between the theoretical reasons for vari
               truncation points, number of cities) and the discipline of the journal publishing the paper to unveil systematic deviations from the iconic 1 value
                    (more precision in tab 
                    'Meta-Analysis / Data')."), br(),   br(),
-             HTML('The current database covers 1681 estimations from 80 studies, spanning over more than 80 countries over 400 years. 
+             HTML('The current database covers 1702 estimations from 81 studies, spanning over more than 80 countries over 400 years. 
             It is open for download (<a href="https://github.com/ClementineCttn/MetaZipf">https://github.com/ClementineCttn/MetaZipf</a>) and you are
             strongly invited to contribute by submitting your own empirical estimates using the \'Contribute !\' tab on the left.'), br(),   br(),
             h5("Before starting, choose a regression form into which all subsequent results will be expressed.")),
@@ -163,27 +163,45 @@ tabPanel("2. An Example of Zipf's law for cities",
               tabsetPanel(
                 
                 
-                tabPanel("1. Hypotheses"),
+                tabPanel("1. Hypotheses",
+                        h4("Hypotheses to explain deviations from Zipf's Law"),
+                        h6("'Almost no data set corresponds exactly to the rank-size rule, so interpretations are based on how the data set diverges from the expected results' - Savage, 1997"),
+                        h2("1. Loosely-integrated systems deviate more than integrated ones"),
+                        h6("Because they duplicate small to medium-size cities and/or lack an appropriate primate city."),
+                        h6("references: Harris, 1970; Johnson, 1977; Rosen & Resnick, 1980"),
+                        h2("2. Recently urbanised systems are more unequal than ancient ones"),
+                        h6("Because the transport networks available at the time of urbanisation were slower in old systems, a larger amount of small cities were necessary. In areas urbanised with railroads and highways, these small cities tend to have been court-circuited."),
+                        h6("references: Berry & Garrison, 1958; Moriconi-Ebrard, 1993; Pumain, 1997"),
+                        h2("3. Small territories are more unequal than large ones"),
+                        h6("Because the concentration of power in the largest cities is not balanced by a sufficiently large set of secondary cities."),
+                        h6("references: Morrill, 1970; Rosen & Resnick, 1980"),
+                        h2("4. Metropolitan areas (and morphoCities) are more unevenly populated than 'city propers'"),
+                        h6("Because the inclusion of suburbs causes a larger proportional increase in large cities than for small city populations, increasing the unevenness measured."),
+                        h6("references: Auerbach, 1913; Rosen & Resnick, 1980; Soo, 2005; Nitsch, 2005"),
+                        h2("5. Smaller sets of cities are more likely to deviate from Zipf's law"),
+                        h6("Because they do not represent sufficiently well the complete distribution of cities."),
+                        h6("references: Rosen & Resnick, 1980; Critelli et al, 2012"),
+                        h2("6. The minimum population used to define cities affects the measure"),
+                        h6("Because some empirical rank-size distributions are convex or concave"),
+                        h6("references: Rosen & Resnick, 1980; Moriconi-Ebrard, 1993; Soo, 2005"),
+                        h2("7. Systems of cities tend to evolve towards more unevenness over time"),
+                        h6("Because larger cities grow faster on average, due to first-mover advantages in innovations."),
+                        h6("references: Pumain, 1997; Nitsch, 2005")
+                         ),
      tabPanel("2. Data", 
-              h4("Data and Hypotheses for a MetaAnalysis of Zipf"),
-              "In a meta-analysis of Zipf for cities, we do not work directly with the cities' data.
-              Instead, we use the estimations made by other researchers in published papers. The data is thus made by the result of their 
-              analysis along with the description of how they made the analysis. Each observation in our case is thus
-              composed of a single estimation of alpha (if you chose the Lotka form) 
-              or alpha' (if you chose the Pareto form) and is characterized by half a dozen other variables.", 
-              withMathJax(h6("$$\\log(P_i) = -\\alpha \\times \\log(R_i) + \\beta + \\epsilon_i$$ $$\\log(R_i) = -\\alpha' \\times \\log(P_i) + \\beta' + \\epsilon'_i$$ ")),  
-              h2("TERRITORY"), 
-              h6("For example: The Netherlands in Brakman et al. (1999)."), "The geographical extent from which cities were selected. When available (i.e. between 1950 and 2015 for countries), the population of the territory was added.
-              Given the diversity of countries with respect to economic development, culture and size, one might expect alpha to vary accordingly.", 
-              
-              h2("DATE & DECADE"),  h6("For example: 1600 in Bretagnolle et al. (2000)."), "The date (and decade) to which the cities' 
+              h4("Data for a MetaAnalysis of Zipf"),
+              "In a meta-analysis, we do not work directly with the cities' data: we use the estimations published by other researchers. The data is thus made by the result of their 
+              analysis along with the description of how they made the analysis. Each observation is 
+              composed of a single estimation of alpha and half a dozen other variables.", 
+             #  withMathJax(h6("$$\\log(P_i) = -\\alpha \\times \\log(R_i) + \\beta + \\epsilon_i$$ $$\\log(R_i) = -\\alpha' \\times \\log(P_i) + \\beta' + \\epsilon'_i$$ ")),  
+               
+              h2("DATE"),  h6("For example: 1600 in Bretagnolle et al. (2000)."), "The date (and decade) to which the cities' 
               population refer. This information can be used to test the hypothesis according to which systems of cities increase
               their level of hierarchy over time, everything else being equal.", br(), 
               h2("URBANISATION AGE"), h6("For example: 'OLD' for China."), 
               "An indication whether urbanisation is a relatively recent or ancient phenomenon in the territory.
               'OLD' continents refer to zones of early urbanisation, in Europe, South-East Asia and the Middle East. 
-              America, Oceania, Africa and central Asia are considered 'NEW' in that respect. It has been found in previous studies 
-              (Moriconi-Ebrard, 1993) that countries of more recent urbanisation tend to generate a steeper hierarchy of cities.",
+              America, Oceania, Africa and central Asia are considered 'NEW' in that respect.",
               h2("NUMBER OF CITIES"), h6("For example: 60 cities in Lepetit (1990)."),
               "The number of cities used to estimate Zipf's coefficient.", br(),  
               h2("CITY DEFINITION"),  h6("For example: MorphoCity in Guerin-Pace (1995)."),
@@ -192,15 +210,14 @@ tabPanel("2. An Example of Zipf's law for cities",
               MetroAreas correspond to functional aggregations of Local units based on flows (typically commuters). 
               VariaMixed indicate that the definition is heterogenous or uncommon.", br(), 
               h2("POPULATION CUTOFF"),  h6("For example: 5000 residents in Parr (1985)."),
-              "The minimum population of the cities selected. This cutoff is know to affect other properties of cities such 
-              as scaling behaviours.", br(),  
+              "The minimum population of the cities selected.", br(),  
               h2("DISCIPLINE"),  h6("For example: 'ECO' for the Quarterly Journal of Economics."),
               "The disciplines in which the journal is recognised, according to the Chicago Journal Ranking SJR. ", br(),  
               "'ECO' refers to estimations published in journals classified in Economics, 
               'SOC' stands for Social Science and 'PHYS' for environmental and physical sciences journals. 
-              A journal can belong to one or more categories. We include this information as a test for disciplinary biases.
-              It could be possible for example that some journals want to validate Zipf's Law with an exponent alpha of 1, whereas
-              another journal would be biased towards publishing more refutations of this law, etc.",br(), 
+              A journal can belong to one or more categories. We include this information as a test for disciplinary biases.",br(), 
+              h2("TERRITORY"), 
+             "We characterize different territories based on their population and type (national boundaries, subnational regions or supra-national macroRegions).", 
               h2("R2"),  h6("For example: 99% in Bretagnolle et al. (2008)."),
               "The coefficient of Determination of the regression, indicating the quality of the fit. ", br(),  br(), 
               #h2("REFERENCE"), "The reference from which the estimation is taken. For example: Singer (1936).", br(),  

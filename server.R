@@ -392,12 +392,12 @@ metaTableSummary <- reactive({
 
 
   output$review = renderDataTable({
-    tab = metaTableSelected()
+   tab = metaTableSelected()
     tab = tab[,c("ALPHA", "TERRITORY", "DATE", "URBANISATION",
-                 "N", "URBANSCALE", "TRUNCATION", "DISCIPLINE", "R2", "REFERENCE")]
+                 "N", "URBANSCALE", "TRUNCATION", "DISCIPLINE", "R2", "TERRITORY_TYPE","TOTAL_POP", "REFERENCE")]
     colnames(tab) = c("Alpha", "Territory", "Date", "Urban Age", 
                       "Number of Cities", "City Definition", "Population Cutoff", 
-                      "Discipline", "R2", "Reference")
+                      "Discipline", "R2", "Type of Territory", "Total Pop (x1000)", "Reference")
     
      return(tab)
   }, options = list(paging = FALSE, searching = FALSE))
