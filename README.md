@@ -84,6 +84,8 @@ Gulden, Timothy R., and Ross A. Hammond 2012Beyond Zipf: An Agent-Based Understa
 
 Hongying, G., and W. Kangping 2008Zipf?s Law and Influential Factors of the Pareto Exponent of the City Size Distribution: Evidence from China. Frontiers of Economics in China 3(1): 137?149.
 
+Iyer, Seema D. 2003Increasing Unevenness in the Distribution of City Sizes in Post-Soviet Russia. Eurasian Geography and Economics 44(5): 348?367.
+
 Kamecke, Ulrich 1990Testing the Rank Size Rule Hypothesis with an Efficient Estimator. Journal of Urban Economics 27(2): 222?231.
 
 Knudsen, Thorbjørn 2001Zipf?s Law for Cities and beyond: The Case of Denmark. American Journal of Economics and Sociology 60(1): 123?146.

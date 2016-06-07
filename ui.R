@@ -51,7 +51,7 @@ so that eventually we could distinguish between the theoretical reasons for vari
               truncation points, number of cities) and the discipline of the journal publishing the paper to unveil systematic deviations from the iconic 1 value
                    (more precision in tab 
                    'Meta-Analysis / Data')."), br(),   br(),
-             HTML('The current database covers 1661 estimations from 79 studies, spanning over more than 80 countries over 400 years. 
+             HTML('The current database covers 1681 estimations from 80 studies, spanning over more than 80 countries over 400 years. 
             It is open for download (<a href="https://github.com/ClementineCttn/MetaZipf">https://github.com/ClementineCttn/MetaZipf</a>) and you are
             strongly invited to contribute by submitting your own empirical estimates using the \'Contribute !\' tab on the left.'), br(),   br(),
             h5("Before starting, choose a regression form into which all subsequent results will be expressed.")),
