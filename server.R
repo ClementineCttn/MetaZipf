@@ -6,9 +6,10 @@ library(rgdal)
 library(rgeos) 
 library(leaflet)
 library(RColorBrewer)
+library(data.table)
+
 
 meta = read.csv("data/zipf_meta.csv", sep=",", dec=".")
-meta$TOTAL_POP = as.numeric(meta$TOTAL_POP)
 meta$REFERENCE = as.character(meta$REFERENCE)
 
 lkp = meta[,c("TERRITORY", "CNTR_ID")]
@@ -16,11 +17,25 @@ lookupCNTR = lkp[lkp$CNTR_ID  != "",]
 lookupCNTR_ID = lookupCNTR[!duplicated(lookupCNTR), ]
 
 refs = read.csv("data/zipf_refs.csv", sep=",", dec=".")
-head(meta)
 metaToAdd = data.frame()
 refsToAdd = data.frame()
 
 meta = data.frame(meta, refs[match(meta$REFID,refs$REFID),])
+rownames(meta) = 1:dim(meta)[1]
+meta$REFID.1 = NULL
+meta$REGRESSIONFORM = NULL
+meta$AUTHOR = NULL
+meta$YEAR = NULL
+meta$PAGE = NULL
+meta$SOURCE = NULL
+
+pops = read.csv("data/UN_Population_1950_2015.csv", sep=",", dec=".")
+meta = data.frame(meta, pops[match(meta$CNTR_ID,pops$CNTR_ID),])
+meta$TOTAL_POP = NA
+for (i in 1:dim(meta)[1]) {
+  if(meta[i,"DATE"] %in% 1950:2015) meta[i,"TOTAL_POP"] = as.numeric(meta[i,paste0("X", meta[i,"DATE"])])
+}
+
 rownames(meta) = 1:dim(meta)[1]
 meta$REFID.1 = NULL
 meta$REGRESSIONFORM = NULL
@@ -169,7 +184,7 @@ shinyServer(function(input, output, session) {
     topC = join( top,mean, by = "Group.1")
     topC = join( topC,keep, by = "Group.1")
     
-    m$ALPHA_REFERENCE = paste(m$REFERENCE,m$ALPHA,  sep=": ")
+    m$ALPHA_REFERENCE = paste(m$REFERENCE,round(m$ALPHA,3),  sep=": ")
     mRefs = aggregate(m[,"ALPHA_REFERENCE"], unique(list(m$CNTR_ID)), FUN = collapseRefs)
     mRefs = as.data.frame(mRefs)
      topC = join(topC,mRefs, by = "Group.1")
@@ -472,6 +487,7 @@ metaTableSummary <- reactive({
                                             right = FALSE)))
       countriesToMap@data$VarToMap = ifelse( is.na(countriesToMap@data$VarToMap), "white", countriesToMap@data$VarToMap )
       
+  
       leaflet(countriesToMap) %>% addProviderTiles("CartoDB.Positron") %>%
       clearShapes() %>% setView(lng=10, lat=20, zoom=2) %>% 
       addPolygons(stroke = FALSE, smoothFactor = 0, 

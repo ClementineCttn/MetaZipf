@@ -100,8 +100,8 @@ tabPanel("3. An Example",
               
     
      tabPanel("1. Estimates Summary",
-              
               br(),
+             
               fluidRow(
                 column(9,"Although Zipf's Law states that alpha should be equal to 1,
               empirical estimations are found to be distributed widely around this value. 
@@ -114,7 +114,8 @@ tabPanel("3. An Example",
                                                  "Number of Estimations" = 'n'),
                                      selected = "Mean Alpha", multiple = F))),
               
-              tags$hr(),
+              tags$hr(), 
+              h6('!! It might take a few seconds to load and update !!'),
               leafletOutput('worldmap') ,  tags$hr(),
               h4("Distribution of estimations"),
               h2("Subset by:"),
