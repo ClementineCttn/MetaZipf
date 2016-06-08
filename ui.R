@@ -3,7 +3,7 @@ library(leaflet)
 shinyUI(
   fluidPage(theme = "flatly_bootstrap.css",
             tags$head(tags$link(rel="shortcut icon", href="favicon.png")),
-            
+            tags$head(includeScript("www/google_analytics.js")),
             tags$head(
               tags$style(HTML("
       @import url('//fonts.googleapis.com/css?family=Orbitron|Cabin:400,700');
