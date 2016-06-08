@@ -1,6 +1,6 @@
 This repository aims at storing the materials for a meta analysis of Zipf's law for cities in the literature, available interactively:  https://clementinegeo.shinyapps.io/MetaZipf .
 The application itself aims at presenting a crowdsourced review and meta analysis of Zipf's law estimations from the literature. It allows interactive queries into a pool of empirical papers to represent the variation of empiricial estimations of Zipf's law's exponent in the literature, with respect to the systems of cities studied and meta-information about the publication. The meta analysis considers urban characteristics (age of the system, total population), the specifications of the regression used (urban definitions, truncation points, number of cities) and the discipline of the journal publishing the paper to unveil systematic deviations from the iconic 1 value.
-!	(https://raw.githubusercontent.com/username/projectname/branch/path/to/img.png)
+!	(https://raw.githubusercontent.com/ClementineCttn/MetaZipf/master/metaZipf_demo.gif)
 
 ## Description of main files:
 
