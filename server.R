@@ -137,8 +137,14 @@ shinyServer(function(input, output, session) {
   
   
   DARIUSSubset <- reactive({
-    if (input$dariusdef == "Local") DARIUS = DARIUS_L
-    if (input$dariusdef == "Morpho") DARIUS = DARIUS_A
+    if (input$dariusdef == "Local") {
+      DARIUS = DARIUS_L
+      DARIUS$ID = DARIUS$ROKATO
+    }
+    if (input$dariusdef == "Morpho") {
+      DARIUS = DARIUS_A
+      DARIUS$ID = DARIUS$AROKATO
+    }
     DARIUSsub = DARIUS
     year4darius = paste0("Pop",input$dariusyear)
     DARIUSsub$Population = DARIUSsub[,year4darius]
@@ -402,7 +408,7 @@ metaTableSummary <- reactive({
     leaflet() %>% addProviderTiles("CartoDB.Positron") %>%
     #  setView(lng=75, lat=58, zoom=3) %>% 
       addCircleMarkers(data=cities, radius = ~sqrt(0.1*Population), lat = ~lat,
-                        color = "#1e90ff", stroke=FALSE, fillOpacity=0.5, layerId = ~AROKATO, lng = ~long)
+                        color = "#1e90ff", stroke=FALSE, fillOpacity=0.5, layerId = ~ID, lng = ~long)
   })
 
   
