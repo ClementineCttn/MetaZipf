@@ -29,32 +29,30 @@ shinyUI(
             "This application aims at presenting a crowdsourced review and meta analysis of Zipf's law estimations from the literature. ",  br(), br(),
             
             "Indeed, this famous 'urban mystery' (Krugman, 1996) of a regular distribution of city sizes, found in many city systems at various points in history,
-            has been an on-going subject of scientific discussion for a century. Despite hundreds of empirical evidences, it is still not clear if there is a universal
-            Zipf's law,  - i.e. a power law relating city population to their rank in the system, with a exponent equal to 1 -, because in many cases, a value significantly different
+            has been an on-going subject of scientific discussion for a century. Despite hundreds of empirical evidences, it is still not clear whether there is a universal
+            Zipf's law (i.e. a power law relating city population to their rank in the system, with a exponent equal to -1) because in many cases, a value significantly different
 from 1 is measured. Comparative papers (Singer, 1936; Rosen, Resnick, 1980; Parr, 1985; Soo, 2005) and meta analyses (Nitsch, 2005) provide a first idea of the magnitude of this variation and they try to
-understand why deviations are observed: is it because this law simply does not apply in some countries (where control over migration is strong for example)? 
+understand why deviations are observed: is it because this law simply does not apply in some countries (where controls over migrations are strong for example)? 
             Is it because the system is not consistently defined (Cristelli et al., 2012), in terms of territory, city definition, etc.? 
-            Is it because the city size inequality tends to evolve over time (Pumain, 1997)?", br(), br(),
+            Is it because the city size inequality tends to increase over time (Pumain, 1997)?", br(), br(),
             
             "Building on the work of V. Nitsch (2005), we bring it further by:",
             tags$ul(
               tags$li("creating a much larger review of empirical papers, 
-            in particular through crowdsourcing to enhance its representativity across dates, areas and study fields."),
-              tags$li("making this database open for other researchers."),
+            in particular through crowdsourcing to enhance representativity across dates, areas and study fields."),
+              tags$li("making this database open."),
               tags$li("testing a broader pool of hypotheses regarding the variability of the exponent measured,
-so that eventually we could distinguish between the theoretical reasons for variations from the technical biases affecting the measurement of this power law."),
-              tags$li("making this meta analysis transparent, interactive and adaptable to future additions and hypotheses.")),
+to distinguish topical differences from technical biases affecting the measurement."),
+              tags$li("making this meta analysis transparent, interactive and adaptable to future developments.")),
         
             tags$b("The present application allows interactive queries into a pool of empirical papers to represent the variation of empiricial estimations of Zipf's 
                   law's exponent in the literature, with respect to the systems of cities studied and meta-information about the publication. The meta analysis 
         considers urban characteristics (age of the system, total population), the specifications of the regression used (urban definitions,
-              truncation points, number of cities) and the discipline of the journal publishing the paper to unveil systematic deviations from the iconic 1 value
-                   (more precision in tab 
-                   'Meta-Analysis / Data')."), br(),   br(),
+              truncation points, number of cities) and the discipline of the journal publishing the paper to unveil systematic deviations from the iconic 1 value."), br(),   br(),
              HTML('The current database covers 1702 estimations from 81 studies, spanning over more than 80 countries over 400 years. 
             It is open for download (<a href="https://github.com/ClementineCttn/MetaZipf">https://github.com/ClementineCttn/MetaZipf</a>) and you are
-            strongly invited to contribute by submitting your own empirical estimates using the \'Contribute !\' tab on the left.'), br(),   br(),
-            h5("Before starting, choose a regression form into which all subsequent results will be expressed.")),
+            strongly invited to contribute by submitting your own empirical estimates using the \'Contribute !\' form.'), br(),   br(),
+            h5("Before starting, choose the way results will be expressed.")),
                       
             tags$hr(),
             
@@ -76,7 +74,10 @@ so that eventually we could distinguish between the theoretical reasons for vari
 ),
 
 tabPanel("2. An Example of Zipf's law for cities",
-         h3("Explore variations of Zipf estimations with..."),
+         h6("Empirical studies are based on urban databases, and the measurement of Zipf's coefficient
+            may be affected by the sample size, date and definition of cities used, as in the example
+            of Soviet cities below. "),
+         tags$hr(),  h3("Explore variations of Zipf estimations with..."),
          fluidRow(
            
          column(4,selectInput("dariusyear", "Year", choice=c(2010, 2002, 1989, 1979, 1970, 1959, 1939, 1926, 1897), multiple=F)),
@@ -96,7 +97,8 @@ tabPanel("2. An Example of Zipf's law for cities",
              tabsetPanel(
                
                tabPanel("1. Literature Overview",
-                        h4('Coverage by Continent:'),
+                        h6("This tab summarises the extent of studies of Zipf's law for cities in the literature."),
+                        tags$hr(),   h4('Coverage by Continent:'),
                         dataTableOutput('continent'),
                        
                         h4('TOP journals where the estimations* are drawn from:'),  
@@ -113,9 +115,9 @@ tabPanel("2. An Example of Zipf's law for cities",
                ),
     
      tabPanel("2. Where & When",
-              br(),
-             
-              fluidRow(
+              h6("This law has been estimated for a wide array of countries and periods, with particular
+                 focuses on cases with reliable available data (i.e. developed countries in recent years)."),
+              tags$hr(),  fluidRow(
                 column(9,h4("Geographical Distribution of estimations"),
                        h6('!! It might take a few seconds to load and update !!')),
              
@@ -134,12 +136,13 @@ tabPanel("2. An Example of Zipf's law for cities",
             
                    ),
      tabPanel("3. Distribution",
-              h4("Statistical Distribution of estimations"),
               h6("Although Zipf's Law states that alpha should be equal to 1,
               empirical estimations are found to be distributed widely around this value.
-              Our meta analysis precisely looks for explanations for this diversity, by relating the value
-              of alpha to some characteristics of the urban system (territory, population, age, type of cities)
-              and to potential biases (city definition, discipline, etc.)."),
+                 The meta analysis precisely looks for explanations for this diversity, by relating the value
+                 of alpha to some characteristics of the urban system (territory, population, age, type of cities)
+                 and to potential biases (city definition, discipline, etc.)."),
+              tags$hr(),  h4("Statistical Distribution of estimations"),
+             
               h2("Subset by:"),
               fluidRow(
                 column(4,selectizeInput("territorys", "Territory", "", multiple=T)),
@@ -154,7 +157,8 @@ tabPanel("2. An Example of Zipf's law for cities",
                 column(6,dataTableOutput('summaryMeta')))
      ),
      tabPanel("4. References",
-              h4("Bibliographical References"), dataTableOutput('references')
+              h6("The analysis is based on estimations found in the following references."),
+              tags$hr(),  h4("Bibliographical References"), dataTableOutput('references')
      )
 
      )),
@@ -164,38 +168,43 @@ tabPanel("2. An Example of Zipf's law for cities",
      tabPanel("Meta-Analysis",
               tabsetPanel(
                 
-                
                 tabPanel("1. Hypotheses",
-                        h4("Hypotheses to explain deviations from Zipf's Law"),
-                        h6("'Almost no data set corresponds exactly to the rank-size rule, so interpretations are based on how the data set diverges from the expected results' - Savage, 1997"),
-                        h2("1. Loosely-integrated systems deviate more than integrated ones"),
-                        h6("Because they duplicate small to medium-size cities and/or lack an appropriate primate city."),
-                        h6("references: Harris, 1970; Johnson, 1977; Rosen & Resnick, 1980"),
-                        h2("2. Recently urbanised systems are more unequal than ancient ones"),
-                        h6("Because the transport networks available at the time of urbanisation were slower in old systems, a larger amount of small cities were necessary. In areas urbanised with railroads and highways, these small cities tend to have been court-circuited."),
-                        h6("references: Berry & Garrison, 1958; Moriconi-Ebrard, 1993; Pumain, 1997"),
-                        h2("3. Small territories are more unequal than large ones"),
+                         h6("'Almost no data set corresponds exactly to the rank-size rule, so interpretations are based on how the data set diverges from the expected results' - Savage, 1997"),
+                         
+                         tags$hr(), 
+                         h4("Hypotheses to explain deviations from Zipf's Law"),
+                         h2("1. Recently urbanised systems are more unequal than ancient ones"),
+                        h6("Because the transport networks available at the time of urbanisation were slower in old systems, a larger amount of small cities were necessary. In areas urbanised with railroads and highways, these small cities tend to have been short-circuited."),
+                        h6("References: Berry & Garrison, 1958; Moriconi-Ebrard, 1993; Pumain, 1997"),
+                        h2("2. Small territories are more unequal than large ones"),
                         h6("Because the concentration of power in the largest cities is not balanced by a sufficiently large set of secondary cities."),
-                        h6("references: Morrill, 1970; Rosen & Resnick, 1980"),
-                        h2("4. Metropolitan areas (and morphoCities) are more unevenly populated than 'city propers'"),
+                        h6("References: Morrill, 1970; Rosen & Resnick, 1980"),
+                        h2("3. Metropolitan areas (and built-up areas to a lesser extent) are more unevenly populated than 'city propers'"),
                         h6("Because the inclusion of suburbs causes a larger proportional increase in large cities than for small city populations, increasing the unevenness measured."),
-                        h6("references: Auerbach, 1913; Rosen & Resnick, 1980; Soo, 2005; Nitsch, 2005"),
-                        h2("5. Smaller sets of cities are more likely to deviate from Zipf's law"),
-                        h6("Because they do not represent sufficiently well the complete distribution of cities."),
-                        h6("references: Rosen & Resnick, 1980; Critelli et al, 2012"),
-                        h2("6. The minimum population used to define cities affects the measure"),
-                        h6("Because some empirical rank-size distributions are convex or concave"),
-                        h6("references: Rosen & Resnick, 1980; Moriconi-Ebrard, 1993; Soo, 2005"),
-                        h2("7. Systems of cities tend to be more uneven with time"),
+                        h6("References: Auerbach, 1913; Rosen & Resnick, 1980; Soo, 2005; Nitsch, 2005"),
+                        h2("4. Systems of cities tend to be more uneven with time"),
                         h6("Because larger cities grow faster on average, due to first-mover advantages in innovations."),
-                        h6("references: Pumain, 1997; Nitsch, 2005")
+                        h6("References: Pumain, 1997; Nitsch, 2005"),
+                        h2("5. Loosely-integrated systems deviate more than integrated ones"),
+                        h6("Because they duplicate small to medium-sized cities and/or lack a primate city."),
+                        h6("References: Harris, 1970; Johnson, 1977; Rosen & Resnick, 1980"),
+                        h2("6. Smaller sets of cities are more likely to deviate from Zipf's law"),
+                        h6("Because they do not represent sufficiently well the complete distribution of cities."),
+                        h6("References: Rosen & Resnick, 1980; Critelli et al, 2012"),
+                        h2("7. The minimum population used to define cities affects the measure"),
+                        h6("Because empirical rank-size distributions can be convex or concave."),
+                        h6("References: Rosen & Resnick, 1980; Moriconi-Ebrard, 1993; Soo, 2005")#,
+                        # h2("8. "),
+                        # h6("Because ."),
+                        # h6("References: ")
+                        
                          ),
      tabPanel("2. Data", 
-              h4("Data for a MetaAnalysis of Zipf"),
-              "In a meta-analysis, we do not work directly with the cities' data: we use the estimations published by other researchers. The data is thus made by the result of their 
+              h6("In a meta-analysis, we do not work directly with the cities' data: we use the estimations published by other researchers. The data is thus made by the result of their 
               analysis along with the description of how they made the analysis. Each observation is 
-              composed of a single estimation of alpha and half a dozen other variables.", 
-             #  withMathJax(h6("$$\\log(P_i) = -\\alpha \\times \\log(R_i) + \\beta + \\epsilon_i$$ $$\\log(R_i) = -\\alpha' \\times \\log(P_i) + \\beta' + \\epsilon'_i$$ ")),  
+                 composed of a single estimation of alpha and half a dozen other variables."), 
+              tags$hr(), h4("Data for a MetaAnalysis of Zipf"),
+              #  withMathJax(h6("$$\\log(P_i) = -\\alpha \\times \\log(R_i) + \\beta + \\epsilon_i$$ $$\\log(R_i) = -\\alpha' \\times \\log(P_i) + \\beta' + \\epsilon'_i$$ ")),  
                
               h2("DATE"),  h6("For example: 1600 in Bretagnolle et al. (2000)."), "The date (and decade) to which the cities' 
               population refer. This information can be used to test the hypothesis according to which systems of cities increase
@@ -240,14 +249,11 @@ tabPanel("2. An Example of Zipf's law for cities",
               ),    
      
                tabPanel("3. Results",
-                        br(),
-                        "Let's test quantitatively some assumptions about the relation between 
+                       h6("We use a multiple linear regression to test our hypotheses about the relation between 
                           estimated alphas and some characteristics of the urban system 
-                        (territory, population, age, type of cities) as well as
-                         potential biases (city definition, discipline, etc.).",
-                        
-                        tags$hr(),
-                        "To this end, we use a multiple linear regression. We regress 
+                        (territory, population, age, type of cities) and
+                         potential biases (city definition, discipline, etc.)."), tags$hr(), 
+                       "Technically, we regress 
                         the value of alpha by the value of other 
                         characteristics Y of i, 
                         resulting in the estimation of an intercept and a vector of 
@@ -255,13 +261,13 @@ tabPanel("2. An Example of Zipf's law for cities",
                         intensity with which the value of alpha varies following a variation
                         of the value of Y.",
                         withMathJax(h6("$$\\alpha_i = Intercept + b * Y_i $$")),
-                        "For comparability reasons, most of the characteristics Y 
+                      "For comparability reasons, most of the characteristics Y 
                         that we consider have been discretised into three ordinal categories.
                         You can modify the parameters of each discretisation, using
                         the sliders corresponding to the quantitative variables (when activated). 
                         The first value in blue indicates the upper bound of the first category and
-                        the second value indicates the lower bound of the third category.", br(),br(),
-                        h6("For example, if you click on 'Population Cutoff', a slider appears.
+                        the second value indicates the lower bound of the third category.", 
+                       tags$hr(),  h6("For example, if you click on 'Population Cutoff', a slider appears.
                            By default, it is set to distinguish three types of estimations from the literature 
                            with respect to the minimum population they consider for cities: "),
                         tags$ul(
@@ -313,7 +319,7 @@ tabPanel("2. An Example of Zipf's law for cities",
                the number of observations decreases when the number of explaning variables increases.", br(), br(),
                tableOutput('modelparameters'),
                tags$hr(), h4("Results"),
-               tableOutput('model'),
+               tableOutput('model'), tags$hr(), 
                "To interpret the results, please note that:", br(), br(),
                tags$ul(
                  tags$li("You should start by looking at the significance values ", tags$b("'Pr(>|t|)'"), " and interpret only
@@ -368,11 +374,12 @@ tabPanel("2. An Example of Zipf's law for cities",
      )),
     
       tabPanel("Contribute !",
-             h1("Add your estimates"), 
-             "Noone can read all the literature and this one is particularly vast and fast-moving. 
+              
+               h1("Add your estimates"), 
+               "No-one can read all the literature and this one is particularly vast and fast-moving. 
               You might have published or reviewed estimates which are absent from the database in its current form.
-              Please add them here to improve the quality and representativity of this open database 
-             and meta analysis.",
+                  Please add them here to improve the quality and representativity of this open database 
+                  and meta analysis.",
              h5("Please remember to press the button 'Save' to save the reference and the estimates. When you do, you will be able
                 to download the resulting formatted file. Do not forget to send this data with your potential comments
                 to the moderator if you want them to be integrated to the meta analysis."),
