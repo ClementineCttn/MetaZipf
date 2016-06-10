@@ -145,7 +145,7 @@ tabPanel("2. An Example of Zipf's law for cities",
              
               h2("Subset by:"),
               fluidRow(
-                column(4,selectizeInput("territorys", "Territory", "", multiple=T)),
+                column(4,selectizeInput("territorys", "Continent", "", multiple=T)),
                 column(4,selectizeInput("scales", "City Definition", "", multiple=T)),
                 column(4,selectizeInput("decades", "Decade", "", multiple=T)),
                 plotOutput('histalpha')), br(), 

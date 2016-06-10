@@ -153,6 +153,8 @@ shinyServer(function(input, output, session) {
     return(DARIUSsub)
   })
   
+
+  
   
   
   DARIUSzipf <- reactive({
@@ -318,6 +320,11 @@ shinyServer(function(input, output, session) {
     return(top)
   })
   
+  
+  
+  
+  
+  
   output$temporal = renderPlot({
     m = meta
   
@@ -381,7 +388,7 @@ metaTableSummary <- reactive({
   dec = input$decades
   def = input$scales
   reg = input$alpha
-  if(length(terr) >= 1) tab = tab[tab$TERRITORY %in% terr,]
+  if(length(terr) >= 1) tab = tab[tab$CONTINENT %in% terr,]
   if(length(dec) >= 1) tab = tab[tab$DECADE %in% dec,]
   if(length(def) >= 1) tab = tab[tab$URBANSCALE %in% def,]
   return(tab)
@@ -701,7 +708,7 @@ metaTableSummary <- reactive({
     inFile<-metaTableSelected()
     if(is.null(inFile))
       return(NULL)
-    updateSelectInput(session, "territorys", choices = c(sort(unique(as.character(inFile$TERRITORY)))))
+    updateSelectInput(session, "territorys", choices = c(sort(unique(as.character(inFile$CONTINENT)))))
     updateSelectInput(session, "scales", choices = c(sort(unique(as.character(inFile$URBANSCALE)))))
     updateSelectInput(session, "decades", choices = c(sort(unique(as.character(inFile$DECADE)))))
   })
@@ -748,9 +755,9 @@ metaTableSummary <- reactive({
     filename = "MetaZipf_Selection.csv",
     content = function(file) {
       tab = metaTableSelected()
-        tab = tab[,c("ALPHA", "TERRITORY", "DATE", "URBANISATION",
+        tab = tab[,c("ALPHA", "TERRITORY", "DATE", "URBANISATION", "CONTINENT",
                             "N", "URBANSCALE", "TRUNCATION", "DISCIPLINE", "R2", "REFERENCE")]
-      colnames(tab) = c("Alpha", "Territory", "Date", "Urban Age", 
+      colnames(tab) = c("Alpha", "Territory", "Date", "Urban Age", "Continent",
                         "Number of Cities", "City Definition", "Population Cutoff", 
                         "Discipline", "R2", "Reference")
       write.csv(tab, file)
