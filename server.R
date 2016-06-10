@@ -74,6 +74,7 @@ SummaryMetaAlpha = function(table, regression = "Lotka"){
   return(Summary)
 }
 
+
 SummaryMetaMeta = function(table, regression = "Lotka"){
   tab = table
   references = length(list(unique(tab$REFERENCE))[[1]])
@@ -287,7 +288,10 @@ shinyServer(function(input, output, session) {
   
   
   output$topauthors= renderDataTable({
-     d = refs[,c("AUTHOR", "YEAR", "JOURNAL", "N_ESTIM")]
+    d1 = refs[refs$IN_HERE == 1,]
+    
+     d = d1[,c("AUTHOR", "YEAR", "JOURNAL", "N_ESTIM")]
+      
     ds = d[order(-d$N_ESTIM),]
     top = as.data.frame(ds)
          colnames(top) = c("Author", "Year", "Journal/Book","Estimations")
@@ -405,7 +409,7 @@ metaTableSummary <- reactive({
                       "Discipline", "R2", "Type of Territory", "Total Pop (x1000)", "Reference")
     
      return(tab)
-  }, options = list(paging = FALSE, searching = FALSE))
+  }, options = list(paging = FALSE))
   
  
   
