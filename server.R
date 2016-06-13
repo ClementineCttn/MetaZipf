@@ -235,22 +235,28 @@ shinyServer(function(input, output, session) {
   })
   
   
-  
-  
+
   output$DARIUSgraph = renderPlot({
     zipf = DARIUSzipf()
-    par(mar = c(2,2,3,2))
+     maxsize = zipf[1,1]
+    df = data.frame(size = c(maxsize, 10), rank = c(1, maxsize / 10))
+     par(mar = c(2,2,3,2))
     p <-ggplot(zipf, aes(x=rank, y=size)) 
-    p + scale_y_log10(breaks=c(10, 100, 1000, 10000)) +
-      scale_x_log10(breaks=c(1, 10, 100, 1000)) + 
-      xlab("Rank") + ylab("Size (Population in thousands)") +
-      geom_point(color = "#1e90ff" ) + geom_line(color = "#1e90ff" ) +
+    p + scale_y_log10(breaks=c(10, 100, 1000, 10000), limits = c(10,15000)) +
+      scale_x_log10(breaks=c(1, 10, 100, 1000), limits=c(1, 2000)) + 
+      xlab("Rank") + ylab("Size (Population in thousands)") + 
+     geom_smooth(method = "lm", se = FALSE, col = "#B91838", size = 0.5) + 
+      geom_line(aes(rank, size), data=df, colour = "#2c3e50", size = 0.5) + 
+         geom_point(color = "#1e90ff" ) + geom_line(color = "#1e90ff" ) +
+      annotate("text", x = 5, y = 50, label = "Zipf's Law (alpha = 1)", colour="#2c3e50", size=5) +
+      annotate("text", x = 5, y = 100, label = "Empirical Estimation", colour="#B91838", size=5) +
+      
       theme(axis.text=element_text(size=12) ,
             axis.title=element_text(size=14),
             axis.text.x = element_text(angle = 45, hjust = 1))
   })
     
-  output$DARIUSestim = renderDataTable({
+  DARIUSmodel <- reactive({
     zipf = DARIUSzipf()
     if (input$alpha == "Lotka") {
       model = lm(log(size) ~ log(rank), data = zipf)
@@ -260,13 +266,22 @@ shinyServer(function(input, output, session) {
     }
     m = summary(model)
     alpha = round(-m$coefficients[2,1],3)
+    beta = round(-m$coefficients[1,1],3)
+    
     sd = round(m$coefficients[2,2],3)
     r2 = round(m$r.squared,3) * 100
     ci9low = round(-confint(model)[2,2],3)
     ci9high = round(-confint(model)[2,1],3)
     n = m$df[1] + m$df[2]
-    summary = data.frame(alpha, sd, r2, n)
-    colnames(summary) = c("Alpha", "Standard Deviation","R2", "N Cities")
+    summary = data.frame(alpha, sd, r2, n, beta)
+    colnames(summary) = c("Alpha", "Standard Deviation","R2", "N Cities", "beta")
+    return(summary)
+  })
+  
+  
+  output$DARIUSestim = renderDataTable({
+    summary = DARIUSmodel()
+    summary$beta = NULL
     return(summary)
     }, options = list(pageLength = 10, paging = FALSE, searching = FALSE))
   
