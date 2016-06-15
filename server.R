@@ -245,11 +245,11 @@ shinyServer(function(input, output, session) {
     p + scale_y_log10(breaks=c(10, 100, 1000, 10000), limits = c(10,15000)) +
       scale_x_log10(breaks=c(1, 10, 100, 1000), limits=c(1, 2000)) + 
       xlab("Rank") + ylab("Size (Population in thousands)") + 
-     geom_smooth(method = "lm", se = FALSE, col = "#B91838", size = 0.5) + 
-      geom_line(aes(rank, size), data=df, colour = "#2c3e50", size = 0.5) + 
+     geom_smooth(method = "lm", se = FALSE, col = "#2c3e50", size = 0.5) + 
+      geom_line(aes(rank, size), data=df, colour = "#B91838", size = 0.5) + 
          geom_point(color = "#1e90ff" ) + geom_line(color = "#1e90ff" ) +
-      annotate("text", x = 5, y = 50, label = "Zipf's Law (alpha = 1)", colour="#2c3e50", size=5) +
-      annotate("text", x = 5, y = 100, label = "Empirical Estimation", colour="#B91838", size=5) +
+      annotate("text", x = 5, y = 50, label = "Zipf's Law (alpha = 1)", colour="#B91838", size=5) +
+      annotate("text", x = 5, y = 100, label = "Empirical Estimation", colour="#2c3e50", size=5) +
       
       theme(axis.text=element_text(size=12) ,
             axis.title=element_text(size=14),
