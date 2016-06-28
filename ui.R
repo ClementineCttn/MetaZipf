@@ -64,8 +64,13 @@ to distinguish topical differences from technical biases affecting the measureme
              withMathJax(h6("with: \\(P_i\\) the population of city \\(i\\),
                             \\(R_i\\) its rank in the urban hierarchy,
                             \\(\\alpha' = \\frac{1}{\\alpha}\\) and
-                            \\(\\beta' = -\\frac{\\beta}{\\alpha}\\)")))),
+                            \\(\\beta' = -\\frac{\\beta}{\\alpha}\\)")))
+            ),
+            tags$hr(),
+            fluidRow(column(6,checkboxInput("Arxiv","Reproduce the analyses of the arXiv paper (reference collection ends in June 2016)",value = TRUE)),
+                     column(6,HTML('Cottineau C. , 2016, « MetaZipf. (Re)producing knowledge about city size distributions », Arxiv.org, <a href="https://arxiv.org/abs/1606.06162">https://arxiv.org/abs/1606.06162</a>'))),
            
+      
    tags$hr(),
    h5("Clémentine Cottineau, 2016, University College London (CASA)."),
    h6("For any information / comment / suggestion, contact: c.cottineau@ucl.ac.uk"),

@@ -130,6 +130,7 @@ shinyServer(function(input, output, session) {
   
   
   output$references = renderDataTable({
+    refs = refsArxiv()
     d = refs[refs$IN_HERE == 1,c("AUTHOR", "YEAR", "JOURNAL", "PAGE", "N_ESTIM", "REGRESSIONFORM")]
     colnames(d) = c("Author", "Year", "Journal", "Page", "Estimations", "Regression")
     return(d)
@@ -204,6 +205,7 @@ shinyServer(function(input, output, session) {
   
   
   alphaSummaryByCountryForTable = reactive({
+    meta = metaArxiv()
     m = meta[meta$TERRITORY_TYPE == "Country",]
     if (input$alpha == "Lotka") m$ALPHA = m$ALPHALOTKA
     if (input$alpha == "Pareto") m$ALPHA = m$ALPHAPARETO
@@ -289,6 +291,7 @@ shinyServer(function(input, output, session) {
   
   
   output$topjournals= renderDataTable({
+    refs = refsArxiv()
      d = refs[refs$JOURNAL !="Dissertation",]
     d$count = 1
     ds = aggregate(d[, "count"], unique(list(d$JOURNAL)), FUN = sumNum)
@@ -303,6 +306,8 @@ shinyServer(function(input, output, session) {
   
   
   output$topauthors= renderDataTable({
+    refs = refsArxiv()
+    
     d1 = refs[refs$IN_HERE == 1,]
     
      d = d1[,c("AUTHOR", "YEAR", "JOURNAL", "N_ESTIM")]
@@ -325,7 +330,7 @@ shinyServer(function(input, output, session) {
   
   
   output$topextremes= renderDataTable({
-    m = meta
+    m = metaArxiv()
     if (input$alpha == "Lotka") m$ALPHA = m$ALPHALOTKA
     if (input$alpha == "Pareto") m$ALPHA = m$ALPHAPARETO
     
@@ -345,7 +350,7 @@ shinyServer(function(input, output, session) {
   
   
   output$temporal = renderPlot({
-    m = meta
+    m = metaArxiv()
   
     ggplot(m, aes(x = DATE)) + 
       geom_histogram(binwidth = 10,color = "#18BC9C", fill = "#18BC9C") +  
@@ -355,7 +360,7 @@ shinyServer(function(input, output, session) {
   
  
   output$continent = renderDataTable({
-    m = meta
+    m = metaArxiv()
     if (input$alpha == "Lotka") m$ALPHA = m$ALPHALOTKA
     if (input$alpha == "Pareto") m$ALPHA = m$ALPHAPARETO
     
@@ -370,7 +375,7 @@ shinyServer(function(input, output, session) {
     refTable[refTable == 0] <- NA
     r = refTable[!is.na(refTable$Freq),]
     r$Freq = 1
-    r[,2] = NULL
+    r$Var2 = NULL
     colnames(r) = c("CONTINENT", "count")
     studies = aggregate(r[, "count"], unique(list(r$CONTINENT)), FUN = sumNum)
     macro$Studies = studies$x
@@ -383,9 +388,20 @@ shinyServer(function(input, output, session) {
     
     
     
+    metaArxiv = reactive({
+      tab = meta
+      if (input$Arxiv == TRUE) tab = subset(tab, ARXIV == 1)
+      return(tab)
+    })
+    
+    refsArxiv = reactive({
+      tab = refs
+      if (input$Arxiv == TRUE) tab = subset(tab, ARXIV == 1)
+      return(tab)
+    })
     
 metaTableSelected <- reactive({
-    tab = meta
+    tab = metaArxiv()
     if (input$alpha == "Lotka") tab$ALPHA = tab$ALPHALOTKA
     if (input$alpha  == "Pareto") tab$ALPHA = tab$ALPHAPARETO
     terr = input$territory
@@ -400,7 +416,7 @@ metaTableSelected <- reactive({
   })
   
 metaTableSummary <- reactive({
-  tab = meta
+  tab = metaArxiv()
   if (input$alpha == "Lotka") tab$ALPHA = tab$ALPHALOTKA
   if (input$alpha  == "Pareto") tab$ALPHA = tab$ALPHAPARETO
   terr = input$territorys
@@ -481,7 +497,7 @@ metaTableSummary <- reactive({
      
      
   output$worldmap <- renderLeaflet({
-    tab = meta
+    tab = metaArxiv()
     if (input$alpha == "Lotka") tab$ALPHA = tab$ALPHALOTKA
     if (input$alpha == "Pareto") tab$ALPHA = tab$ALPHAPARETO
     
@@ -563,7 +579,7 @@ metaTableSummary <- reactive({
   
   
   metaModel <- reactive({
-    tab = meta
+    tab = metaArxiv()
     if (input$alpha == "Lotka") tab$ALPHA = tab$ALPHALOTKA
     if (input$alpha == "Pareto") tab$ALPHA = tab$ALPHAPARETO
     
