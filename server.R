@@ -648,14 +648,16 @@ metaTableSummary <- reactive({
   output$model_significant = renderTable({
    model = metaModel()
      mod = as.data.frame(summary(model)$coefficients)
-     significant = mod[mod$`Pr(>|t|)` <= 0.05,]
+     sign = input$significance / 100
+     significant = mod[mod$`Pr(>|t|)` <= sign,]
      return(significant)
   })
   
   output$model_non_significant = renderTable({
     model = metaModel()
     mod = as.data.frame(summary(model)$coefficients)
-    non_significant = mod[mod$`Pr(>|t|)` > 0.05,]
+    sign = input$significance / 100
+    non_significant = mod[mod$`Pr(>|t|)` > sign,]
     return(non_significant)
   })
   
