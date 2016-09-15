@@ -310,26 +310,34 @@ tabPanel("2. An Example of Zipf's law for cities",
                                              "Country GDP per capita" = "countryGDP"), selected = NULL, inline = FALSE)),
                column(4,checkboxGroupInput("otherSpecs", "Other Specifications", 
                                            c("All" = "allother",
-                                             "Year of Publication" = "yearOfP", 
+                                             "Year of Publication" = "yearOfPubli", 
                                              "Discipline" = "discipline", 
-                                             ""), selected = NULL, inline = FALSE)),
+                                             "Estimations in Study" = "studySize", ""), selected = NULL, inline = FALSE)),
                
-               column(6,conditionalPanel(
+               column(4,conditionalPanel(
                  condition = 'input.technicalSpecs.indexOf("truncation4model") != -1 || input.technicalSpecs.indexOf("alltech") != -1', 
                  sliderInput("truncVal", "Population Cutoff (to define high, medium and low truncatures)",
                              min = 0, max = 1000000, value = c(10000, 100000)))),
-               column(6,conditionalPanel(
+               column(4,conditionalPanel(
                  condition = 'input.technicalSpecs.indexOf("N4model") != -1 || input.technicalSpecs.indexOf("alltech") != -1',
                  sliderInput("NVal", "Number of cities (to define large, medium and small samples)",
                              min = 1, max = 1000, value = c(30, 300)))),
-               column(6,conditionalPanel(
+               column(4,conditionalPanel(
                  condition = 'input.topicalSpecs.indexOf("countrySize") != -1 || input.topicalSpecs.indexOf("alltop") != -1',
                  sliderInput("PopVal", "Country Population (x 1000, to define large, medium and small countries)",
                              min = 1, max = 1000000, value = c(10000, 100000)))),
-             column(6,conditionalPanel(
+             column(4,conditionalPanel(
                condition = 'input.topicalSpecs.indexOf("countryGDP") != -1 || input.topicalSpecs.indexOf("alltop") != -1',
                sliderInput("GDPVal", "GDP per Capita (current US$, to define rich, medium and poor countries)",
-                           min = 1, max = 100000, value = c(1000, 10000))))),
+                           min = 1, max = 100000, value = c(1000, 10000)))),
+             column(4,conditionalPanel(
+               condition = 'input.otherSpecs.indexOf("yearOfPubli") != -1 || input.otherSpecs.indexOf("alltop") != -1',
+               sliderInput("yearOfP", "Year of Publication (to define early, medium and recent studies)",
+                           min = 1925, max = 2015, value = c(1975, 2000)))),
+             column(4,conditionalPanel(
+               condition = 'input.otherSpecs.indexOf("studySize") != -1 || input.otherSpecs.indexOf("alltop") != -1',
+               sliderInput("n_estim", "Number of estimations in the study (to define small and large studies)",
+                           min = 2, max = 100, value = 10)))),
      
              fluidRow(
                tags$hr(),

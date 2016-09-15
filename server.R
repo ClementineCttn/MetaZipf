@@ -597,7 +597,7 @@ metaTableSummary <- reactive({
     
     if ('alltech' %in% TechnicalSpecs == "TRUE") TechnicalSpecs = c("scale4model",  "truncation4model", "N4model", "country")
     if ('alltop' %in% TopicalSpecs == "TRUE") TopicalSpecs = c("urbanisation4model",  "countrySize", "countryGDP","year4model")
-    if ('allother' %in% OtherSpecs == "TRUE") OtherSpecs = c("discipline", "yearOfP")
+    if ('allother' %in% OtherSpecs == "TRUE") OtherSpecs = c("discipline", "yearOfPubli", "studySize")
     
     regressants = "ALPHA ~ 1"
     if ('year4model' %in% TopicalSpecs == "TRUE") {
@@ -634,9 +634,12 @@ metaTableSummary <- reactive({
       tab$Discipline_SOC = tab$SOC
       tab$Discipline_PHYS = tab$PHYS
       regressants = paste(regressants, " + Discipline_ECO + Discipline_SOC + Discipline_PHYS", sep="")}
-    if ('yearOfP' %in% OtherSpecs  == "TRUE") {
-      tab$Year_Of_Publication = tab$YEARPUB - 2000
-      regressants = paste(regressants, " + Year_Of_Publication", sep="")}
+    if ('yearOfPubli' %in% OtherSpecs  == "TRUE") {
+      tab$Year_Of_Publication_ = as.factor(ifelse(tab$YEARPUB <= input$yearOfP[[1]], "Early", ifelse(tab$YEARPUB >= input$yearOfP[[2]], "Recent", "Medium")))
+       regressants = paste(regressants, " + Year_Of_Publication_", sep="")}
+    if ('studySize' %in% OtherSpecs  == "TRUE") {
+      tab$Study_Size_ = as.factor(ifelse(tab$N_ESTIM == 1, "Single", ifelse(tab$N_ESTIM >= input$n_estim, "Large", "Small")))
+      regressants = paste(regressants, " + Study_Size_", sep="")}
   #  head(tab)
     model = lm(regressants, data=tab, na.action = na.omit)
     return(model)
@@ -689,7 +692,8 @@ metaTableSummary <- reactive({
     if ('countryGDP' %in% TopicalSpecs  == "TRUE") Reference = paste(Reference, " | Country GDP: High", sep="")
     if ('discipline' %in% OtherSpecs == "TRUE") Reference = paste(Reference, " | Discipline: none", sep="")
     if ('country' %in% OtherSpecs  == "TRUE") Reference = paste(Reference, " | Territory: National State", sep="")
-    if ('yearOfP' %in% OtherSpecs == "TRUE") Reference = paste(Reference, " | Year Of Publication: 2000", sep="")
+    if ('yearOfP' %in% OtherSpecs == "TRUE") Reference = paste(Reference, " | Year Of Publication: Early", sep="")
+    if ('studySize' %in% OtherSpecs == "TRUE") Reference = paste(Reference, " | Study Size: Large", sep="")
     if (Reference != "") Reference = paste0("Reference Categories ", Reference)
     h5(Reference)
   })
@@ -824,8 +828,6 @@ metaTableSummary <- reactive({
       write.csv(tab, file)
     }
   )
-  
-  
   
   
   
