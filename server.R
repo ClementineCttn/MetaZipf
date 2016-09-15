@@ -31,7 +31,7 @@ meta$PAGE = NULL
 meta$SOURCE = NULL
 
   min_year_by_study = ddply(meta,~REFERENCE,summarise,min=min(DATE),max=max(DATE))
-  min_year_by_study$Study_Period = min_year_by_study$max - min_year_by_study$min
+  min_year_by_study$StudyPeriod = min_year_by_study$max - min_year_by_study$min
   meta = data.frame(meta, min_year_by_study[match(meta$REFERENCE,min_year_by_study$REFERENCE),])
 
 pops = read.csv("data/UN_Population_1950_2015.csv", sep=",", dec=".")
@@ -601,20 +601,20 @@ metaTableSummary <- reactive({
     
     if ('alltech' %in% TechnicalSpecs == "TRUE") TechnicalSpecs = c("scale4model",  "truncation4model", "N4model", "country")
     if ('alltop' %in% TopicalSpecs == "TRUE") TopicalSpecs = c("urbanisation4model",  "countrySize", "countryGDP","year4model")
-    if ('allother' %in% OtherSpecs == "TRUE") OtherSpecs = c("discipline", "yearOfPubli", "studySize")
+    if ('allother' %in% OtherSpecs == "TRUE") OtherSpecs = c("discipline", "yearOfPubli", "studySize", "studyPeriod")
     
     regressants = "ALPHA ~ 1"
     if ('year4model' %in% TopicalSpecs == "TRUE") {
       tab$Date_of_Observation = tab$DATE - 1950
       regressants = paste(regressants, " + Date_of_Observation", sep="")}
     if ('truncation4model' %in% TechnicalSpecs == "TRUE"){
-      tab$Population_Cutoff_ = as.factor(ifelse(tab$TRUNCATION_POINT <= input$truncVal[[1]], "Low", ifelse(tab$TRUNCATION_POINT >= input$truncVal[[2]], "High", "Medium")))
+      tab$Population_Cutoff_ = as.factor(ifelse(tab$TRUNCATION_POINT <= input$truncVal[[1]], "Low", ifelse(tab$TRUNCATION_POINT >= input$truncVal[[2]], "High", " Medium")))
       regressants = paste(regressants, " + Population_Cutoff_", sep="")}
     if ('scale4model' %in% TechnicalSpecs == "TRUE")  {
       tab$City_Definition_ = tab$URBANSCALE
       regressants = paste(regressants, " + City_Definition_", sep="")}
     if ('N4model' %in% TechnicalSpecs == "TRUE")  {
-      tab$Number_Of_Cities_ = as.factor(ifelse(tab$N <= input$NVal[[1]], "Small", ifelse(tab$N >= input$NVal[[2]], "Large", "Medium")))
+      tab$Number_Of_Cities_ = as.factor(ifelse(tab$N <= input$NVal[[1]], "Small", ifelse(tab$N >= input$NVal[[2]], "Large", " Medium")))
       regressants = paste(regressants, " + Number_Of_Cities_", sep="")}
     if ('country' %in% TechnicalSpecs  == "TRUE") {
       tab = subset(tab, TERRITORY_TYPE != "")
@@ -626,11 +626,11 @@ metaTableSummary <- reactive({
       regressants = paste(regressants, " + Urbanisation_Age_", sep="")}
     if ('countrySize' %in% TopicalSpecs  == "TRUE") {
       tab = subset(tab, TOTAL_POP > 0)
-      tab$Country_Size_ = as.factor(ifelse(tab$TOTAL_POP <= input$PopVal[[1]], "Small", ifelse(tab$TOTAL_POP >= input$PopVal[[2]], "Large", "Medium")))
+      tab$Country_Size_ = as.factor(ifelse(tab$TOTAL_POP <= input$PopVal[[1]], "Small", ifelse(tab$TOTAL_POP >= input$PopVal[[2]], "Large", " Medium")))
       regressants = paste(regressants, " + Country_Size_", sep="")}
     if ('countryGDP' %in% TopicalSpecs  == "TRUE") {
       tab = subset(tab, GDPPC > 0)
-      tab$Country_GDP_ = as.factor(ifelse(tab$GDPPC <= input$GDPVal[[1]], "Low", ifelse(tab$GDPPC >= input$GDPVal[[2]], "High", "Medium")))
+      tab$Country_GDP_ = as.factor(ifelse(tab$GDPPC <= input$GDPVal[[1]], "Low", ifelse(tab$GDPPC >= input$GDPVal[[2]], "High", " Medium")))
        regressants = paste(regressants, " + Country_GDP_", sep="")}
     if ('discipline' %in% OtherSpecs == "TRUE") {
       tab = subset(tab, ECO != "")
@@ -639,11 +639,15 @@ metaTableSummary <- reactive({
       tab$Discipline_PHYS = tab$PHYS
       regressants = paste(regressants, " + Discipline_ECO + Discipline_SOC + Discipline_PHYS", sep="")}
     if ('yearOfPubli' %in% OtherSpecs  == "TRUE") {
-      tab$Year_Of_Publication_ = as.factor(ifelse(tab$YEARPUB <= input$yearOfP[[1]], "Early", ifelse(tab$YEARPUB >= input$yearOfP[[2]], "Recent", "Medium")))
+      tab$Year_Of_Publication_ = as.factor(ifelse(tab$YEARPUB <= input$yearOfP[[1]], "Early", ifelse(tab$YEARPUB >= input$yearOfP[[2]], "Recent", " Medium")))
        regressants = paste(regressants, " + Year_Of_Publication_", sep="")}
     if ('studySize' %in% OtherSpecs  == "TRUE") {
-      tab$Study_Size_ = as.factor(ifelse(tab$N_ESTIM == 1, "Single", ifelse(tab$N_ESTIM >= input$n_estim, "Large", "Small")))
+      tab$Study_Size_ = as.factor(ifelse(tab$N_ESTIM == 1, "Single_estimation", ifelse(tab$N_ESTIM >= input$n_estim, "Large", " Small")))
       regressants = paste(regressants, " + Study_Size_", sep="")}
+    if ('studyPeriod' %in% OtherSpecs  == "TRUE") {
+        tab$Period_Analysed_ = as.factor(ifelse(tab$StudyPeriod == 0, "Cross_Section", ifelse(tab$StudyPeriod >= input$s_period, "Long", " Short")))
+      regressants = paste(regressants, " + Period_Analysed_", sep="")}
+    
   #  head(tab)
     model = lm(regressants, data=tab, na.action = na.omit)
     return(model)
@@ -682,22 +686,23 @@ metaTableSummary <- reactive({
     TopicalSpecs = input$topicalSpecs
     OtherSpecs = input$otherSpecs
     
-    if ('alltech' %in% TechnicalSpecs == "TRUE") TechnicalSpecs = c("scale4model",  "truncation4model", "N4model")
+    if ('alltech' %in% TechnicalSpecs == "TRUE") TechnicalSpecs = c("scale4model",  "truncation4model", "N4model", "country")
     if ('alltop' %in% TopicalSpecs == "TRUE") TopicalSpecs = c("urbanisation4model",  "countrySize", "countryGDP","year4model")
-    if ('allother' %in% OtherSpecs == "TRUE") OtherSpecs = c("discipline", "country")
+    if ('allother' %in% OtherSpecs == "TRUE") OtherSpecs = c("discipline", "yearOfPubli", "studySize", "studyPeriod")
     
     Reference = ""
     if ('urbanisation4model' %in% TopicalSpecs == "TRUE") Reference = paste(Reference, " | Age of Urbanisation: Old", sep="")
-    if ('truncation4model' %in% TechnicalSpecs == "TRUE")Reference = paste(Reference, " | Population Cutoff: High", sep="")
-    if ('N4model' %in% TechnicalSpecs == "TRUE") Reference = paste(Reference, " | Number of cities: Large", sep="")
+    if ('truncation4model' %in% TechnicalSpecs == "TRUE") Reference = paste(Reference, " | Population Cutoff: Low", sep="")
+    if ('N4model' %in% TechnicalSpecs == "TRUE") Reference = paste(Reference, " | Number of cities: Medium", sep="")
     if ('year4model' %in% TopicalSpecs == "TRUE") Reference = paste(Reference, " | Date of Observation: 1950", sep="")
     if ('scale4model' %in% TechnicalSpecs == "TRUE") Reference = paste(Reference, " | City Definition: LocalUnit", sep="")
-    if ('countrySize' %in% TopicalSpecs  == "TRUE") Reference = paste(Reference, " | Country Size: Large", sep="")
-    if ('countryGDP' %in% TopicalSpecs  == "TRUE") Reference = paste(Reference, " | Country GDP: High", sep="")
+    if ('countrySize' %in% TopicalSpecs  == "TRUE") Reference = paste(Reference, " | Country Size: Medium", sep="")
+    if ('countryGDP' %in% TopicalSpecs  == "TRUE") Reference = paste(Reference, " | Country GDP: Medium", sep="")
     if ('discipline' %in% OtherSpecs == "TRUE") Reference = paste(Reference, " | Discipline: none", sep="")
     if ('country' %in% OtherSpecs  == "TRUE") Reference = paste(Reference, " | Territory: National State", sep="")
-    if ('yearOfP' %in% OtherSpecs == "TRUE") Reference = paste(Reference, " | Year Of Publication: Early", sep="")
-    if ('studySize' %in% OtherSpecs == "TRUE") Reference = paste(Reference, " | Study Size: Large", sep="")
+    if ('yearOfP' %in% OtherSpecs == "TRUE") Reference = paste(Reference, " | Year Of Publication: Medium", sep="")
+    if ('studySize' %in% OtherSpecs == "TRUE") Reference = paste(Reference, " | Study Size: Small", sep="")
+    if ('studyPeriod' %in% OtherSpecs == "TRUE") Reference = paste(Reference, " | Study Period: Short", sep="")
     if (Reference != "") Reference = paste0("Reference Categories ", Reference)
     h5(Reference)
   })
