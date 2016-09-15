@@ -30,6 +30,10 @@ meta$YEAR = NULL
 meta$PAGE = NULL
 meta$SOURCE = NULL
 
+  min_year_by_study = ddply(meta,~REFERENCE,summarise,min=min(DATE),max=max(DATE))
+  min_year_by_study$Study_Period = min_year_by_study$max - min_year_by_study$min
+  meta = data.frame(meta, min_year_by_study[match(meta$REFERENCE,min_year_by_study$REFERENCE),])
+
 pops = read.csv("data/UN_Population_1950_2015.csv", sep=",", dec=".")
 colnames(pops) = c("CNTR_ID", "Name", "CC", paste0("POP", 1950:2015))
 gdps = read.csv("data/WB_GDP_1960_2015.csv", sep=",", dec=".")
