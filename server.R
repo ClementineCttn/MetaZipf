@@ -37,11 +37,11 @@ meta = data.frame(meta, pops[match(meta$CNTR_ID,pops$CNTR_ID),])
 meta = data.frame(meta, gdps[match(meta$CNTR_ID,gdps$CNTR_ID),])
 meta$TOTAL_POP = NA
 for (i in 1:dim(meta)[1]) {
-  if(meta[i,"DATE"] %in% 1950:2015) meta[i,"TOTAL_POP"] = as.numeric(meta[i,paste0("POP", meta[i,"DATE"])])
+  if(meta[i,"DATE"] %in% 1950:2015) meta[i,"TOTAL_POP"] = round(as.numeric(meta[i,paste0("POP", meta[i,"DATE"])]),0)
 }
 meta$GDPPC = NA
 for (i in 1:dim(meta)[1]) {
-  if(meta[i,"DATE"] %in% 1960:2015) meta[i,"GDPPC"] = as.numeric(meta[i,paste0("GDP", meta[i,"DATE"])])
+  if(meta[i,"DATE"] %in% 1960:2015) meta[i,"GDPPC"] = round(as.numeric(meta[i,paste0("GDP", meta[i,"DATE"])]),0)
 }
 rownames(meta) = 1:dim(meta)[1]
 meta$REFID.1 = NULL
@@ -583,8 +583,8 @@ metaTableSummary <- reactive({
   })
   
   
-  
-  
+ 
+    
   metaModel <- reactive({
     tab = metaArxiv()
     if (input$alpha == "Lotka") tab$ALPHA = tab$ALPHALOTKA
@@ -595,7 +595,7 @@ metaTableSummary <- reactive({
     OtherSpecs = input$otherSpecs
     
     if ('alltech' %in% TechnicalSpecs == "TRUE") TechnicalSpecs = c("scale4model",  "truncation4model", "N4model")
-    if ('alltop' %in% TopicalSpecs == "TRUE") TopicalSpecs = c("urbanisation4model",  "countrySize", "year4model")
+    if ('alltop' %in% TopicalSpecs == "TRUE") TopicalSpecs = c("urbanisation4model",  "countrySize", "countryGDP","year4model")
     if ('allother' %in% OtherSpecs == "TRUE") OtherSpecs = c("discipline", "country")
     
     regressants = "ALPHA ~ 1"
@@ -621,8 +621,8 @@ metaTableSummary <- reactive({
       regressants = paste(regressants, " + Country_Size_", sep="")}
     if ('countryGDP' %in% TopicalSpecs  == "TRUE") {
       tab = subset(tab, GDPPC > 0)
-      tab$Country_GDP_ = as.factor(ifelse(tab$GDPPC <= input$PopGDP[[1]], "Small", ifelse(tab$GDPPC >= input$PopGDP[[2]], "Large", "Medium")))
-      regressants = paste(regressants, " + Country_GDP_", sep="")}
+      tab$Country_GDP_ = as.factor(ifelse(tab$GDPPC <= input$GDPVal[[1]], "Low", ifelse(tab$GDPPC >= input$GDPVal[[2]], "High", "Medium")))
+       regressants = paste(regressants, " + Country_GDP_", sep="")}
     if ('discipline' %in% OtherSpecs == "TRUE") {
       tab = subset(tab, ECO != "")
       tab$Discipline_ECO = tab$ECO
@@ -662,7 +662,7 @@ metaTableSummary <- reactive({
     OtherSpecs = input$otherSpecs
     
     if ('alltech' %in% TechnicalSpecs == "TRUE") TechnicalSpecs = c("scale4model",  "truncation4model", "N4model")
-    if ('alltop' %in% TopicalSpecs == "TRUE") TopicalSpecs = c("urbanisation4model",  "countrySize", "year4model")
+    if ('alltop' %in% TopicalSpecs == "TRUE") TopicalSpecs = c("urbanisation4model",  "countrySize", "countryGDP","year4model")
     if ('allother' %in% OtherSpecs == "TRUE") OtherSpecs = c("discipline", "country")
     
     Reference = ""
@@ -672,9 +672,9 @@ metaTableSummary <- reactive({
     if ('year4model' %in% TopicalSpecs == "TRUE") Reference = paste(Reference, " | Date of Observation: 1950", sep="")
     if ('scale4model' %in% TechnicalSpecs == "TRUE") Reference = paste(Reference, " | City Definition: LocalUnit", sep="")
     if ('countrySize' %in% TopicalSpecs  == "TRUE") Reference = paste(Reference, " | Country Size: Large", sep="")
+    if ('countryGDP' %in% TopicalSpecs  == "TRUE") Reference = paste(Reference, " | Country GDP: High", sep="")
     if ('discipline' %in% OtherSpecs == "TRUE") Reference = paste(Reference, " | Discipline: none", sep="")
     if ('country' %in% OtherSpecs  == "TRUE") Reference = paste(Reference, " | Territory: National State", sep="")
-      
     if (Reference != "") Reference = paste0("Reference Categories ", Reference)
     h5(Reference)
   })

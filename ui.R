@@ -293,29 +293,35 @@ tabPanel("2. An Example of Zipf's law for cities",
                                            c("All" = "alltech",
                                              "City definition" = "scale4model", 
                                               "Population Cutoff" = "truncation4model",
-                                              "Number of Cities" = "N4model"), selected = NULL, inline = FALSE)),
+                                              "Number of Cities" = "N4model",""), selected = NULL, inline = FALSE)),
                column(4,checkboxGroupInput("topicalSpecs", "Topical Specifications", 
                                            c("All" = "alltop",
                                              "Age of Urbanisation" = "urbanisation4model",
                                              "Date of Observation" = "year4model",
-                                             "Country Population" = "countrySize"), selected = NULL, inline = FALSE)),
+                                             "Country Population" = "countrySize",
+                                             "Country GDP per capita" = "countryGDP"), selected = NULL, inline = FALSE)),
                column(4,checkboxGroupInput("otherSpecs", "Other Specifications", 
                                            c("All" = "allother",
                                              "Discipline" = "discipline", 
-                                             "Type of territory" = "country",""), selected = NULL, inline = FALSE)),
+                                             "Type of territory" = "country","",""), selected = NULL, inline = FALSE)),
                
-               column(4,conditionalPanel(
+               column(3,conditionalPanel(
                  condition = 'input.technicalSpecs.indexOf("truncation4model") != -1 || input.technicalSpecs.indexOf("alltech") != -1', 
                  sliderInput("truncVal", "Population Cutoff (to define high, medium and low truncatures)",
                              min = 0, max = 1000000, value = c(10000, 100000)))),
-               column(4,conditionalPanel(
+               column(3,conditionalPanel(
                  condition = 'input.technicalSpecs.indexOf("N4model") != -1 || input.technicalSpecs.indexOf("alltech") != -1',
                  sliderInput("NVal", "Number of cities (to define large, medium and small samples)",
                              min = 1, max = 1000, value = c(30, 300)))),
-               column(4,conditionalPanel(
+               column(3,conditionalPanel(
                  condition = 'input.topicalSpecs.indexOf("countrySize") != -1 || input.topicalSpecs.indexOf("alltop") != -1',
                  sliderInput("PopVal", "Country Population (x 1000, to define large, medium and small countries)",
-                             min = 1, max = 1000000, value = c(10000, 100000))))),
+                             min = 1, max = 1000000, value = c(10000, 100000)))),
+             column(3,conditionalPanel(
+               condition = 'input.topicalSpecs.indexOf("countryGDP") != -1 || input.topicalSpecs.indexOf("alltop") != -1',
+               sliderInput("GDPVal", "GDP per Capita (current US$, to define rich, medium and poor countries)",
+                           min = 1, max = 100000, value = c(1000, 10000))))),
+     
              fluidRow(
                tags$hr(),
                h4("Model Fit"),
