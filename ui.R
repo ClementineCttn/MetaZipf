@@ -302,8 +302,9 @@ tabPanel("2. An Example of Zipf's law for cities",
                                              "Country GDP per capita" = "countryGDP"), selected = NULL, inline = FALSE)),
                column(4,checkboxGroupInput("otherSpecs", "Other Specifications", 
                                            c("All" = "allother",
+                                             "Year of Publication" = "yearOfP", 
                                              "Discipline" = "discipline", 
-                                             "Type of territory" = "country","",""), selected = NULL, inline = FALSE)),
+                                             "Type of territory" = "country",""), selected = NULL, inline = FALSE)),
                
                column(3,conditionalPanel(
                  condition = 'input.technicalSpecs.indexOf("truncation4model") != -1 || input.technicalSpecs.indexOf("alltech") != -1', 

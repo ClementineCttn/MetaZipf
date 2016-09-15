@@ -23,8 +23,9 @@ refsToAdd = data.frame()
 meta = data.frame(meta, refs[match(meta$REFID,refs$REFID),])
 rownames(meta) = 1:dim(meta)[1]
 meta$REFID.1 = NULL
-meta$REGRESSIONFORM = NULL
+#meta$REGRESSIONFORM = NULL
 meta$AUTHOR = NULL
+meta$YEARPUB = meta$YEAR 
 meta$YEAR = NULL
 meta$PAGE = NULL
 meta$SOURCE = NULL
@@ -596,7 +597,7 @@ metaTableSummary <- reactive({
     
     if ('alltech' %in% TechnicalSpecs == "TRUE") TechnicalSpecs = c("scale4model",  "truncation4model", "N4model")
     if ('alltop' %in% TopicalSpecs == "TRUE") TopicalSpecs = c("urbanisation4model",  "countrySize", "countryGDP","year4model")
-    if ('allother' %in% OtherSpecs == "TRUE") OtherSpecs = c("discipline", "country")
+    if ('allother' %in% OtherSpecs == "TRUE") OtherSpecs = c("discipline", "country", "yearOfP")
     
     regressants = "ALPHA ~ 1"
     if ('year4model' %in% TopicalSpecs == "TRUE") {
@@ -633,7 +634,10 @@ metaTableSummary <- reactive({
       tab = subset(tab, TERRITORY_TYPE != "")
       tab$Territory_ = tab$TERRITORY_TYPE
       regressants = paste(regressants, " + Territory_", sep="")}
-    
+    if ('yearOfP' %in% OtherSpecs  == "TRUE") {
+      tab$Year_Of_Publication = tab$YEARPUB - 2000
+      regressants = paste(regressants, " + Year_Of_Publication", sep="")}
+  #  head(tab)
     model = lm(regressants, data=tab, na.action = na.omit)
     return(model)
   })
@@ -675,6 +679,7 @@ metaTableSummary <- reactive({
     if ('countryGDP' %in% TopicalSpecs  == "TRUE") Reference = paste(Reference, " | Country GDP: High", sep="")
     if ('discipline' %in% OtherSpecs == "TRUE") Reference = paste(Reference, " | Discipline: none", sep="")
     if ('country' %in% OtherSpecs  == "TRUE") Reference = paste(Reference, " | Territory: National State", sep="")
+    if ('yearOfP' %in% OtherSpecs == "TRUE") Reference = paste(Reference, " | Year Of Publication: 2000", sep="")
     if (Reference != "") Reference = paste0("Reference Categories ", Reference)
     h5(Reference)
   })
