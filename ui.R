@@ -234,8 +234,16 @@ tabPanel("2. An Example of Zipf's law for cities",
               A journal can belong to one or more categories. We include this information as a test for disciplinary biases.",br(), 
               h2("TERRITORY"), 
              "We characterize different territories based on their population and type (national boundaries, subnational regions or supra-national macroRegions).", 
-              h2("R2"),  h6("For example: 99% in Bretagnolle et al. (2008)."),
-              "The coefficient of Determination of the regression, indicating the quality of the fit. ", br(),  br(), 
+             h2("COUNTRY POPULATION"), 
+             HTML('Total population in thousands, from UN estimates (1950-2015) 
+                      <a href=http://esa.un.org/unpd/wpp/Download/Standard/Population/">http://esa.un.org/unpd/wpp/Download/Standard/Population/</a>'),
+             h2("COUNTRY GDP"), 
+             HTML('GDP per capita in current US $, from World Bank estimates (1960-2015) 
+                     <a href=http://data.worldbank.org/indicator/NY.GDP.PCAP.CD">http://data.worldbank.org/indicator/NY.GDP.PCAP.CD</a>'),
+             
+             #h2("R2"),  h6("For example: 99% in Bretagnolle et al. (2008)."),
+              #"The coefficient of Determination of the regression, indicating the quality of the fit. ",
+             br(),  br(), 
               #h2("REFERENCE"), "The reference from which the estimation is taken. For example: Singer (1936).", br(),  
               h4("Data"),
               h2("Subset Table by:"),
@@ -246,10 +254,9 @@ tabPanel("2. An Example of Zipf's law for cities",
                 column(3,downloadButton("downloadData", "Download")), 
                 column(9, HTML('N.B. This table is a simplified version. You can find the full version here <a href="here">https://github.com/ClementineCttn/MetaZipf</a>'))),
               dataTableOutput('review'),
-              tags$hr(),
-              h6(HTML('Total population in thousands, from UN estimates (1950-2015) 
-                      <a href=http://esa.un.org/unpd/wpp/Download/Standard/Population/">http://esa.un.org/unpd/wpp/Download/Standard/Population/</a>')
-              )
+              tags$hr()
+             
+             
               
               ),    
      
