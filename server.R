@@ -30,12 +30,19 @@ meta$PAGE = NULL
 meta$SOURCE = NULL
 
 pops = read.csv("data/UN_Population_1950_2015.csv", sep=",", dec=".")
+colnames(pops) = c("CNTR_ID", "Name", "CC", paste0("POP", 1950:2015))
+gdps = read.csv("data/WB_GDP_1960_2015.csv", sep=",", dec=".")
+colnames(gdps) = c("CNTR_ID", "Name", "CC", paste0("GDP", 1960:2015))
 meta = data.frame(meta, pops[match(meta$CNTR_ID,pops$CNTR_ID),])
+meta = data.frame(meta, gdps[match(meta$CNTR_ID,gdps$CNTR_ID),])
 meta$TOTAL_POP = NA
 for (i in 1:dim(meta)[1]) {
-  if(meta[i,"DATE"] %in% 1950:2015) meta[i,"TOTAL_POP"] = as.numeric(meta[i,paste0("X", meta[i,"DATE"])])
+  if(meta[i,"DATE"] %in% 1950:2015) meta[i,"TOTAL_POP"] = as.numeric(meta[i,paste0("POP", meta[i,"DATE"])])
 }
-
+meta$GDPPC = NA
+for (i in 1:dim(meta)[1]) {
+  if(meta[i,"DATE"] %in% 1960:2015) meta[i,"GDPPC"] = as.numeric(meta[i,paste0("GDP", meta[i,"DATE"])])
+}
 rownames(meta) = 1:dim(meta)[1]
 meta$REFID.1 = NULL
 meta$REGRESSIONFORM = NULL
@@ -434,10 +441,10 @@ metaTableSummary <- reactive({
   output$review = renderDataTable({
    tab = metaTableSelected()
     tab = tab[,c("ALPHA", "TERRITORY", "DATE", "URBANISATION",
-                 "N", "URBANSCALE", "TRUNCATION", "DISCIPLINE", "R2", "TERRITORY_TYPE","TOTAL_POP", "REFERENCE")]
+                 "N", "URBANSCALE", "TRUNCATION", "DISCIPLINE", "R2", "TERRITORY_TYPE","TOTAL_POP", "GDPPC","REFERENCE")]
     colnames(tab) = c("Alpha", "Territory", "Date", "Urban Age", 
                       "Number of Cities", "City Definition", "Population Cutoff", 
-                      "Discipline", "R2", "Type of Territory", "Total Pop (x1000)", "Reference")
+                      "Discipline", "R2", "Type of Territory", "Total Pop (x1000)", "GDP per Cap. (Current US$)","Reference")
     
      return(tab)
   }, options = list(paging = FALSE))
@@ -612,6 +619,10 @@ metaTableSummary <- reactive({
       tab = subset(tab, TOTAL_POP > 0)
       tab$Country_Size_ = as.factor(ifelse(tab$TOTAL_POP <= input$PopVal[[1]], "Small", ifelse(tab$TOTAL_POP >= input$PopVal[[2]], "Large", "Medium")))
       regressants = paste(regressants, " + Country_Size_", sep="")}
+    if ('countryGDP' %in% TopicalSpecs  == "TRUE") {
+      tab = subset(tab, GDPPC > 0)
+      tab$Country_GDP_ = as.factor(ifelse(tab$GDPPC <= input$PopGDP[[1]], "Small", ifelse(tab$GDPPC >= input$PopGDP[[2]], "Large", "Medium")))
+      regressants = paste(regressants, " + Country_GDP_", sep="")}
     if ('discipline' %in% OtherSpecs == "TRUE") {
       tab = subset(tab, ECO != "")
       tab$Discipline_ECO = tab$ECO
