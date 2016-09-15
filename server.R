@@ -595,9 +595,9 @@ metaTableSummary <- reactive({
     TopicalSpecs = input$topicalSpecs
     OtherSpecs = input$otherSpecs
     
-    if ('alltech' %in% TechnicalSpecs == "TRUE") TechnicalSpecs = c("scale4model",  "truncation4model", "N4model")
+    if ('alltech' %in% TechnicalSpecs == "TRUE") TechnicalSpecs = c("scale4model",  "truncation4model", "N4model", "country")
     if ('alltop' %in% TopicalSpecs == "TRUE") TopicalSpecs = c("urbanisation4model",  "countrySize", "countryGDP","year4model")
-    if ('allother' %in% OtherSpecs == "TRUE") OtherSpecs = c("discipline", "country", "yearOfP")
+    if ('allother' %in% OtherSpecs == "TRUE") OtherSpecs = c("discipline", "yearOfP")
     
     regressants = "ALPHA ~ 1"
     if ('year4model' %in% TopicalSpecs == "TRUE") {
@@ -612,6 +612,10 @@ metaTableSummary <- reactive({
     if ('N4model' %in% TechnicalSpecs == "TRUE")  {
       tab$Number_Of_Cities_ = as.factor(ifelse(tab$N <= input$NVal[[1]], "Small", ifelse(tab$N >= input$NVal[[2]], "Large", "Medium")))
       regressants = paste(regressants, " + Number_Of_Cities_", sep="")}
+    if ('country' %in% TechnicalSpecs  == "TRUE") {
+      tab = subset(tab, TERRITORY_TYPE != "")
+      tab$Territory_ = tab$TERRITORY_TYPE
+      regressants = paste(regressants, " + Territory_", sep="")}
     if ('urbanisation4model' %in% TopicalSpecs == "TRUE"){
       tab = subset(tab, URBANISATION != "")
       tab$Urbanisation_Age_ = tab$URBANISATION
@@ -630,10 +634,6 @@ metaTableSummary <- reactive({
       tab$Discipline_SOC = tab$SOC
       tab$Discipline_PHYS = tab$PHYS
       regressants = paste(regressants, " + Discipline_ECO + Discipline_SOC + Discipline_PHYS", sep="")}
-    if ('country' %in% OtherSpecs  == "TRUE") {
-      tab = subset(tab, TERRITORY_TYPE != "")
-      tab$Territory_ = tab$TERRITORY_TYPE
-      regressants = paste(regressants, " + Territory_", sep="")}
     if ('yearOfP' %in% OtherSpecs  == "TRUE") {
       tab$Year_Of_Publication = tab$YEARPUB - 2000
       regressants = paste(regressants, " + Year_Of_Publication", sep="")}
@@ -645,10 +645,18 @@ metaTableSummary <- reactive({
   
   
   
-  output$model = renderTable({
+  output$model_significant = renderTable({
    model = metaModel()
-     mod = summary(model)
-     return(mod)
+     mod = as.data.frame(summary(model)$coefficients)
+     significant = mod[mod$`Pr(>|t|)` <= 0.05,]
+     return(significant)
+  })
+  
+  output$model_non_significant = renderTable({
+    model = metaModel()
+    mod = as.data.frame(summary(model)$coefficients)
+    non_significant = mod[mod$`Pr(>|t|)` > 0.05,]
+    return(non_significant)
   })
   
   output$modelparameters = renderTable({
