@@ -29,12 +29,14 @@ meta$YEAR = NULL
 meta$PAGE = NULL
 meta$SOURCE = NULL
 
-colnames(meta)
 
-  min_year_by_study = ddply(meta,~REFERENCE,summarise,min=min(DATE),max=max(DATE),N_COUNTRIES=length(unique(TERRITORY)))
+
+  min_year_by_study = ddply(meta,~REFERENCE,summarise,min=min(DATE),max=max(DATE),
+                            N_COUNTRIES=length(unique(TERRITORY)))
   min_year_by_study$StudyPeriod = min_year_by_study$max - min_year_by_study$min
   meta = data.frame(meta, min_year_by_study[match(meta$REFERENCE,min_year_by_study$REFERENCE),])
  
+
   
   pops = read.csv("data/UN_Population_1950_2015.csv", sep=",", dec=".")
 colnames(pops) = c("CNTR_ID", "Name", "CC", paste0("POP", 1950:2015))
@@ -64,6 +66,8 @@ meta[meta$ECO == 1 & meta$SOC == 1 & meta$PHYS == 1, "DISCIPLINE"] = "ECO, SOC &
 meta[meta$ECO == 0 & meta$SOC == 1 & meta$PHYS == 0, "DISCIPLINE"] = "SOC"
 meta[meta$ECO == 0 & meta$SOC == 1 & meta$PHYS == 1, "DISCIPLINE"] = "SOC & PHYS"
 meta[meta$ECO == 0 & meta$SOC == 0 & meta$PHYS == 1, "DISCIPLINE"] = "PHYS"
+
+
 
 DARIUS_A<-read.csv("data/DARIUS_A.csv", sep=",", dec=".")
 DARIUS_L<-read.csv("data/DARIUS_L.csv", sep=",", dec=".")
@@ -248,8 +252,14 @@ shinyServer(function(input, output, session) {
     finalTop$CNTR_ID = NULL
     return(finalTop)
   })
-  
-  
+
+# output$plotTRAJ = renderPlot({
+#   tab = metaTableSummary()
+#   tab = tab[tab$StudyPeriod > 0,]
+#   p <-ggplot(tab, aes(x=DATE, y=ALPHA, group=sameSpec, col=sameSpec) )
+#   p +  geom_point() + geom_line()
+# })
+
 
   output$DARIUSgraph = renderPlot({
     zipf = DARIUSzipf()
@@ -435,12 +445,35 @@ metaTableSummary <- reactive({
   terr = input$territorys
   dec = input$decades
   def = input$scales
-  reg = input$alpha
   if(length(terr) >= 1) tab = tab[tab$CONTINENT %in% terr,]
   if(length(dec) >= 1) tab = tab[tab$DECADE %in% dec,]
   if(length(def) >= 1) tab = tab[tab$URBANSCALE %in% def,]
   return(tab)
 })
+
+
+tableForTrajectories <- reactive({
+  tab = metaArxiv()
+  if (input$alpha == "Lotka") tab$ALPHA = tab$ALPHALOTKA
+  if (input$alpha  == "Pareto") tab$ALPHA = tab$ALPHAPARETO
+  terr = input$territory_3
+   if(length(terr) >= 1) {
+     tab = tab[tab$TERRITORY %in% terr,]
+       } else {
+     terr = unique(as.character(tab$TERRITORY))
+   }
+  
+  longitudinalAlphas = tab[tab$TRUNCATION != "" & tab$TERRITORY %in% terr, ]
+  longitudinalAlphas$SAME_SPECIFICATIONS = ifelse(longitudinalAlphas$TRUNCATION == "sample size", 
+                                      paste(longitudinalAlphas$REFID, longitudinalAlphas$TERRITORY, longitudinalAlphas$URBANSCALE, longitudinalAlphas$TRUNCATION, longitudinalAlphas$N, sep="_"),
+                                      paste(longitudinalAlphas$REFID, longitudinalAlphas$TERRITORY, longitudinalAlphas$URBANSCALE, longitudinalAlphas$TRUNCATION_POINT,sep="_"))
+  numberOfDates = ddply(longitudinalAlphas,~SAME_SPECIFICATIONS,summarise,N_DATES=length(unique(DATE)))
+  longitudinalAlphas = data.frame(longitudinalAlphas, numberOfDates[match(longitudinalAlphas$SAME_SPECIFICATIONS,numberOfDates$SAME_SPECIFICATIONS),])
+  longitudinalAlphas = longitudinalAlphas[!is.na(longitudinalAlphas$REGRESSION) & longitudinalAlphas$N_DATES > 1, ]
+  return(longitudinalAlphas)
+})
+
+
 
 
 
@@ -456,8 +489,18 @@ metaTableSummary <- reactive({
   }, options = list(paging = FALSE))
   
  
+  output$trajectories = renderPlot({
+    tab = tableForTrajectories()
+    gp = ggplot(data = tab, aes(x=DATE, y=ALPHA, group=SAME_SPECIFICATIONS, col=SAME_SPECIFICATIONS))
+   if (length(unique(tab$SAME_SPECIFICATIONS)) <= 20)  {
+      gp + geom_point() + geom_line()
+      } else {
+      gp + geom_point() + geom_line() + guides(colour=FALSE)
+      }
+  })
   
-  output$DARIUS <- renderLeaflet({
+  
+    output$DARIUS <- renderLeaflet({
     cities = DARIUSSubset()
     
     leaflet() %>% addProviderTiles("CartoDB.Positron") %>%
@@ -680,6 +723,9 @@ metaTableSummary <- reactive({
      return(significant)
   }, digits=3)
   
+  
+  
+  
   output$model_non_significant = renderTable({
     model = metaModel()
     mod = as.data.frame(summary(model)$coefficients)
@@ -727,6 +773,55 @@ metaTableSummary <- reactive({
     
  
  
+  
+  
+  
+  output$mapectories <- renderLeaflet({
+    tab = tableForTrajectories()()
+    countriesToMap = ZipfCountries()
+    
+    toMap = input$dynVarToMap
+    if (toMap == "meanAlpha") {
+      countriesToMap@data$VarToCut = as.numeric(countriesToMap@data$Alpha)
+      ColorRamp = "BrBG" #colorRampPalette(c("#18BC9C", "#e3e3e3", "#2c3e50"))(n = 299)
+      #pal <- colorNumeric('Blues', NULL)
+      Breaks = c(0, 0.9, 0.95, 1, 1.05, 1.1, 2)
+      t = "Mean Alpha"
+    }
+    if (toMap == "diversity") {
+      countriesToMap@data$VarToCut = as.numeric(countriesToMap@data$Diversity)
+      ColorRamp = 'Blues'#  colorRampPalette(c("#e3e3e3","#2c3e50"))(n = 299)
+      Breaks = c(0, 0.1, 0.2, 0.3, 0.4, 0.5, 1) 
+      t = "Standard Deviation of Alpha"
+    }
+    if (toMap == "n") {
+      countriesToMap@data$VarToCut = as.numeric(countriesToMap@data$Estimation)
+      ColorRamp = 'Greys'# colorRampPalette(c("#e3e3e3","#18BC9C"))(n = 299)
+      Breaks = c(5, 10, 20, 50, 100, 500, 1000) 
+      t = "Number of Estimations"
+    } 
+    
+    vPal6 <- brewer.pal(n = 6, name = ColorRamp)
+    countriesToMap@data$VarToMap<- as.character(cut(countriesToMap@data$VarToCut,
+                                                    breaks = Breaks,
+                                                    labels = vPal6,
+                                                    include.lowest = TRUE,
+                                                    right = FALSE))
+    vLegendBox <- as.character(levels(cut(countriesToMap@data$VarToCut,
+                                          breaks = Breaks,
+                                          include.lowest = TRUE,
+                                          right = FALSE)))
+    countriesToMap@data$VarToMap = ifelse( is.na(countriesToMap@data$VarToMap), "white", countriesToMap@data$VarToMap )
+    
+    
+    leaflet(countriesToMap) %>% addProviderTiles("CartoDB.Positron") %>%
+      clearShapes() %>% setView(lng=10, lat=20, zoom=2) %>% 
+      addPolygons(stroke = FALSE, smoothFactor = 0, 
+                  fillColor = ~VarToMap, fillOpacity = 0.7, 
+                  layerId = ~CNTR_ID, popup = ~Values, options = popupOptions(maxWidth = 100)) %>% 
+      addLegend("bottomright", colors= vPal6, labels=vLegendBox, title=t)
+    
+  })
   
   
   
@@ -804,6 +899,24 @@ metaTableSummary <- reactive({
     updateSelectInput(session, "scales", choices = c(sort(unique(as.character(inFile$URBANSCALE)))))
     updateSelectInput(session, "decades", choices = c(sort(unique(as.character(inFile$DECADE)))))
   })
+  
+  observe({
+    tab = metaArxiv()
+    if (input$alpha == "Lotka") tab$ALPHA = tab$ALPHALOTKA
+    if (input$alpha  == "Pareto") tab$ALPHA = tab$ALPHAPARETO
+    longitudinalAlphas = tab[tab$TRUNCATION != "", ]
+    longitudinalAlphas$SAME_SPECIFICATIONS = ifelse(longitudinalAlphas$TRUNCATION == "sample size", 
+                                                    paste(longitudinalAlphas$REFID, longitudinalAlphas$TERRITORY, longitudinalAlphas$URBANSCALE, longitudinalAlphas$TRUNCATION, longitudinalAlphas$N, sep="_"),
+                                                    paste(longitudinalAlphas$REFID, longitudinalAlphas$TERRITORY, longitudinalAlphas$URBANSCALE, longitudinalAlphas$TRUNCATION_POINT,sep="_"))
+    numberOfDates = ddply(longitudinalAlphas,~SAME_SPECIFICATIONS,summarise,N_DATES=length(unique(DATE)))
+    longitudinalAlphas = data.frame(longitudinalAlphas, numberOfDates[match(longitudinalAlphas$SAME_SPECIFICATIONS,numberOfDates$SAME_SPECIFICATIONS),])
+    inFile = longitudinalAlphas[!is.na(longitudinalAlphas$REGRESSION) & longitudinalAlphas$N_DATES > 1, ]
+    if(is.null(inFile))
+      return(NULL)
+    updateSelectInput(session, "territory_3", choices = c(sort(unique(as.character(inFile$TERRITORY)))))
+  })
+
+  
 #  observe({
 #    refsToAdd = refsToAdd
 #    if(is.null(input$addest) || input$addest==0) return(NULL)

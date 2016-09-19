@@ -160,7 +160,10 @@ tabPanel("2. An Example of Zipf's law for cities",
               fluidRow( 
                 column(6,dataTableOutput('summaryAlpha')),
                 column(6,dataTableOutput('summaryMeta')))
+            
+              
      ),
+   
      tabPanel("4. References",
               h6("The analysis is based on estimations found in the following references."),
               tags$hr(),  h4("Bibliographical References"), dataTableOutput('references')
@@ -170,7 +173,7 @@ tabPanel("2. An Example of Zipf's law for cities",
      
      
      
-     tabPanel("Meta-Analysis",
+     tabPanel("Static Meta-Analysis",
               tabsetPanel(
                 
                 tabPanel("1. Hypotheses",
@@ -253,8 +256,9 @@ tabPanel("2. An Example of Zipf's law for cities",
                 column(4,selectizeInput("decade", "Decade", "", multiple=T)),
                 column(3,downloadButton("downloadData", "Download")), 
                 column(9, HTML('N.B. This table is a simplified version. You can find the full version here <a href="here">https://github.com/ClementineCttn/MetaZipf</a>'))),
-              dataTableOutput('review'),
-              tags$hr()
+             dataTableOutput('review'),
+          
+             tags$hr()
              
              
               
@@ -415,7 +419,41 @@ tabPanel("2. An Example of Zipf's law for cities",
                # )
              )
      )),
-    
+tabPanel("Dynamic Meta-Analysis",
+         tabsetPanel(
+           tabPanel("1. Trajectories of urban hierarchy",
+                    h2("Subset Table by:"),
+                    fluidRow(
+                      column(4,selectizeInput("territory_3", "Territory", "", multiple=T)),
+                    plotOutput('trajectories')),   
+                    br(), 
+                    tags$hr(),
+                    tags$hr(),
+                    fluidRow(
+                      column(6,h4("Geographical Distribution of Trajectories"),
+                           h6('!! It might take a few seconds to load and update !!')),
+                    column(6,h4("Geographical Distribution of Trajectories"),
+                           h6('!! It might take a few seconds to load and update !!')),
+                    column(4,selectInput('dynVarToMap', 'Annual Average growth of Alpha (%)', 
+                                         choices = c("Mean Value" = 'meanDynAlpha',
+                                                     "Standard Deviation" = 'sdDynAlpha',
+                                                     "Number of Observations" = 'nDynAlpha'),
+                                         selected = "meanDynAlpha", multiple = F)),
+                    column(4,selectInput('contextToMap', 'Annual Average Growth context (%)', 
+                                         choices = c("Mean Alpha" = 'meanAlpha',
+                                                     "Standard Deviation" = 'diversity',
+                                                     "Number of Estimations" = 'n'),
+                                         selected = "meanAlpha", multiple = F)),
+                   column(4,sliderInput('periodToMap', 'Period under Enquiry', 
+                                        min = 1950, max = 2015, value = c(1960,2000))),
+           
+                    leafletOutput('mapectories'),
+                    tags$hr()
+           )),
+           tabPanel("2. Projections"
+           )
+           )),
+
       tabPanel("Contribute !",
               
                h1("Add your estimates"), 
