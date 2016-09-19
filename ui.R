@@ -419,7 +419,7 @@ tabPanel("2. An Example of Zipf's law for cities",
                # )
              )
      )),
-tabPanel("Dynamic Meta-Analysis",
+tabPanel("Dynamic Analysis",
          tabsetPanel(
            tabPanel("1. Trajectories of urban hierarchy",
                     h2("Subset Table by:"),
@@ -439,19 +439,19 @@ tabPanel("Dynamic Meta-Analysis",
                                                      "Standard Deviation" = 'sdDynAlpha',
                                                      "Number of Observations" = 'nDynAlpha'),
                                          selected = "meanDynAlpha", multiple = F)),
-                    column(4,selectInput('contextToMap', 'Annual Average Growth context (%)', 
-                                         choices = c("Mean Alpha" = 'meanAlpha',
-                                                     "Standard Deviation" = 'diversity',
-                                                     "Number of Estimations" = 'n'),
-                                         selected = "meanAlpha", multiple = F)),
-                   column(4,sliderInput('periodToMap', 'Period under Enquiry', 
-                                        min = 1950, max = 2015, value = c(1960,2000))),
-           
+                    column(4,selectInput("decade_3", "Decade", choices = c("1950s", "1960s","1970s","1980s","1990s","2000s", "2010s"),
+                                         selected = c("1980s"), multiple=F)),
+                      column(4,selectInput('contextToMap', 'Annual Average Growth context (%)', 
+                                         choices = c("GDP per Capita" = 'g_GDP',
+                                                     "Population" = 'g_pop'),
+                                         selected = "g_GDP", multiple = F)),
+                  
                    column(6,leafletOutput('mapectories')),
-                   column(6,leafletOutput('mapcontext')),
+                   column(6,leafletOutput('mapcontext'))),
+                   
                    
                     tags$hr()
-           )),
+           ),
            tabPanel("2. Projections"
            )
            )),

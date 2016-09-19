@@ -40,9 +40,28 @@ meta$SOURCE = NULL
   
   pops = read.csv("data/UN_Population_1950_2015.csv", sep=",", dec=".")
 colnames(pops) = c("CNTR_ID", "Name", "CC", paste0("POP", 1950:2015))
+pops[pops == 0] <- NA
+
+pops$Pct_POP_1950s = AAGR_pct(pops$POP1950, pops$POP1960, 10)
+pops$Pct_POP_1960s = AAGR_pct(pops$POP1960, pops$POP1970, 10)
+pops$Pct_POP_1970s = AAGR_pct(pops$POP1970, pops$POP1980, 10)
+pops$Pct_POP_1980s = AAGR_pct(pops$POP1980, pops$POP1990, 10)
+pops$Pct_POP_1990s = AAGR_pct(pops$POP1990, pops$POP2000, 10)
+pops$Pct_POP_2000s = AAGR_pct(pops$POP2000, pops$POP2010, 10)
+pops$Pct_POP_2010s = AAGR_pct(pops$POP2010, pops$POP2015, 5)
+
 gdps = read.csv("data/WB_GDP_1960_2015.csv", sep=",", dec=".")
 colnames(gdps) = c("CNTR_ID", "Name", "CC", paste0("GDP", 1960:2015))
-meta = data.frame(meta, pops[match(meta$CNTR_ID,pops$CNTR_ID),])
+gdps[gdps == 0] <- NA
+  
+  gdps$Pct_GDP_1960s = AAGR_pct(gdps$GDP1960, gdps$GDP1970, 10)
+  gdps$Pct_GDP_1970s = AAGR_pct(gdps$GDP1970, gdps$GDP1980, 10)
+  gdps$Pct_GDP_1980s = AAGR_pct(gdps$GDP1980, gdps$GDP1990, 10)
+  gdps$Pct_GDP_1990s = AAGR_pct(gdps$GDP1990, gdps$GDP2000, 10)
+  gdps$Pct_GDP_2000s = AAGR_pct(gdps$GDP2000, gdps$GDP2010, 10)
+  gdps$Pct_GDP_2010s = AAGR_pct(gdps$GDP2010, gdps$GDP2015, 5)
+ 
+  meta = data.frame(meta, pops[match(meta$CNTR_ID,pops$CNTR_ID),])
 meta = data.frame(meta, gdps[match(meta$CNTR_ID,gdps$CNTR_ID),])
 meta$TOTAL_POP = NA
 for (i in 1:dim(meta)[1]) {
@@ -76,9 +95,15 @@ full_countries <- readOGR(dsn='data/world_SimplifiedGeom.shp', layer = "world_Si
 
 
 
-
+sumNum = function(x){sum(as.numeric(x), na.rm=TRUE)}
+stdDev = function(x){sd(as.numeric(x), na.rm=TRUE)}
+collapseRefs = function(x){paste(as.list(as.character(x), na.rm=TRUE), sep=" ", collapse = " | ")}
 raiseXToPowerY = function(x,y){sign(x)*abs(x)^y}
-AAGR_pct = function(initVal, finalVal, nPeriods){ (raiseXToPowerY((finalVal / initVal),nPeriods) - 1 ) * 100 }
+AAGR_pct = function(initVal, finalVal, nPeriods){ (raiseXToPowerY((finalVal / initVal), (1 / nPeriods)) - 1 ) * 100 }
+
+
+
+
 
 SummaryMetaAlpha = function(table, regression = "Lotka"){
   tab = table
@@ -123,9 +148,6 @@ SummaryMetaMeta = function(table, regression = "Lotka"){
   return(Summary)
 }
 
-sumNum = function(x){sum(as.numeric(x), na.rm=TRUE)}
-stdDev = function(x){sd(as.numeric(x), na.rm=TRUE)}
-collapseRefs = function(x){paste(as.list(as.character(x), na.rm=TRUE), sep=" ", collapse = " | ")}
 
 generateEstimRows <- function(i){
   list(
@@ -483,9 +505,12 @@ tableForTrajectories <- reactive({
       fv = longitudinalAlphas[i+1,"ALPHA"]
       iv = longitudinalAlphas[i,"ALPHA"]
       ye = 1 / (longitudinalAlphas[i+1,"DATE"] - longitudinalAlphas[i,"DATE"])
+      median_date = (longitudinalAlphas[i,"DATE"] + longitudinalAlphas[i+1,"DATE"]) / 2
        longitudinalAlphas[i,"PCT_GROWTH_ALPHA"] =  AAGR_pct(initVal = iv, finalVal = fv, nPeriods = ye) 
+       longitudinalAlphas[i,"GROWTH_DECADE"] = paste0(substr(as.character(median_date),1,3),'0s')
     } else {
       longitudinalAlphas[i,"PCT_GROWTH_ALPHA"] = NA
+      longitudinalAlphas[i,"GROWTH_DECADE"] = NA
       }
   }
    return(longitudinalAlphas)
@@ -556,11 +581,13 @@ tableForTrajectories <- reactive({
   
   
   
-GrowthCountries <- reactive({
+  GrowthCountries <- reactive({
     c_shp <- full_countries#[full_countries$CNTR_ID == input$Country_name, ]
     tab = tableForTrajectories()
-    period = input$periodToMap
-    tab = tab[tab$TERRITORY_TYPE == "Country" & !is.na(tab$PCT_GROWTH_ALPHA) & tab$DATE %in% period[1]:period[2] ,]
+  #  periods = c("1950s", "1960s", "1970s")
+    periods = as.character(input$decade_3)
+    tab$GROWTH_DECADE = as.character(tab$GROWTH_DECADE)
+    tab = tab[tab$TERRITORY_TYPE == "Country" & !is.na(tab$PCT_GROWTH_ALPHA) & tab$GROWTH_DECADE %in% periods,]
     tab$count = 1
     data = ddply(tab,~TERRITORY,summarise, 
                  MEAN_GROWTH_ALPHA=mean(PCT_GROWTH_ALPHA),
@@ -568,9 +595,13 @@ GrowthCountries <- reactive({
                  N_GROWTH_ALPHA=sumNum(count))
     
     data = merge(data, lookupCNTR_ID, by = "TERRITORY", all.x=T, all.y=F)
-    
     c_shp@data = data.frame(c_shp@data, data[match(c_shp@data$CNTR_ID,data$CNTR_ID), ])
-    return(c_shp)
+    rate_gdp = gdps[, c("CNTR_ID", paste0('Pct_GDP_',c(1960, 1970, 1980, 1990, 2000, 2010),'s'))]
+    c_shp@data = data.frame(c_shp@data, rate_gdp[match(c_shp@data$CNTR_ID,rate_gdp$CNTR_ID), ])
+    rate_pop = pops[, c("CNTR_ID", paste0('Pct_POP_',c(1950,1960, 1970, 1980, 1990, 2000, 2010),'s'))]
+    c_shp@data = data.frame(c_shp@data, rate_pop[match(c_shp@data$CNTR_ID,rate_pop$CNTR_ID), ])
+    
+     return(c_shp)
   })
   
   
@@ -580,6 +611,9 @@ GrowthCountries <- reactive({
      data = alphaSummaryByCountryForMap()
     
     colnames(data) = c("CNTR_ID", "Name", "Diversity", "Alpha", "Estimation", "Values")
+    c_shp@data = data.frame(c_shp@data, data[match(c_shp@data$CNTR_ID,data$CNTR_ID), ])
+    
+    c_shp@data = data.frame(c_shp@data, data[match(c_shp@data$CNTR_ID,data$CNTR_ID), ])
     c_shp@data = data.frame(c_shp@data, data[match(c_shp@data$CNTR_ID,data$CNTR_ID), ])
     return(c_shp)
   })
@@ -808,19 +842,61 @@ GrowthCountries <- reactive({
     
  ###### ABCD
  
+   output$mapcontext<- renderLeaflet({
+    countriesToMap = GrowthCountries()
+    
+    toMap = input$contextToMap
+    period = input$decade_3
+    
+      Breaks = c(-100, -5, -2, 0, 2, 5, 100)
+    ColorRamp = "BrBG" #colorRampPalette(c("#18BC9C", "#e3e3e3", "#2c3e50"))(n = 299)
+    
+    if (toMap == "g_GDP") {
+      var = "GDP" 
+      t = "Annual Average Growth of GDP per Capita"
+    }
+    if (toMap == "g_pop") {
+      var = "POP" 
+      t = "Annual Average Growth of Population"
+    }
+
+    countriesToMap@data$VarToCut = countriesToMap@data[,paste0('Pct_', var, '_', period)]
+
+    vPal6 <- brewer.pal(n = 6, name = ColorRamp)
+    countriesToMap@data$VarToMap<- as.character(cut(countriesToMap@data$VarToCut,
+                                                    breaks = Breaks,
+                                                    labels = vPal6,
+                                                    include.lowest = TRUE,
+                                                    right = FALSE))
+    vLegendBox <- as.character(levels(cut(countriesToMap@data$VarToCut,
+                                          breaks = Breaks,
+                                          include.lowest = TRUE,
+                                          right = FALSE)))
+    countriesToMap@data$VarToMap = ifelse( is.na(countriesToMap@data$VarToMap), "white", countriesToMap@data$VarToMap )
+    
+    
+    leaflet(countriesToMap) %>% addProviderTiles("CartoDB.Positron") %>%
+      clearShapes() %>% setView(lng=10, lat=20, zoom=2) %>% 
+      addPolygons(stroke = FALSE, smoothFactor = 0, 
+                  fillColor = ~VarToMap, fillOpacity = 0.7, layerId = ~CNTR_ID#,
+               #   popup = ~N_GROWTH_ALPHA, options = popupOptions(maxWidth = 100)
+      ) %>% 
+      addLegend("bottomright", colors= vPal6, labels=vLegendBox, title=t)
+    
+  })
+  
+  
   
   
   output$mapectories <- renderLeaflet({
     countriesToMap = GrowthCountries()
-    
     toMap = input$dynVarToMap
-  
-  
+    
        if (toMap == "meanDynAlpha") {
       countriesToMap@data$VarToCut = as.numeric(countriesToMap@data$MEAN_GROWTH_ALPHA)
       ColorRamp = "BrBG" #colorRampPalette(c("#18BC9C", "#e3e3e3", "#2c3e50"))(n = 299)
       #pal <- colorNumeric('Blues', NULL)
-      Breaks = c(-2, -1, -0.5, 0, 0.5, 1, 2)
+      Breaks = c(-100, -5, -2, 0, 2, 5, 100)
       t = "Mean Growth of Alpha"
     }
     if (toMap == "sdDynAlpha") {
@@ -853,10 +929,11 @@ GrowthCountries <- reactive({
       clearShapes() %>% setView(lng=10, lat=20, zoom=2) %>% 
       addPolygons(stroke = FALSE, smoothFactor = 0, 
                   fillColor = ~VarToMap, fillOpacity = 0.7, layerId = ~CNTR_ID,
-                  popup = ~N_GROWTH_ALPHA, options = popupOptions(maxWidth = 100)
+                  popup = ~VarToCut, options = popupOptions(maxWidth = 100)
                   ) %>% 
       addLegend("bottomright", colors= vPal6, labels=vLegendBox, title=t)
     
+
   })
   
   
