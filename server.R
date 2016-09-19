@@ -74,6 +74,12 @@ DARIUS_L<-read.csv("data/DARIUS_L.csv", sep=",", dec=".")
 full_countries <- readOGR(dsn='data/world_SimplifiedGeom.shp', layer = "world_SimplifiedGeom", 
                           verbose = F,encoding = "utf8")
 
+
+
+
+raiseXToPowerY = function(x,y){sign(x)*abs(x)^y}
+AAGR_pct = function(initVal, finalVal, nPeriods){ (raiseXToPowerY((finalVal / initVal),nPeriods) - 1 ) * 100 }
+
 SummaryMetaAlpha = function(table, regression = "Lotka"){
   tab = table
   meanAlpha = round(mean(tab$ALPHA),3)
@@ -203,7 +209,6 @@ shinyServer(function(input, output, session) {
     mean$x = round(mean$x, 3)
     topC = join( top,mean, by = "Group.1")
     topC = join( topC,keep, by = "Group.1")
-    
     m$ALPHA_REFERENCE = paste(m$REFERENCE,round(m$ALPHA,3),  sep=": ")
     mRefs = aggregate(m[,"ALPHA_REFERENCE"], unique(list(m$CNTR_ID)), FUN = collapseRefs)
     mRefs = as.data.frame(mRefs)
@@ -470,7 +475,20 @@ tableForTrajectories <- reactive({
   numberOfDates = ddply(longitudinalAlphas,~SAME_SPECIFICATIONS,summarise,N_DATES=length(unique(DATE)))
   longitudinalAlphas = data.frame(longitudinalAlphas, numberOfDates[match(longitudinalAlphas$SAME_SPECIFICATIONS,numberOfDates$SAME_SPECIFICATIONS),])
   longitudinalAlphas = longitudinalAlphas[!is.na(longitudinalAlphas$REGRESSION) & longitudinalAlphas$N_DATES > 1, ]
-  return(longitudinalAlphas)
+  
+  n = dim(longitudinalAlphas)[1] - 1
+  
+  for (i in 1:n){
+    if (longitudinalAlphas[i,"SAME_SPECIFICATIONS"] == longitudinalAlphas[i+1,"SAME_SPECIFICATIONS"]) {
+      fv = longitudinalAlphas[i+1,"ALPHA"]
+      iv = longitudinalAlphas[i,"ALPHA"]
+      ye = 1 / (longitudinalAlphas[i+1,"DATE"] - longitudinalAlphas[i,"DATE"])
+       longitudinalAlphas[i,"PCT_GROWTH_ALPHA"] =  AAGR_pct(initVal = iv, finalVal = fv, nPeriods = ye) 
+    } else {
+      longitudinalAlphas[i,"PCT_GROWTH_ALPHA"] = NA
+      }
+  }
+   return(longitudinalAlphas)
 })
 
 
@@ -488,7 +506,6 @@ tableForTrajectories <- reactive({
      return(tab)
   }, options = list(paging = FALSE))
   
- 
   output$trajectories = renderPlot({
     tab = tableForTrajectories()
     gp = ggplot(data = tab, aes(x=DATE, y=ALPHA, group=SAME_SPECIFICATIONS, col=SAME_SPECIFICATIONS))
@@ -537,6 +554,24 @@ tableForTrajectories <- reactive({
   })
   
   
+  
+  
+GrowthCountries <- reactive({
+    c_shp <- full_countries#[full_countries$CNTR_ID == input$Country_name, ]
+    tab = tableForTrajectories()
+    period = input$periodToMap
+    tab = tab[tab$TERRITORY_TYPE == "Country" & !is.na(tab$PCT_GROWTH_ALPHA) & tab$DATE %in% period[1]:period[2] ,]
+    tab$count = 1
+    data = ddply(tab,~TERRITORY,summarise, 
+                 MEAN_GROWTH_ALPHA=mean(PCT_GROWTH_ALPHA),
+                 SD_GROWTH_ALPHA=sd(PCT_GROWTH_ALPHA),
+                 N_GROWTH_ALPHA=sumNum(count))
+    
+    data = merge(data, lookupCNTR_ID, by = "TERRITORY", all.x=T, all.y=F)
+    
+    c_shp@data = data.frame(c_shp@data, data[match(c_shp@data$CNTR_ID,data$CNTR_ID), ])
+    return(c_shp)
+  })
   
   
   
@@ -771,34 +806,34 @@ tableForTrajectories <- reactive({
     h5(Reference)
   })
     
+ ###### ABCD
  
- 
-  
   
   
   output$mapectories <- renderLeaflet({
-    tab = tableForTrajectories()()
-    countriesToMap = ZipfCountries()
+    countriesToMap = GrowthCountries()
     
     toMap = input$dynVarToMap
-    if (toMap == "meanAlpha") {
-      countriesToMap@data$VarToCut = as.numeric(countriesToMap@data$Alpha)
+  
+  
+       if (toMap == "meanDynAlpha") {
+      countriesToMap@data$VarToCut = as.numeric(countriesToMap@data$MEAN_GROWTH_ALPHA)
       ColorRamp = "BrBG" #colorRampPalette(c("#18BC9C", "#e3e3e3", "#2c3e50"))(n = 299)
       #pal <- colorNumeric('Blues', NULL)
-      Breaks = c(0, 0.9, 0.95, 1, 1.05, 1.1, 2)
-      t = "Mean Alpha"
+      Breaks = c(-2, -1, -0.5, 0, 0.5, 1, 2)
+      t = "Mean Growth of Alpha"
     }
-    if (toMap == "diversity") {
-      countriesToMap@data$VarToCut = as.numeric(countriesToMap@data$Diversity)
+    if (toMap == "sdDynAlpha") {
+      countriesToMap@data$VarToCut = as.numeric(countriesToMap@data$SD_GROWTH_ALPHA)
       ColorRamp = 'Blues'#  colorRampPalette(c("#e3e3e3","#2c3e50"))(n = 299)
       Breaks = c(0, 0.1, 0.2, 0.3, 0.4, 0.5, 1) 
-      t = "Standard Deviation of Alpha"
+      t = "Standard Deviation of Growth"
     }
-    if (toMap == "n") {
-      countriesToMap@data$VarToCut = as.numeric(countriesToMap@data$Estimation)
+    if (toMap == "nDynAlpha") {
+      countriesToMap@data$VarToCut = as.numeric(countriesToMap@data$N_GROWTH_ALPHA)
       ColorRamp = 'Greys'# colorRampPalette(c("#e3e3e3","#18BC9C"))(n = 299)
-      Breaks = c(5, 10, 20, 50, 100, 500, 1000) 
-      t = "Number of Estimations"
+      Breaks = c(1, 5, 10, 20, 50, 100, 500) 
+      t = "Number of Observations"
     } 
     
     vPal6 <- brewer.pal(n = 6, name = ColorRamp)
@@ -817,8 +852,9 @@ tableForTrajectories <- reactive({
     leaflet(countriesToMap) %>% addProviderTiles("CartoDB.Positron") %>%
       clearShapes() %>% setView(lng=10, lat=20, zoom=2) %>% 
       addPolygons(stroke = FALSE, smoothFactor = 0, 
-                  fillColor = ~VarToMap, fillOpacity = 0.7, 
-                  layerId = ~CNTR_ID, popup = ~Values, options = popupOptions(maxWidth = 100)) %>% 
+                  fillColor = ~VarToMap, fillOpacity = 0.7, layerId = ~CNTR_ID,
+                  popup = ~N_GROWTH_ALPHA, options = popupOptions(maxWidth = 100)
+                  ) %>% 
       addLegend("bottomright", colors= vPal6, labels=vLegendBox, title=t)
     
   })

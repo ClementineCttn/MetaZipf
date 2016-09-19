@@ -447,7 +447,9 @@ tabPanel("Dynamic Meta-Analysis",
                    column(4,sliderInput('periodToMap', 'Period under Enquiry', 
                                         min = 1950, max = 2015, value = c(1960,2000))),
            
-                    leafletOutput('mapectories'),
+                   column(6,leafletOutput('mapectories')),
+                   column(6,leafletOutput('mapcontext')),
+                   
                     tags$hr()
            )),
            tabPanel("2. Projections"
