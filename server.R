@@ -101,6 +101,10 @@ stdDev = function(x){sd(as.numeric(x), na.rm=TRUE)}
 collapseRefs = function(x){paste(as.list(as.character(x), na.rm=TRUE), sep=" ", collapse = " | ")}
 raiseXToPowerY = function(x,y){sign(x)*abs(x)^y}
 AAGR_pct = function(initVal, finalVal, nPeriods){ (raiseXToPowerY((finalVal / initVal), (1 / nPeriods)) - 1 ) * 100 }
+r2.corr.mer <- function(m) {
+  lmfit <-  lm(model.response(model.frame(m)) ~ fitted(m))
+  summary(lmfit)$r.squared
+}
 
 
 
@@ -166,6 +170,7 @@ generateEstimRows <- function(i){
     tags$hr()
   )
 }
+
 
 r_colors <- rgb(t(col2rgb(colors()) / 255))
 names(r_colors) <- colors()
@@ -866,12 +871,17 @@ tableForTrajectories <- reactive({
       tab$Period_Analysed_ = as.factor(ifelse(tab$StudyPeriod == 0, "Cross_section", ifelse(tab$StudyPeriod >= input$s_period, "Long", " Short")))
       regressants = paste0(regressants, " + Period_Analysed_")}
    
+    
     sameSample = input$sameSample
     if (sameSample == T) {
+      tab = subset(tab, TRUNCATION_POINT >= 0)
+      tab = subset(tab, N >= 0)
       tab = subset(tab, TERRITORY_TYPE != "")
       tab = subset(tab, URBANISATION != "")
       tab = subset(tab, TOTAL_POP > 0)
       tab = subset(tab, GDPPC > 0)
+      tab = tab[,columnsToKeep]
+      tab = tab[complete.cases(tab),]
     }
     
     
@@ -880,8 +890,7 @@ tableForTrajectories <- reactive({
                                                paste(tab$REFID, tab$TERRITORY, tab$URBANDEF, tab$TRUNCATION_POINT,sep="_")))
 
      model = lmer(as.formula(paste0(regressants, " + ( 1 | REFID)")),data=tab, REML=F, na.action=na.omit)
-     
-       return(model)
+      return(model)
   })
 
 output$pFtest = renderText({
@@ -936,6 +945,22 @@ output$pFtest = renderText({
   
   output$modelparameters = renderTable({
     if (input$fixedEffects == T) {
+      model = metaModelFixed()
+      R2 = r2.corr.mer(model) * 100
+      vc <- VarCorr(model) 
+      vc.tab <- as.data.frame(vc)
+      vc.tabinter <- vc.tab [1,]
+      vc.tabintra <- vc.tab [2,]
+      InterVarMnnull <- vc.tabinter$vcov
+      IntraVarMnnull <- vc.tabintra$vcov
+      TotalVarMnnull <- InterVarMnnull + IntraVarMnnull
+      ShareInterVar <- InterVarMnnull / TotalVarMnnull
+      R2between = ShareInterVar * R2
+      R2within = R2 - R2between
+      Observations = length(model@frame$ALPHA)
+      summ = data.frame(R2within, R2between, Observations)
+      colnames(summ) = c("R2 within (%)", "R2 between (%)", "Number of Estimations")
+      return(summ)
      } else {
       model = metaModelOLS()
      R2 = summary(model)$r.squared * 100
