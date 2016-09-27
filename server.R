@@ -892,15 +892,15 @@ tableForTrajectories <- reactive({
      model = lmer(as.formula(paste0(regressants, " + ( 1 | REFID)")),data=tab, REML=F, na.action=na.omit)
       return(model)
   })
-
-output$pFtest = renderText({
-  ols = metaModelOLS()
-  fixed = metaModelFixed()
-#  f = pFtest(fixed, ols)
-  yesOrNo = "No"
-#   if (f$p.value < 0.05) { yesOrNo = "yes"}
-  return(yesOrNo)
-})
+# 
+# output$pFtest = renderText({
+#   ols = metaModelOLS()
+#   fixed = metaModelFixed()
+# #  f = pFtest(fixed, ols)
+#   yesOrNo = "No"
+# #   if (f$p.value < 0.05) { yesOrNo = "yes"}
+#   return(yesOrNo)
+# })
 
   output$model_temporal = renderTable({
     fixedEffect = input$fixedEffects
@@ -913,34 +913,45 @@ output$pFtest = renderText({
     temporal = mod[rownames(mod) %in% c("(Intercept)","Date_of_Observation"),]
     return(temporal)
   }, digits = 3)
-  
-  
+ 
+   
   output$model_significant = renderTable({
     if (input$fixedEffects == T) {
       model = metaModelFixed()
+       mod = as.data.frame(summary(model)$coefficients)
+       sign = input$significance / 100
+       if (sign <= 0.1) tTestValue = 1.282  
+       if (sign < 0.05) tTestValue = 1.645
+       if (sign < 0.025) tTestValue = 1.960
+       if (sign < 0.01) tTestValue = 2.326
+     significant = round(mod[mod$`t value` >= tTestValue,],3)
     } else {
       model = metaModelOLS()
+      mod = as.data.frame(summary(model)$coefficients)
+      sign = input$significance / 100
+      significant = round(mod[mod$`Pr(>|t|)` <= sign,],3)
      }
-    mod = as.data.frame(summary(model)$coefficients)
-    sign = input$significance / 100
-     significant = round(mod[mod$`Pr(>|t|)` <= sign,],3)
      significant = significant[!rownames(significant) %in% c("(Intercept)","Date_of_Observation"),]
      return(significant)
   }, digits=3)
   
-  
-  
-  
   output$model_non_significant = renderTable({
     if (input$fixedEffects == T) {
       model = metaModelFixed()
+      mod = as.data.frame(summary(model)$coefficients)
+      sign = input$significance / 100
+      if (sign <= 0.1) tTestValue = 1.282  
+      if (sign < 0.05) tTestValue = 1.645
+      if (sign < 0.025) tTestValue = 1.960
+      if (sign < 0.01) tTestValue = 2.326
+      non_significant = mod[mod$`t value` < tTestValue,]
     } else {
       model = metaModelOLS()
-     }
-    mod = as.data.frame(summary(model)$coefficients)
-    sign = input$significance / 100
-    non_significant = mod[mod$`Pr(>|t|)` > sign,]
-    return(non_significant)
+      mod = as.data.frame(summary(model)$coefficients)
+      sign = input$significance / 100
+      non_significant = mod[mod$`Pr(>|t|)` > sign,]
+      }
+      return(non_significant)
   })
   
   output$modelparameters = renderTable({
