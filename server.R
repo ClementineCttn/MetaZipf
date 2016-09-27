@@ -924,7 +924,7 @@ tableForTrajectories <- reactive({
        if (sign < 0.05) tTestValue = 1.645
        if (sign < 0.025) tTestValue = 1.960
        if (sign < 0.01) tTestValue = 2.326
-     significant = round(mod[mod$`t value` >= tTestValue,],3)
+     significant = round(mod[abs(mod$`t value`) >= tTestValue,],3)
     } else {
       model = metaModelOLS()
       mod = as.data.frame(summary(model)$coefficients)
@@ -944,7 +944,7 @@ tableForTrajectories <- reactive({
       if (sign < 0.05) tTestValue = 1.645
       if (sign < 0.025) tTestValue = 1.960
       if (sign < 0.01) tTestValue = 2.326
-      non_significant = mod[mod$`t value` < tTestValue,]
+      non_significant = mod[abs(mod$`t value`) < tTestValue,]
     } else {
       model = metaModelOLS()
       mod = as.data.frame(summary(model)$coefficients)
