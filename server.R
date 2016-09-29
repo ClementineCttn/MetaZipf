@@ -821,56 +821,90 @@ tableForTrajectories <- reactive({
     
     tab$Date_of_Observation = tab$DATE - 1950
     regressants = "ALPHA ~ Date_of_Observation"
+    columnsToKeep = c("REFID","ALPHA", "Date_of_Observation")
     # if ('year4model' %in% TopicalSpecs == "TRUE") {
     #   tab$Date_of_Observation = tab$DATE - 1950
     #   regressants = paste(regressants, " + Date_of_Observation", sep="")}
     if ('truncation4model' %in% TechnicalSpecs == "TRUE"){
       tab$Population_Cutoff_ = as.factor(ifelse(tab$TRUNCATION_POINT <= input$truncVal[[1]], "Low", ifelse(tab$TRUNCATION_POINT >= input$truncVal[[2]], "High", " Medium")))
-      regressants = paste0(regressants, " + Population_Cutoff_")}
+      regressants = paste0(regressants, " + Population_Cutoff_")
+      columnsToKeep = c(columnsToKeep, "Population_Cutoff_")
+      }
     if ('N4model' %in% TechnicalSpecs == "TRUE")  {
       tab$Number_Of_Cities_ = as.factor(ifelse(tab$N <= input$NVal[[1]], "Small", ifelse(tab$N >= input$NVal[[2]], "Large", " Medium")))
-      regressants = paste0(regressants, " + Number_Of_Cities_")}
+      regressants = paste0(regressants, " + Number_Of_Cities_")
+      columnsToKeep = c(columnsToKeep, "Number_Of_Cities_")
+      }
+    
     if ('country' %in% TopicalSpecs  == "TRUE") {
       tab = subset(tab, TERRITORY_TYPE != "")
       tab$Territory_ = tab$TERRITORY_TYPE
-      regressants = paste0(regressants, " + Territory_")}
+      regressants = paste0(regressants, " + Territory_") 
+      columnsToKeep = c(columnsToKeep, "Territory_")
+      }
+    
     if ('regForm' %in%  TechnicalSpecs == "TRUE")  {
       tab$Regression_Form_ = tab$REGRESSIONFORM
-      regressants = paste0(regressants, " + Regression_Form_")}
+      regressants = paste0(regressants, " + Regression_Form_")
+      columnsToKeep = c(columnsToKeep, "Regression_Form_")
+    }
+    
     if ('scale4model' %in% TechnicalSpecs == "TRUE")  {
       tab$City_Definition_ = tab$URBANSCALE
-      regressants = paste0(regressants, " + City_Definition_")}
+      regressants = paste0(regressants, " + City_Definition_")
+      columnsToKeep = c(columnsToKeep, "City_Definition_")
+    }
+    
     if ('urbanisation4model' %in% TopicalSpecs == "TRUE"){
       tab = subset(tab, URBANISATION != "")
       tab$Urbanisation_Age_ = tab$URBANISATION
-      regressants = paste0(regressants, " + Urbanisation_Age_")}
+      regressants = paste0(regressants, " + Urbanisation_Age_")
+      columnsToKeep = c(columnsToKeep, "Urbanisation_Age_")
+    }
+    
     if ('countrySize' %in% TopicalSpecs  == "TRUE") {
       tab = subset(tab, TOTAL_POP > 0)
       tab$Country_Size_ = as.factor(ifelse(tab$TOTAL_POP <= input$PopVal[[1]], "Small", ifelse(tab$TOTAL_POP >= input$PopVal[[2]], "Large", " Medium")))
-      regressants = paste0(regressants, " + Country_Size_")}
+      regressants = paste0(regressants, " + Country_Size_")
+      columnsToKeep = c(columnsToKeep, "Country_Size_")
+    }
+    
     if ('countryGDP' %in% TopicalSpecs  == "TRUE") {
       tab = subset(tab, GDPPC > 0)
       tab$Country_GDP_ = as.factor(ifelse(tab$GDPPC <= input$GDPVal[[1]], "Low", ifelse(tab$GDPPC >= input$GDPVal[[2]], "High", " Medium")))
-      regressants = paste0(regressants, " + Country_GDP_")}
+      regressants = paste0(regressants, " + Country_GDP_")
+      columnsToKeep = c(columnsToKeep, "Country_GDP_")
+      }
     # if ('discipline' %in% OtherSpecs == "TRUE") {
     #   tab = subset(tab, ECO != "")
     #   tab$Discipline_ECO = tab$ECO
     #   tab$Discipline_SOC = tab$SOC
     #   tab$Discipline_PHYS = tab$PHYS
     #   regressants = paste0(regressants, " + Discipline_ECO + Discipline_SOC + Discipline_PHYS")}
-     if ('yearOfPubli' %in% OtherSpecs  == "TRUE") {
+    if ('yearOfPubli' %in% OtherSpecs  == "TRUE") {
       tab$Year_Of_Publication_ = as.factor(ifelse(tab$YEARPUB <= input$yearOfP[[1]], "Early", ifelse(tab$YEARPUB >= input$yearOfP[[2]], "Recent", " Medium")))
-      regressants = paste0(regressants, " + Year_Of_Publication_")}
+      regressants = paste0(regressants, " + Year_Of_Publication_")
+      columnsToKeep = c(columnsToKeep, "Year_Of_Publication_")
+    }
+    
     if ('studySize' %in% OtherSpecs  == "TRUE") {
       tab$Study_Size_ = as.factor(ifelse(tab$N_ESTIM == 1, "Single", ifelse(tab$N_ESTIM >= input$n_estim, "Large", " Small")))
-      regressants = paste0(regressants, " + Study_Size_")}
+      regressants = paste0(regressants, " + Study_Size_")
+      columnsToKeep = c(columnsToKeep, "Study_Size_")
+    }
+    
     if ('studyCoverage' %in% OtherSpecs  == "TRUE") {
       tab$Territorial_Coverage_ = as.factor(ifelse(tab$N_COUNTRIES == 1, "Single", ifelse(tab$N_COUNTRIES >= input$n_territories, "Large", " Small")))
-      regressants = paste0(regressants, " + Territorial_Coverage_")}
+      regressants = paste0(regressants, " + Territorial_Coverage_")
+      columnsToKeep = c(columnsToKeep, "Territorial_Coverage_")
+    }
+    
     if ('studyPeriod' %in% OtherSpecs  == "TRUE") {
       tab$Period_Analysed_ = as.factor(ifelse(tab$StudyPeriod == 0, "Cross_section", ifelse(tab$StudyPeriod >= input$s_period, "Long", " Short")))
-      regressants = paste0(regressants, " + Period_Analysed_")}
-   
+      regressants = paste0(regressants, " + Period_Analysed_")
+      columnsToKeep = c(columnsToKeep, "Period_Analysed_")
+      }
+    
     
     sameSample = input$sameSample
     if (sameSample == T) {
@@ -885,22 +919,23 @@ tableForTrajectories <- reactive({
     }
     
     
-     tab$SAME_SPECIFICATIONS = as.factor(ifelse(tab$TRUNCATION == "sample size" | is.na(tab$TRUNCATION_POINT), 
-                                               paste(tab$REFID, tab$TERRITORY, tab$URBANDEF, tab$TRUNCATION, tab$N, sep="_"),
-                                               paste(tab$REFID, tab$TERRITORY, tab$URBANDEF, tab$TRUNCATION_POINT,sep="_")))
+     # tab$SAME_SPECIFICATIONS = as.factor(ifelse(tab$TRUNCATION == "sample size" | is.na(tab$TRUNCATION_POINT), 
+     #                                           paste(tab$REFID, tab$TERRITORY, tab$URBANDEF, tab$TRUNCATION, tab$N, sep="_"),
+     #                                           paste(tab$REFID, tab$TERRITORY, tab$URBANDEF, tab$TRUNCATION_POINT,sep="_")))
 
      model = lmer(as.formula(paste0(regressants, " + ( 1 | REFID)")),data=tab, REML=F, na.action=na.omit)
       return(model)
   })
-# 
-# output$pFtest = renderText({
-#   ols = metaModelOLS()
-#   fixed = metaModelFixed()
-# #  f = pFtest(fixed, ols)
-#   yesOrNo = "No"
-# #   if (f$p.value < 0.05) { yesOrNo = "yes"}
-#   return(yesOrNo)
-# })
+
+
+ #  output$pFtest = renderText({
+ #  ols = metaModelOLS()
+ #  fixed = metaModelFixed()
+ #   f = pFtest(fixed, ols)
+ #  sign = input$significance / 100
+ #   if (f$p.value < sign) { yesOrNo = "yes"} else { yesOrNo = "No"}
+ #  return(yesOrNo)
+ # })
 
   output$model_temporal = renderTable({
     fixedEffect = input$fixedEffects
