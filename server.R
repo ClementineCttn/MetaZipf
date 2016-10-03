@@ -485,6 +485,41 @@ metaTableSummary <- reactive({
 })
 
 
+tableForTrajectoryMaps <- reactive({
+  tab = metaArxiv()
+  if (input$alpha == "Lotka") tab$ALPHA = tab$ALPHALOTKA
+  if (input$alpha  == "Pareto") tab$ALPHA = tab$ALPHAPARETO
+  terr = unique(as.character(tab$TERRITORY))
+  longitudinalAlphas = tab[tab$TRUNCATION != "" & tab$TERRITORY %in% terr, ]
+  longitudinalAlphas$SAME_SPECIFICATIONS = ifelse(longitudinalAlphas$TRUNCATION == "sample size", 
+                                                  paste(longitudinalAlphas$REFID, longitudinalAlphas$TERRITORY, longitudinalAlphas$URBANSCALE, longitudinalAlphas$TRUNCATION, longitudinalAlphas$N, sep="_"),
+                                                  paste(longitudinalAlphas$REFID, longitudinalAlphas$TERRITORY, longitudinalAlphas$URBANSCALE, longitudinalAlphas$TRUNCATION_POINT,sep="_"))
+  numberOfDates = ddply(longitudinalAlphas,~SAME_SPECIFICATIONS,summarise,N_DATES=length(unique(DATE)))
+  longitudinalAlphas = data.frame(longitudinalAlphas, numberOfDates[match(longitudinalAlphas$SAME_SPECIFICATIONS,numberOfDates$SAME_SPECIFICATIONS),])
+  longitudinalAlphas = longitudinalAlphas[!is.na(longitudinalAlphas$REGRESSION) & longitudinalAlphas$N_DATES > 1, ]
+  
+  longitudinalAlphas = longitudinalAlphas[order(longitudinalAlphas$SAME_SPECIFICATIONS, longitudinalAlphas$DATE),]
+  n = dim(longitudinalAlphas)[1] - 1
+
+    for (i in 1:n){
+    if (longitudinalAlphas[i,"SAME_SPECIFICATIONS"] == longitudinalAlphas[i+1,"SAME_SPECIFICATIONS"]) {
+      fv = longitudinalAlphas[i+1,"ALPHA"]
+      iv = longitudinalAlphas[i,"ALPHA"]
+      ye = longitudinalAlphas[i+1,"DATE"] - longitudinalAlphas[i,"DATE"]
+      median_date = (longitudinalAlphas[i,"DATE"] + longitudinalAlphas[i+1,"DATE"]) / 2
+      longitudinalAlphas[i,"PCT_GROWTH_ALPHA"] =  AAGR_pct(initVal = iv, finalVal = fv, nPeriods = ye) 
+      longitudinalAlphas[i,"GROWTH_DECADE"] = paste0(substr(as.character(median_date),1,3),'0s')
+    } else {
+      longitudinalAlphas[i,"PCT_GROWTH_ALPHA"] = NA
+      longitudinalAlphas[i,"GROWTH_DECADE"] = NA
+    }
+  }
+  
+  longitudinalAlphas = longitudinalAlphas[is.finite(longitudinalAlphas$PCT_GROWTH_ALPHA),]
+  return(longitudinalAlphas)
+})
+
+
 tableForTrajectories <- reactive({
   tab = metaArxiv()
   if (input$alpha == "Lotka") tab$ALPHA = tab$ALPHALOTKA
@@ -589,7 +624,7 @@ tableForTrajectories <- reactive({
   
   GrowthCountries <- reactive({
     c_shp <- full_countries#[full_countries$CNTR_ID == input$Country_name, ]
-    tab = tableForTrajectories()
+    tab = tableForTrajectoryMaps()
   #  periods = c("1950s", "1960s", "1970s")
     periods = as.character(input$decade_3)
     tab$GROWTH_DECADE = as.character(tab$GROWTH_DECADE)
@@ -1090,7 +1125,42 @@ tableForTrajectories <- reactive({
   })
   
   
+<<<<<<< HEAD
+   
+     
+     output$data_trajectories = renderDataTable({
+       tab = tableForTrajectoryMaps()
+       crit = input$criteriaSubset
+       if (input$alpha == "PARETO") {
+         if ( crit == "increasing") {
+           crit = "decreasing"
+         } else {
+           crit = "increasing"
+         }
+       }
+           
+       tab$ALPHA = round(tab$ALPHA, 2)
+       tab$PCT_GROWTH_ALPHA = round(tab$PCT_GROWTH_ALPHA, 2)
+       
+       if (crit == "increasing"){
+         thresh = input$threshold_growthrate_increasing
+         selectedTable = tab[tab$PCT_GROWTH_ALPHA >= thresh,]
+         selectedTable = selectedTable[order(-selectedTable$PCT_GROWTH_ALPHA),]
+        } else {
+           thresh = input$threshold_growthrate_decreasing
+         selectedTable = tab[tab$PCT_GROWTH_ALPHA <= thresh,]
+         selectedTable = selectedTable[order(selectedTable$PCT_GROWTH_ALPHA),]
+       }
+       
+       selectedTable = selectedTable[,c("PCT_GROWTH_ALPHA", "ALPHA","TERRITORY", "GROWTH_DECADE", "URBANSCALE", "TRUNCATION_POINT", "REFERENCE")]
+       colnames(selectedTable) = c("AAGR* of alpha (%)", "Initial Alpha", "Territory", "Decade", "City definition","Population Cutoff", "Reference")
+       selectedTable = selectedTable[complete.cases(selectedTable),]
+       
+        return(selectedTable)
+     })
+=======
   
+>>>>>>> parent of 011158b... display highest and lowest alpha growth rates + group functions in global.R
   
   output$mapectories <- renderLeaflet({
     countriesToMap = GrowthCountries()
@@ -1309,5 +1379,84 @@ tableForTrajectories <- reactive({
    }
  )
 
+<<<<<<< HEAD
+ 
+ 
+ output$downloadTrajTable <- downloadHandler(
+   filename = function() {
+     where = input$territory_3[1]
+     paste0("trajAlpha_", where)
+   },
+   content = function(file) {
+     write.csv(tableForTrajectoryMaps(), file)
+   }
+ )
+ 
+ 
+ 
+
+ metaModelDynOLS <- reactive({
+   tab = tableForTrajectoryMaps()
+   tab = tab[!is.na(tab$PCT_GROWTH_ALPHA),]
+   vars = input$var_dyn_meta_analysis
+ 
+    regressants = "PCT_GROWTH_ALPHA ~ 1 "
+  
+      if ('tcam_pop' %in% vars == "TRUE"){
+     tab$Population_Growth = ifelse(tab$GROWTH_DECADE == "1950s", tab$Pct_POP_1950s,
+                                    ifelse(tab$GROWTH_DECADE == "1960s", tab$Pct_POP_1960s,
+                                           ifelse(tab$GROWTH_DECADE == "1970s", tab$Pct_POP_1970s,
+                                                  ifelse(tab$GROWTH_DECADE == "1980s", tab$Pct_POP_1980s,
+                                                         ifelse(tab$GROWTH_DECADE == "1990s", tab$Pct_POP_1990s,
+                                                                ifelse(tab$GROWTH_DECADE == "2000s", tab$Pct_POP_2000s, 
+                                                                       ifelse(tab$GROWTH_DECADE == "2010s",tab$Pct_POP_2010s, NA)))))))
+      regressants = paste0(regressants, " + Population_Growth")
+      }
+      if ('tcam_gdp' %in% vars == "TRUE"){
+        tab$GDP_Growth =  ifelse(tab$GROWTH_DECADE == "1960s", tab$Pct_GDP_1960s,
+                                       ifelse(tab$GROWTH_DECADE == "1970s", tab$Pct_GDP_1970s,
+                                              ifelse(tab$GROWTH_DECADE == "1980s", tab$Pct_GDP_1980s,
+                                                     ifelse(tab$GROWTH_DECADE == "1990s", tab$Pct_GDP_1990s,
+                                                            ifelse(tab$GROWTH_DECADE == "2000s", tab$Pct_GDP_2000s, 
+                                                                   ifelse(tab$GROWTH_DECADE == "2010s",tab$Pct_GDP_2010s, NA))))))
+        regressants = paste0(regressants, " + GDP_Growth")
+      }
+    if ('alpha' %in% vars == "TRUE"){
+      tab$Initial_Alpha = tab$ALPHA
+      regressants = paste0(regressants, " + Initial_Alpha")
+    }
+    if ('wwii' %in% vars == "TRUE"){
+      tab$WWII_ = ifelse(tab$GROWTH_DECADE == "1940s", 1, 0)
+      regressants = paste0(regressants, " + WWII_")
+      
+     }
+    
+       model = lm(regressants, data=tab, na.action = na.omit)
+   return(model)
+ })
+ 
+ output$model_dyn_param = renderTable({
+     model = metaModelDynOLS()
+     mod = as.data.frame(summary(model)$coefficients)
+    param = round(mod,3)
+   return(param)
+ }, digits=3)
+ 
+ 
+ output$modeldyn_fit = renderTable({
+     model = metaModelDynOLS()
+     R2 = summary(model)$r.squared * 100
+     Observations = summary(model)$df[[2]] + summary(model)$df[[1]] 
+     summ = data.frame(R2, Observations)
+     colnames(summ) = c("R2 of regression (%)", "Number of Estimations")
+     return(summ)
+ }, include.rownames = FALSE)
+ 
+ 
+ 
+ 
+ 
+=======
+>>>>>>> parent of 011158b... display highest and lowest alpha growth rates + group functions in global.R
  })
 

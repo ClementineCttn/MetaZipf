@@ -430,10 +430,85 @@ tabPanel("Dynamic Analysis",
                     h2("Subset Table by:"),
                     fluidRow(
                       column(4,selectizeInput("territory_3", "Territory", "", multiple=T)),
-                    plotOutput('trajectories')),   
-                    br(), 
-                    tags$hr(),
-                    tags$hr(),
+                    plotOutput('trajectories'))
+                    ),
+<<<<<<< HEAD
+           tabPanel("2. Data",
+                    "Explore the growth rates of alpha to relate them to potential historical factors",
+                    h2("Subset Table by:"),
+                    fluidRow(
+                      column(4,selectInput("criteriaSubset", "Criteria", choices= c("Increasing unevenness" = "increasing",
+                                                                                    "Decreasing unevenness" = "decreasing")
+                                             , selected = c("increasing"), multiple=F)),
+                      column(4,conditionalPanel(
+                        condition = 'input.criteriaSubset.indexOf("increasing") != -1',
+                        sliderInput("threshold_growthrate_increasing", "Minimum AAGR* for display (%)",
+                                    min = 0, max = 10, value = 0))),
+                      column(4,conditionalPanel(
+                        condition = 'input.criteriaSubset.indexOf("decreasing") != -1',
+                        sliderInput("threshold_growthrate_decreasing", "Maximum AAGR* for display (%)",
+                                    min = -10, max = 0, value = 0))),
+                      column(12,"* AAGR = Average Annual Growth Rate"),
+                      dataTableOutput('data_trajectories')#,
+                      #     downloadButton("downloadTrajTable", "Download Data")
+                    )
+           ),
+           tabPanel("3. Contexts of growth",
+
+                    fluidRow(
+                      column(6,h4("Growth of Alpha"),
+                           h6('!! It might take a few seconds to load and update !!')),
+                    column(6,h4("Contextual Growth"),
+                           h6('!! It might take a few seconds to load and update !!')),
+                    column(4,selectInput('dynVarToMap', 'Annual Average growth of Alpha (%)',
+                                         choices = c("Mean Value" = 'meanDynAlpha',
+                                                     "Standard Deviation" = 'sdDynAlpha',
+                                                     "Number of Observations" = 'nDynAlpha'),
+                                         selected = "meanDynAlpha", multiple = F)),
+                    column(4,selectInput("decade_3", "Decade", choices = c("1950s", "1960s","1970s","1980s","1990s","2000s", "2010s"),
+                                         selected = c("1980s"), multiple=F)),
+                      column(4,selectInput('contextToMap', 'Annual Average Growth context (%)',
+                                         choices = c("GDP per Capita" = 'g_GDP',
+                                                     "Population" = 'g_pop'),
+                                         selected = "g_GDP", multiple = F)),
+
+                   column(6,leafletOutput('mapectories')),
+                   column(6,leafletOutput('mapcontext'))),
+
+
+                    tags$hr()
+           ),
+           tabPanel("4. Meta Dynamic Analysis",
+                    h4("Select Features for the Dynamic Meta Analysis"),
+                    fluidRow(
+                      column(12,checkboxGroupInput("var_dyn_meta_analysis", "Evolutive Context", 
+                                                  c("Population Growth" = "tcam_pop",
+                                                    "GDP per capita Growth" = "tcam_gdp",
+                                                    "Initial Alpha" = "alpha"
+                                                   
+                                                    #"World War II" = "wwii"
+                                                  ),
+                                                     selected = NULL))
+                       
+                    ),
+                    
+                    fluidRow(
+                      tags$hr(),
+                      h4("Model Fit"),
+                      tableOutput('modeldyn_fit'),
+                      # tags$b("Are fixed study effects needed? (based on pFtest)"),
+                      #  textOutput('pFtest'),
+                      tags$hr(), h4("Results"),
+                     tableOutput('model_dyn_param')
+                      
+                      )
+                    )
+           
+                    
+           
+=======
+           tabPanel("2. Geographical contexts of growth",
+                    
                     fluidRow(
                       column(6,h4("Growth of Alpha"),
                            h6('!! It might take a few seconds to load and update !!')),
@@ -457,8 +532,9 @@ tabPanel("Dynamic Analysis",
                    
                     tags$hr()
            ),
-           tabPanel("2. Projections"
+           tabPanel("3. Projections"
            )
+>>>>>>> parent of 011158b... display highest and lowest alpha growth rates + group functions in global.R
            )),
 
       tabPanel("Contribute !",
