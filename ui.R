@@ -432,7 +432,6 @@ tabPanel("Dynamic Analysis",
                       column(4,selectizeInput("territory_3", "Territory", "", multiple=T)),
                     plotOutput('trajectories'))
                     ),
-<<<<<<< HEAD
            tabPanel("2. Data",
                     "Explore the growth rates of alpha to relate them to potential historical factors",
                     h2("Subset Table by:"),
@@ -502,11 +501,10 @@ tabPanel("Dynamic Analysis",
                      tableOutput('model_dyn_param')
                       
                       )
-                    )
+                    ),
            
                     
            
-=======
            tabPanel("2. Geographical contexts of growth",
                     
                     fluidRow(
@@ -534,7 +532,6 @@ tabPanel("Dynamic Analysis",
            ),
            tabPanel("3. Projections"
            )
->>>>>>> parent of 011158b... display highest and lowest alpha growth rates + group functions in global.R
            )),
 
       tabPanel("Contribute !",
