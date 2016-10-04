@@ -1,569 +1,1 @@
-DECADE,COUNTRY_ID,EVENT,Revolution,CivilWars,
-1640s,UK,English Revolution,1,,
-1650s,UK,English Revolution,1,,
-1680s,UK,Glorious Revolution,1,,
-1680s,IN,Siamese Revolution,1,,
-1770s,US,American Revolution,1,,
-1780s,FR,French Revolution,1,,
-1790s,FR,French Revolution,1,,
-1780s,BE,Brabant Revolution ,1,,
-1790s,HT,Haitian Revolution,1,,
-1800s,HT,Haitian Revolution,1,,
-1800s,RS,Serbian Revolution against Ottoman Rule,1,,
-1810s,RS,Serbian Revolution against Ottoman Rule,1,,
-1800s,BO,Chuquisaca and La Paz Revolutions,1,,
-1800s,BO,Chuquisaca and La Paz Revolutions,1,,
-1810s,AR,May revolution,1,,
-1830s,FR,July Revolution,1,,
-1840s,FR,Revolutions of 1848,1,,
-1840s,IT,Revolutions of 1848,1,,
-1840s,DE,Revolutions of 1848,1,,
-1840s,DK,Revolutions of 1848,1,,
-1840s,AT,Revolutions of 1848,1,,
-1840s,MD,Revolutions of 1848,1,,
-1840s,DE,Revolutions of 1848,1,,
-1850s,ES,Revolution against the Moderate Party,1,,
-1850s,MX,Revolution of Ayutla,1,,
-1860s,JP,Meiji Restoration and modernization revolution,1,,
-1860s,ES,Glorious Revolution,1,,
-1870s,GT,Liberal Revolution,1,,
-1890s,KR,Donghak Peasant Revolution,1,,
-1890s,PE,Revolution,1,,
-1900s,PA,Liberal Revolution,1,,
-1900s,AR,Argentine Revolution of 1905,1,,
-1900s,IR,Persian/Iranian constitutional revolution.,1,,
-1900s,PL,Revolution in the Kingdom of Poland (1905ï¿½07),1,,
-1900s,RU,1905 Russian Revolution,1,,
-1900s,TR,Young Turk Revolution,1,,
-1910s,MX,Mexican Revolution,1,,
-1910s,PT,Republican Revolution,1,,
-1910s,CN,Xinhai Revolution,1,,
-1910s,RU,"Februay Revolution, October Revolution",1,,
-1910s,UA,Ukrainian Revolution,1,,
-1920s,UA,Ukrainian Revolution,1,,
-1910s,DE,German Revolution,1,,
-1920s,RU,Third Russian Revolution,1,,
-1910s,HU,Hungary Revolution,1,,
-1920s,IT,Fascist national Revolution,1,,
-1920s,EC,July revolution,1,,
-1920s,PT,National Revolution,1,,
-1930s,BR,Brazilian Revolution,1,,
-1930s,TH,Promoters Revolution,1,,
-1930s,CU,Popular revolution,1,,
-1930s,PY,Febrerista Revolution,1,,
-1930s,ES,Civil revolutionary war,1,,
-1940s,GT,Guatemalan Revolution,1,,
-1940s,VE,Democratic revolution,1,,
-1950s,BO,Popular revolution,1,,
-1950s,LB,Rosewater Revolution,1,,
-1950s,EG,Egyptian Revolution,1,,
-1950s,CU,Cuban Revolution,1,,
-1950s,RW,Rwanda Revolution,1,,
-1960s,RW,Rwanda Revolution,1,,
-1960s,KR,April Revolution,1,,
-1960s,YE,Revolution,1,,
-1960s,IR,White Revolution,1,,
-1960s,SD,October Revolution,1,,
-1960s,CG,Revolution,1,,
-1970s,TT,Black Power Revolution,1,,
-1970s,BJ,Revolution,1,,
-1970s,ET,Revolution,1,,
-1970s,PT,Carnation Revolution,1,,
-1970s,KH,Revolution,1,,
-1970s,AF,Saur Revolution,1,,
-1970s,GD,New Jewel Movement,1,,
-1970s,NI,Nicaraguan Revolution,1,,
-1970s,IR,Iranian Revolution,1,,
-1980s,PH,People Power Revolution,1,,
-1980s,EE,Singing Revolution,1,,
-1980s,LV,Singing Revolution,1,,
-1980s,LT,Singing Revolution,1,,
-1980s,CN,Revolutions of 1989,1,,
-1980s,HU,Revolutions of 1989,1,,
-1980s,PL,Revolutions of 1989,1,,
-1980s,BG,Revolutions of 1989,1,,
-1980s,SK,Velvet Revolution,1,,
-1980s,CZ,Velvet Revolution,1,,
-1980s,RO,Revolutions of 1989,1,,
-1980s,DE,Revolutions of 1989,1,,
-1990s,AL,National Democratic Revolution,1,,
-1990s,ET,Ethiopian People's Revolution,1,,
-1990s,VE,Bolivarian Revolution,1,,
-1990s,ID,Indonesian Revolution of 1998,1,,
-2000s,BA,Bulldozer revolution,1,,
-2000s,RS,Bulldozer revolution,1,,
-2000s,ME,Bulldozer revolution,1,,
-2000s,MK,Bulldozer revolution,1,,
-2000s,GE,Rose revolution,1,,
-2000s,UA,Orange Revolution,1,,
-2000s,LB,Cedar Revolution,1,,
-2000s,KG,Tulip revolution,1,,
-2000s,MM,Saffron revolution,1,,
-2010s,KG,Kyrgyz revolution of 2010,1,,
-2010s,YE,Arab Spring,1,,
-2010s,EG,Arab Spring,1,,
-2010s,TN,Arab Spring,1,,
-2010s,SY,Rojava revolution,1,,
-2010s,UA,Ukrainian Revolution,1,,
-1810s,MX,Mexican War of Independence against spanish colonialism,1,,
-1820s,MX,Mexican War of Independence against spanish colonialism,1,,
-1820s,ID,Dipanegara Revolution,1,,
-1830s,ID,Dipanegara Revolution,1,,
-1890s,PH,Philippine Revolution,1,,
-1910s,EG,1919 Egyptian revolution,1,,
-1920s,MN,Independence revolution,1,,
-1940s,ID,Indonesian National Revolution,1,,
-1940s,VN,August Revolution,1,,
-1950s,IQ,Iraqi Revolution,1,,
-1960s,GW,Revolutionary war of independence in Portuguese Guinea,1,,
-1970s,GW,Revolutionary war of independence in Portuguese Guinea,1,,
-1970s,MG,Revolution,1,,
-1990s,EE,Singing Revolution,1,,
-1990s,LV,Singing Revolution,1,,
-1990s,LT,Singing Revolution,1,,
-1990s,HR,Log Revolution,1,,
-1770s,US,American Revolutionary War,,1,
-1780s,US,American Revolutionary War,,1,
-1770s,CA,American Revolutionary War,,1,
-1780s,CA,American Revolutionary War,,1,
-1790s,FR,War in the VendÃ©e,,1,
-1800s,FR,War in the VendÃ©e,,1,
-1810s,AR,Argentine Civil Wars,,1,
-1820s,AR,Argentine Civil Wars,,1,
-1830s,AR,Argentine Civil Wars,,1,
-1840s,AR,Argentine Civil Wars,,1,
-1850s,AR,Argentine Civil Wars,,1,
-1860s,AR,Argentine Civil Wars,,1,
-1870s,AR,Argentine Civil Wars,,1,
-1810s,ZA,Zulu Civil Wars,,1,
-1820s,EL,Greek Civil War,,1,
-1820s,PT,Liberal Wars,,1,
-1830s,PT,Liberal Wars,,1,
-1820s,CL,Chilean Civil War,,1,
-1830s,CL,Chilean Civil War,,1,
-1830s,BR,Ragamuffin War,,1,
-1840s,BR,Ragamuffin War,,1,
-1830s,ES,Carlist Wars,,1,
-1840s,ES,Carlist Wars,,1,
-1830s,ES,Carlist Wars,,1,
-1830s,UY,Uruguayan Civil War,,1,
-1840s,UY,Uruguayan Civil War,,1,
-1850s,UY,Uruguayan Civil War,,1,
-1840s,NZ,Maori War,,1,
-1850s,NZ,Maori War,,1,
-1860s,NZ,Maori War,,1,
-1870s,NZ,Maori War,,1,
-1840s,CH,Sonderbund war,,1,
-1850s,MX,War of Reform,,1,
-1860s,MX,War of Reform,,1,
-1860s,US,American Civil War,,1,
-1860s,MY,Klang War,,1,
-1870s,MY,Klang War,,1,
-1860s,JP,Boshin War,,1,
-1870s,MY,Jementah Civil War,,1,
-1890s,CL,Chilean Civil War,,1,
-1890s,BR,War of Canudos,,1,
-1890s,PA,Banana Wars,,1,
-1900s,PA,Banana Wars,,1,
-1910s,PA,Banana Wars,,1,
-1920s,PA,Banana Wars,,1,
-1930s,PA,Banana Wars,,1,
-1890s,NI,Banana Wars,,1,
-1900s,NI,Banana Wars,,1,
-1910s,NI,Banana Wars,,1,
-1920s,NI,Banana Wars,,1,
-1930s,NI,Banana Wars,,1,
-1890s,CU,Banana Wars,,1,
-1900s,CU,Banana Wars,,1,
-1910s,CU,Banana Wars,,1,
-1920s,CU,Banana Wars,,1,
-1930s,CU,Banana Wars,,1,
-1890s,HT,Banana Wars,,1,
-1900s,HT,Banana Wars,,1,
-1910s,HT,Banana Wars,,1,
-1920s,HT,Banana Wars,,1,
-1930s,HT,Banana Wars,,1,
-1890s,DO,Banana Wars,,1,
-1900s,DO,Banana Wars,,1,
-1910s,DO,Banana Wars,,1,
-1920s,DO,Banana Wars,,1,
-1930s,DO,Banana Wars,,1,
-1890s,HN,Banana Wars,,1,
-1900s,HN,Banana Wars,,1,
-1910s,HN,Banana Wars,,1,
-1920s,HN,Banana Wars,,1,
-1930s,HN,Banana Wars,,1,
-1890s,MX,Banana Wars,,1,
-1900s,MX,Banana Wars,,1,
-1910s,MX,Banana Wars,,1,
-1920s,MX,Banana Wars,,1,
-1930s,MX,Banana Wars,,1,
-1890s,CO,Thousand Days War,,1,
-1900s,CO,Thousand Days War,,1,
-1910s,CN,Warlord Era,,1,
-1920s,CN,Warlord Era,,1,
-1910s,RU,Russian Civil War,,1,
-1920s,RU,Russian Civil War,,1,
-1910s,FI,Finnish Civil War,,1,
-1920s,IE,Irish Civil War,,1,
-1920s,PY,Paraguayan Civil War,,1,
-1920s,NI,Nicaraguan Civil War,,1,
-1920s,MX,Cristero War,,1,
-1920s,CN,Chinese Civil War,,1,
-1930s,CN,Chinese Civil War,,1,
-1940s,CN,Chinese Civil War,,1,
-1930s,BR,Paulista War,,1,
-1930s,AT,Austrian Civil War,,1,
-1930s,ES,Spanish Civil War,,1,
-1940s,IT,Italian Civil War,,1,
-1940s,EL,Greek Civil War,,1,
-1940s,PY,Paraguayan Civil War,,1,
-1940s,PS,Civil War in Mandatory Palestine,,1,
-1940s,CR,Costa Rican Civil War,,1,
-1940s,MY,Malaysian Emergency,,1,
-1950s,MM,Internal Conflict in Burma,,1,
-1960s,KR,Koren War,,1,
-1960s,KP,Koren War,,1,
-1940s,LA,Laotian Secret War,,1,
-1950s,LA,Laotian Secret War,,1,
-1960s,LA,Laotian Secret War,,1,
-1970s,LA,Laotian Secret War,,1,
-1950s,SD,First Sudanese Civil War,,1,
-1960s,SD,First Sudanese Civil War,,1,
-1970s,SD,First Sudanese Civil War,,1,
-1950s,VN,Vietnam War,,1,
-1960s,VN,Vietnam War,,1,
-1970s,VN,Vietnam War,,1,
-1960s,CD,Congo Crisis,,1,
-1960s,GT,Guatemalan Civil War,,1,
-1970s,GT,Guatemalan Civil War,,1,
-1980s,GT,Guatemalan Civil War,,1,
-1990s,GT,Guatemalan Civil War,,1,
-1960s,YE,North Yemen Civil War,,1,
-1970s,YE,North Yemen Civil War,,1,
-1960s,NI,Nicaraguan Civil War,,1,
-1970s,NI,Nicaraguan Civil War,,1,
-1980s,NI,Nicaraguan Civil War,,1,
-1990s,NI,Nicaraguan Civil War,,1,
-1960s,DO,Dominican Civil War,,1,
-1960s,ZW,Rodhesian Bush War,,1,
-1970s,ZW,Rodhesian Bush War,,1,
-1980s,ZW,Rodhesian Bush War,,1,
-1960s,TH,Communist Insurgency,,1,
-1970s,TH,Communist Insurgency,,1,
-1980s,TH,Communist Insurgency,,1,
-1960s,CY,Cypriot Civil War,,1,
-1960s,NG,Nigerian Civil War,,1,
-1970s,NG,Nigerian Civil War,,1,
-1960s,UK,The Troubles Northern Ireland,,1,
-1970s,UK,The Troubles Northern Ireland,,1,
-1980s,UK,The Troubles Northern Ireland,,1,
-1990s,UK,The Troubles Northern Ireland,,1,
-1970s,KH,Cambodian Civil War,,1,
-1970s,LB,Lebanese Civil War,,1,
-1980s,LB,Lebanese Civil War,,1,
-1990s,LB,Lebanese Civil War,,1,
-1970s,MZ,Mozambican Civil War,,1,
-1980s,MZ,Mozambican Civil War,,1,
-1990s,MZ,Mozambican Civil War,,1,
-1970s,AO,Angolan Civil War,,1,
-1980s,AO,Angolan Civil War,,1,
-1990s,AO,Angolan Civil War,,1,
-1980s,AF,Civil War in Afghanistan,,1,
-1990s,AF,Civil War in Afghanistan,,1,
-2000s,AF,Civil War in Afghanistan,,1,
-2010s,AF,Civil War in Afghanistan,,1,
-1970s,SV,Salvadoran Civil War,,1,
-1980s,SV,Salvadoran Civil War,,1,
-1990s,SV,Salvadoran Civil War,,1,
-1980s,SD,Second Sudanese Civil War,,1,
-1990s,SD,Second Sudanese Civil War,,1,
-2000s,SD,Second Sudanese Civil War,,1,
-1980s,LK,Sri Lankan Civil War,,1,
-1990s,LK,Sri Lankan Civil War,,1,
-2000s,LK,Sri Lankan Civil War,,1,
-1980s,YE,South Yemen Civil War,,1,
-1980s,LR,First Liberian Civil War,,1,
-1990s,LR,First Liberian Civil War,,1,
-1990s,RW,Rwandan Civil War,,1,
-1990s,SN,Casamance Conflict,,1,
-2000s,SN,Casamance Conflict,,1,
-1990s,BA,Yugoslav Wars,,1,
-1990s,HR,Yugoslav Wars,,1,
-1990s,ME,Yugoslav Wars,,1,
-1990s,MK,Yugoslav Wars,,1,
-1990s,RS,Yugoslav Wars,,1,
-1990s,GE,Georgian Civil War,,1,
-1990s,SL,Sierra Leone Civil War,,1,
-2000s,SL,Sierra Leone Civil War,,1,
-1990s,DZ,Algerian Civil War,,1,
-2000s,DZ,Algerian Civil War,,1,
-1990s,TJ,Civil War in Tadjikistan,,1,
-1990s,BI,Burundi Civil War,,1,
-2000s,BI,Burundi Civil War,,1,
-1990s,YE,Civil War in Yemen,,1,
-1990s,RU,First Chechen War,,1,
-1990s,IQ,Iraqi Kurdish Civil War,,1,
-1990s,CD,First Congo War,,1,
-1990s,NP,Nepalese Civil War,,1,
-2000s,NP,Nepalese Civil War,,1,
-1990s,GW,Guinea-Bissau Civil War,,1,
-1990s,CD,Second Congo War,,1,
-2000s,CD,Second Congo War,,1,
-1990s,LR,Second Liberian War,,1,
-2000s,LR,Second Liberian War,,1,
-2000s,RU,Second Chechen War,,1,
-2000s,CI,First Ivorian Civil War,,1,
-2000s,IQ,Iraqi War,,1,
-2010s,IQ,Iraqi War,,1,
-2000s,TD,Fourth Chadian Civil War,,1,
-2010s,TD,Fourth Chadian Civil War,,1,
-2000s,CI,Second Ivorian Civil War,,1,
-2000s,LY,Lybian Civil War,,1,
-2010s,LY,Lybian Civil War,,1,
-2010s,ML,Mali Conflict,,1,
-1940s,IL,Israel Palestinian Conflict,,1,
-1950s,IL,Israel Palestinian Conflict,,1,
-1960s,IL,Israel Palestinian Conflict,,1,
-1970s,IL,Israel Palestinian Conflict,,1,
-1980s,IL,Israel Palestinian Conflict,,1,
-1990s,IL,Israel Palestinian Conflict,,1,
-2000s,IL,Israel Palestinian Conflict,,1,
-2010s,IL,Israel Palestinian Conflict,,1,
-1940s,PA,Israel Palestinian Conflict,,1,
-1950s,PA,Israel Palestinian Conflict,,1,
-1960s,PA,Israel Palestinian Conflict,,1,
-1970s,PA,Israel Palestinian Conflict,,1,
-1980s,PA,Israel Palestinian Conflict,,1,
-1990s,PA,Israel Palestinian Conflict,,1,
-2000s,PA,Israel Palestinian Conflict,,1,
-2010s,PA,Israel Palestinian Conflict,,1,
-1960s,PG,Papua Conflict,,1,
-1970s,PG,Papua Conflict,,1,
-1980s,PG,Papua Conflict,,1,
-1990s,PG,Papua Conflict,,1,
-2000s,PG,Papua Conflict,,1,
-2010s,PG,Papua Conflict,,1,
-1960s,CO,Colombian Conflict,,1,
-1970s,CO,Colombian Conflict,,1,
-1980s,CO,Colombian Conflict,,1,
-1990s,CO,Colombian Conflict,,1,
-2000s,CO,Colombian Conflict,,1,
-2010s,CO,Colombian Conflict,,1,
-1970s,PE,Peruvian Conflict,,1,
-1980s,PE,Peruvian Conflict,,1,
-1990s,PE,Peruvian Conflict,,1,
-2000s,PE,Peruvian Conflict,,1,
-2010s,PE,Peruvian Conflict,,1,
-1980s,SO,Somali Civil War,,1,
-1990s,SO,Somali Civil War,,1,
-2000s,SO,Somali Civil War,,1,
-2010s,SO,Somali Civil War,,1,
-2010s,SY,Syrian Civil War,,1,
-2010s,CF,Central African Republic Conflic,,1,
-2010s,SD,South Sudanese Civil War,,1,
-2010s,RU,Donbass War,,1,
-2010s,UA,Donbass War,,1,
-2010s,LY,Second Lybian Civil War,,1,
-2010s,YE,Yemeni Civil War,,1,
-2010s,TR,Kurdish Turkish Conflict,,1,
-1900s,RU,Russo Japanese War,,,1
-1900s,JP,Russo Japanese War,,,1
-1900s,HN,Honduran-Nicaraguan War,,,1
-1900s,NI,Honduran-Nicaraguan War,,,1
-1910s,IT,Italo-Turkish War,,,1
-1910s,TR,Italo-Turkish War,,,1
-1910s,MN,Sino-Mondolian War,,,1
-1910s,CN,Sino-Mondolian War,,,1
-1910s,BG,First Balkan War,,,1
-1910s,EL,First Balkan War,,,1
-1910s,RS,First Balkan War,,,1
-1910s,ME,First Balkan War,,,1
-1910s,TR,First Balkan War,,,1
-1910s,BG,Second Balkan War,,,1
-1910s,EL,Second Balkan War,,,1
-1910s,RS,Second Balkan War,,,1
-1910s,ME,Second Balkan War,,,1
-1910s,TR,Second Balkan War,,,1
-1910s,RO,Second Balkan War,,,1
-1910s,BE,World War I,,,1
-1910s,RS,World War I,,,1
-1910s,FR,World War I,,,1
-1910s,RU,World War I,,,1
-1910s,UK,World War I,,,1
-1910s,IT,World War I,,,1
-1910s,IN,World War I,,,1
-1910s,CN,World War I,,,1
-1910s,CA,World War I,,,1
-1910s,AU,World War I,,,1
-1910s,NZ,World War I,,,1
-1910s,UA,World War I,,,1
-1910s,US,World War I,,,1
-1910s,ME,World War I,,,1
-1910s,JP,World War I,,,1
-1910s,PT,World War I,,,1
-1910s,RO,World War I,,,1
-1910s,EL,World War I,,,1
-1910s,AL,World War I,,,1
-1910s,BR,World War I,,,1
-1910s,AZ,World War I,,,1
-1910s,CZ,World War I,,,1
-1910s,SK,World War I,,,1
-1910s,TH,World War I,,,1
-1910s,CN,World War I,,,1
-1910s,ZA,World War I,,,1
-1910s,AT,World War I,,,1
-1910s,HU,World War I,,,1
-1910s,DE,World War I,,,1
-1910s,TR,World War I,,,1
-1910s,BG,World War I,,,1
-1910s,GE,Georgian-Armenian War,,,1
-1910s,AZ,Georgian-Armenian War,,,1
-1910s,AF,Third Anglo-Afghan War,,,1
-1910s,UK,Third Anglo-Afghan War,,,1
-1910s,IN,Third Anglo-Afghan War,,,1
-1910s,PL,Polish-Soviet War,,,1
-1920s,PL,Polish-Soviet War,,,1
-1910s,UA,Polish-Soviet War,,,1
-1920s,UA,Polish-Soviet War,,,1
-1910s,RU,Polish-Soviet War,,,1
-1920s,RU,Polish-Soviet War,,,1
-1920s,TR,Turkish-Armenian War,,,1
-1920s,RU,Turkish-Armenian War,,,1
-1920s,AZ,Turkish-Armenian War,,,1
-1930s,BO,Chaco War,,,1
-1930s,PY,Chaco War,,,1
-1930s,YE,Saudi Yemeni War,,,1
-1930s,SA,Saudi Yemeni War,,,1
-1930s,IT,Second Italo-Ethiopian War,,,1
-1930s,ET,Second Italo-Ethiopian War,,,1
-1930s,CN,Second Sino-Japanese War,,,1
-1940s,CN,Second Sino-Japanese War,,,1
-1930s,JP,Second Sino-Japanese War,,,1
-1940s,JP,Second Sino-Japanese War,,,1
-1940s,PL,World War II,,,1
-1940s,AU,World War II,,,1
-1940s,FR,World War II,,,1
-1940s,NZ,World War II,,,1
-1940s,UK,World War II,,,1
-1940s,ZA,World War II,,,1
-1940s,CA,World War II,,,1
-1940s,CZ,World War II,,,1
-1940s,SK,World War II,,,1
-1940s,DK,World War II,,,1
-1940s,NO,World War II,,,1
-1940s,BE,World War II,,,1
-1940s,LU,World War II,,,1
-1940s,NL,World War II,,,1
-1940s,EL,World War II,,,1
-1940s,RS,World War II,,,1
-1940s,ME ,World War II,,,1
-1940s,HR,World War II,,,1
-1940s,MK,World War II,,,1
-1940s,RU,World War II,,,1
-1940s,CR,World War II,,,1
-1940s,DO,World War II,,,1
-1940s,SV,World War II,,,1
-1940s,HT,World War II,,,1
-1940s,HN,World War II,,,1
-1940s,NI,World War II,,,1
-1940s,US,World War II,,,1
-1940s,CN,World War II,,,1
-1940s,GT,World War II,,,1
-1940s,CU,World War II,,,1
-1940s,PH,World War II,,,1
-1940s,IN,World War II,,,1
-1940s,MX,World War II,,,1
-1940s,BR,World War II,,,1
-1940s,ET,World War II,,,1
-1940s,IQ,World War II,,,1
-1940s,BO,World War II,,,1
-1940s,CO,World War II,,,1
-1940s,IR,World War II,,,1
-1940s,LR,World War II,,,1
-1940s,PE,World War II,,,1
-1940s,IT,World War II,,,1
-1940s,RO,World War II,,,1
-1940s,BG,World War II,,,1
-1940s,AL,World War II,,,1
-1940s,PY,World War II,,,1
-1940s,EC,World War II,,,1
-1940s,UY,World War II,,,1
-1940s,VE,World War II,,,1
-1940s,TR,World War II,,,1
-1940s,EG,World War II,,,1
-1940s,LB,World War II,,,1
-1940s,SY,World War II,,,1
-1940s,SA,World War II,,,1
-1940s,AR,World War II,,,1
-1940s,CL,World War II,,,1
-1940s,DE,World War II,,,1
-1940s,HU,World War II,,,1
-1940s,JP,World War II,,,1
-1940s,HR,World War II,,,1
-1940s,SK,World War II,,,1
-1940s,FI,World War II,,,1
-1940s,TH,World War II,,,1
-1930s,PL,World War II,,,1
-1930s,AU,World War II,,,1
-1930s,FR,World War II,,,1
-1930s,NZ,World War II,,,1
-1930s,UK,World War II,,,1
-1930s,ZA,World War II,,,1
-1930s,CA,World War II,,,1
-1930s,CZ,World War II,,,1
-1930s,SK,World War II,,,1
-1930s,DK,World War II,,,1
-1930s,NO,World War II,,,1
-1930s,BE,World War II,,,1
-1930s,LU,World War II,,,1
-1930s,NL,World War II,,,1
-1930s,EL,World War II,,,1
-1930s,RS,World War II,,,1
-1930s,ME ,World War II,,,1
-1930s,HR,World War II,,,1
-1930s,MK,World War II,,,1
-1930s,RU,World War II,,,1
-1930s,CR,World War II,,,1
-1930s,DO,World War II,,,1
-1930s,SV,World War II,,,1
-1930s,HT,World War II,,,1
-1930s,HN,World War II,,,1
-1930s,NI,World War II,,,1
-1930s,US,World War II,,,1
-1930s,CN,World War II,,,1
-1930s,GT,World War II,,,1
-1930s,CU,World War II,,,1
-1930s,PH,World War II,,,1
-1930s,IN,World War II,,,1
-1930s,MX,World War II,,,1
-1930s,BR,World War II,,,1
-1930s,ET,World War II,,,1
-1930s,IQ,World War II,,,1
-1930s,BO,World War II,,,1
-1930s,CO,World War II,,,1
-1930s,IR,World War II,,,1
-1930s,LR,World War II,,,1
-1930s,PE,World War II,,,1
-1930s,IT,World War II,,,1
-1930s,RO,World War II,,,1
-1930s,BG,World War II,,,1
-1930s,AL,World War II,,,1
-1930s,PY,World War II,,,1
-1930s,EC,World War II,,,1
-1930s,UY,World War II,,,1
-1930s,VE,World War II,,,1
-1930s,TR,World War II,,,1
-1930s,EG,World War II,,,1
-1930s,LB,World War II,,,1
-1930s,SY,World War II,,,1
-1930s,SA,World War II,,,1
-1930s,AR,World War II,,,1
-1930s,CL,World War II,,,1
-1930s,DE,World War II,,,1
-1930s,HU,World War II,,,1
-1930s,JP,World War II,,,1
-1930s,HR,World War II,,,1
-1930s,SK,World War II,,,1
-1930s,FI,World War II,,,1
-1930s,TH,World War II,,,1
+DECADE,COUNTRY_ID,EVENT,Revolution,CivilWars,InternationalWar1640s,UK,English Revolution,1,,1650s,UK,English Revolution,1,,1680s,UK,Glorious Revolution,1,,1680s,IN,Siamese Revolution,1,,1770s,US,American Revolution,1,,1780s,FR,French Revolution,1,,1790s,FR,French Revolution,1,,1780s,BE,Brabant Revolution ,1,,1790s,HT,Haitian Revolution,1,,1800s,HT,Haitian Revolution,1,,1800s,RS,Serbian Revolution against Ottoman Rule,1,,1810s,RS,Serbian Revolution against Ottoman Rule,1,,1800s,BO,Chuquisaca and La Paz Revolutions,1,,1800s,BO,Chuquisaca and La Paz Revolutions,1,,1810s,AR,May revolution,1,,1830s,FR,July Revolution,1,,1840s,FR,Revolutions of 1848,1,,1840s,IT,Revolutions of 1848,1,,1840s,DE,Revolutions of 1848,1,,1840s,DK,Revolutions of 1848,1,,1840s,AT,Revolutions of 1848,1,,1840s,MD,Revolutions of 1848,1,,1840s,DE,Revolutions of 1848,1,,1850s,ES,Revolution against the Moderate Party,1,,1850s,MX,Revolution of Ayutla,1,,1860s,JP,Meiji Restoration and modernization revolution,1,,1860s,ES,Glorious Revolution,1,,1870s,GT,Liberal Revolution,1,,1890s,KR,Donghak Peasant Revolution,1,,1890s,PE,Revolution,1,,1900s,PA,Liberal Revolution,1,,1900s,AR,Argentine Revolution of 1905,1,,1900s,IR,Persian/Iranian constitutional revolution.,1,,1900s,PL,Revolution in the Kingdom of Poland (1905¥Ë_07),1,,1900s,RU,1905 Russian Revolution,1,,1900s,TR,Young Turk Revolution,1,,1910s,MX,Mexican Revolution,1,,1910s,PT,Republican Revolution,1,,1910s,CN,Xinhai Revolution,1,,1910s,RU,"Februay Revolution, October Revolution",1,,1910s,UA,Ukrainian Revolution,1,,1920s,UA,Ukrainian Revolution,1,,1910s,DE,German Revolution,1,,1920s,RU,Third Russian Revolution,1,,1910s,HU,Hungary Revolution,1,,1920s,IT,Fascist national Revolution,1,,1920s,EC,July revolution,1,,1920s,PT,National Revolution,1,,1930s,BR,Brazilian Revolution,1,,1930s,TH,Promoters Revolution,1,,1930s,CU,Popular revolution,1,,1930s,PY,Febrerista Revolution,1,,1930s,ES,Civil revolutionary war,1,,1940s,GT,Guatemalan Revolution,1,,1940s,VE,Democratic revolution,1,,1950s,BO,Popular revolution,1,,1950s,LB,Rosewater Revolution,1,,1950s,EG,Egyptian Revolution,1,,1950s,CU,Cuban Revolution,1,,1950s,RW,Rwanda Revolution,1,,1960s,RW,Rwanda Revolution,1,,1960s,KR,April Revolution,1,,1960s,YE,Revolution,1,,1960s,IR,White Revolution,1,,1960s,SD,October Revolution,1,,1960s,CG,Revolution,1,,1970s,TT,Black Power Revolution,1,,1970s,BJ,Revolution,1,,1970s,ET,Revolution,1,,1970s,PT,Carnation Revolution,1,,1970s,KH,Revolution,1,,1970s,AF,Saur Revolution,1,,1970s,GD,New Jewel Movement,1,,1970s,NI,Nicaraguan Revolution,1,,1970s,IR,Iranian Revolution,1,,1980s,PH,People Power Revolution,1,,1980s,EE,Singing Revolution,1,,1980s,LV,Singing Revolution,1,,1980s,LT,Singing Revolution,1,,1980s,CN,Revolutions of 1989,1,,1980s,HU,Revolutions of 1989,1,,1980s,PL,Revolutions of 1989,1,,1980s,BG,Revolutions of 1989,1,,1980s,SK,Velvet Revolution,1,,1980s,CZ,Velvet Revolution,1,,1980s,RO,Revolutions of 1989,1,,1980s,DE,Revolutions of 1989,1,,1990s,AL,National Democratic Revolution,1,,1990s,ET,Ethiopian People's Revolution,1,,1990s,VE,Bolivarian Revolution,1,,1990s,ID,Indonesian Revolution of 1998,1,,2000s,BA,Bulldozer revolution,1,,2000s,RS,Bulldozer revolution,1,,2000s,ME,Bulldozer revolution,1,,2000s,MK,Bulldozer revolution,1,,2000s,GE,Rose revolution,1,,2000s,UA,Orange Revolution,1,,2000s,LB,Cedar Revolution,1,,2000s,KG,Tulip revolution,1,,2000s,MM,Saffron revolution,1,,2010s,KG,Kyrgyz revolution of 2010,1,,2010s,YE,Arab Spring,1,,2010s,EG,Arab Spring,1,,2010s,TN,Arab Spring,1,,2010s,SY,Rojava revolution,1,,2010s,UA,Ukrainian Revolution,1,,1810s,MX,Mexican War of Independence against spanish colonialism,1,,1820s,MX,Mexican War of Independence against spanish colonialism,1,,1820s,ID,Dipanegara Revolution,1,,1830s,ID,Dipanegara Revolution,1,,1890s,PH,Philippine Revolution,1,,1910s,EG,1919 Egyptian revolution,1,,1920s,MN,Independence revolution,1,,1940s,ID,Indonesian National Revolution,1,,1940s,VN,August Revolution,1,,1950s,IQ,Iraqi Revolution,1,,1960s,GW,Revolutionary war of independence in Portuguese Guinea,1,,1970s,GW,Revolutionary war of independence in Portuguese Guinea,1,,1970s,MG,Revolution,1,,1990s,EE,Singing Revolution,1,,1990s,LV,Singing Revolution,1,,1990s,LT,Singing Revolution,1,,1990s,HR,Log Revolution,1,,1770s,US,American Revolutionary War,,1,1780s,US,American Revolutionary War,,1,1770s,CA,American Revolutionary War,,1,1780s,CA,American Revolutionary War,,1,1790s,FR,War in the Vendí©e,,1,1800s,FR,War in the Vendí©e,,1,1810s,AR,Argentine Civil Wars,,1,1820s,AR,Argentine Civil Wars,,1,1830s,AR,Argentine Civil Wars,,1,1840s,AR,Argentine Civil Wars,,1,1850s,AR,Argentine Civil Wars,,1,1860s,AR,Argentine Civil Wars,,1,1870s,AR,Argentine Civil Wars,,1,1810s,ZA,Zulu Civil Wars,,1,1820s,EL,Greek Civil War,,1,1820s,PT,Liberal Wars,,1,1830s,PT,Liberal Wars,,1,1820s,CL,Chilean Civil War,,1,1830s,CL,Chilean Civil War,,1,1830s,BR,Ragamuffin War,,1,1840s,BR,Ragamuffin War,,1,1830s,ES,Carlist Wars,,1,1840s,ES,Carlist Wars,,1,1830s,ES,Carlist Wars,,1,1830s,UY,Uruguayan Civil War,,1,1840s,UY,Uruguayan Civil War,,1,1850s,UY,Uruguayan Civil War,,1,1840s,NZ,Maori War,,1,1850s,NZ,Maori War,,1,1860s,NZ,Maori War,,1,1870s,NZ,Maori War,,1,1840s,CH,Sonderbund war,,1,1850s,MX,War of Reform,,1,1860s,MX,War of Reform,,1,1860s,US,American Civil War,,1,1860s,MY,Klang War,,1,1870s,MY,Klang War,,1,1860s,JP,Boshin War,,1,1870s,MY,Jementah Civil War,,1,1890s,CL,Chilean Civil War,,1,1890s,BR,War of Canudos,,1,1890s,PA,Banana Wars,,1,1900s,PA,Banana Wars,,1,1910s,PA,Banana Wars,,1,1920s,PA,Banana Wars,,1,1930s,PA,Banana Wars,,1,1890s,NI,Banana Wars,,1,1900s,NI,Banana Wars,,1,1910s,NI,Banana Wars,,1,1920s,NI,Banana Wars,,1,1930s,NI,Banana Wars,,1,1890s,CU,Banana Wars,,1,1900s,CU,Banana Wars,,1,1910s,CU,Banana Wars,,1,1920s,CU,Banana Wars,,1,1930s,CU,Banana Wars,,1,1890s,HT,Banana Wars,,1,1900s,HT,Banana Wars,,1,1910s,HT,Banana Wars,,1,1920s,HT,Banana Wars,,1,1930s,HT,Banana Wars,,1,1890s,DO,Banana Wars,,1,1900s,DO,Banana Wars,,1,1910s,DO,Banana Wars,,1,1920s,DO,Banana Wars,,1,1930s,DO,Banana Wars,,1,1890s,HN,Banana Wars,,1,1900s,HN,Banana Wars,,1,1910s,HN,Banana Wars,,1,1920s,HN,Banana Wars,,1,1930s,HN,Banana Wars,,1,1890s,MX,Banana Wars,,1,1900s,MX,Banana Wars,,1,1910s,MX,Banana Wars,,1,1920s,MX,Banana Wars,,1,1930s,MX,Banana Wars,,1,1890s,CO,Thousand Days War,,1,1900s,CO,Thousand Days War,,1,1910s,CN,Warlord Era,,1,1920s,CN,Warlord Era,,1,1910s,RU,Russian Civil War,,1,1920s,RU,Russian Civil War,,1,1910s,FI,Finnish Civil War,,1,1920s,IE,Irish Civil War,,1,1920s,PY,Paraguayan Civil War,,1,1920s,NI,Nicaraguan Civil War,,1,1920s,MX,Cristero War,,1,1920s,CN,Chinese Civil War,,1,1930s,CN,Chinese Civil War,,1,1940s,CN,Chinese Civil War,,1,1930s,BR,Paulista War,,1,1930s,AT,Austrian Civil War,,1,1930s,ES,Spanish Civil War,,1,1940s,IT,Italian Civil War,,1,1940s,EL,Greek Civil War,,1,1940s,PY,Paraguayan Civil War,,1,1940s,PS,Civil War in Mandatory Palestine,,1,1940s,CR,Costa Rican Civil War,,1,1940s,MY,Malaysian Emergency,,1,1950s,MM,Internal Conflict in Burma,,1,1960s,KR,Koren War,,1,1960s,KP,Koren War,,1,1940s,LA,Laotian Secret War,,1,1950s,LA,Laotian Secret War,,1,1960s,LA,Laotian Secret War,,1,1970s,LA,Laotian Secret War,,1,1950s,SD,First Sudanese Civil War,,1,1960s,SD,First Sudanese Civil War,,1,1970s,SD,First Sudanese Civil War,,1,1950s,VN,Vietnam War,,1,1960s,VN,Vietnam War,,1,1970s,VN,Vietnam War,,1,1960s,CD,Congo Crisis,,1,1960s,GT,Guatemalan Civil War,,1,1970s,GT,Guatemalan Civil War,,1,1980s,GT,Guatemalan Civil War,,1,1990s,GT,Guatemalan Civil War,,1,1960s,YE,North Yemen Civil War,,1,1970s,YE,North Yemen Civil War,,1,1960s,NI,Nicaraguan Civil War,,1,1970s,NI,Nicaraguan Civil War,,1,1980s,NI,Nicaraguan Civil War,,1,1990s,NI,Nicaraguan Civil War,,1,1960s,DO,Dominican Civil War,,1,1960s,ZW,Rodhesian Bush War,,1,1970s,ZW,Rodhesian Bush War,,1,1980s,ZW,Rodhesian Bush War,,1,1960s,TH,Communist Insurgency,,1,1970s,TH,Communist Insurgency,,1,1980s,TH,Communist Insurgency,,1,1960s,CY,Cypriot Civil War,,1,1960s,NG,Nigerian Civil War,,1,1970s,NG,Nigerian Civil War,,1,1960s,UK,The Troubles Northern Ireland,,1,1970s,UK,The Troubles Northern Ireland,,1,1980s,UK,The Troubles Northern Ireland,,1,1990s,UK,The Troubles Northern Ireland,,1,1970s,KH,Cambodian Civil War,,1,1970s,LB,Lebanese Civil War,,1,1980s,LB,Lebanese Civil War,,1,1990s,LB,Lebanese Civil War,,1,1970s,MZ,Mozambican Civil War,,1,1980s,MZ,Mozambican Civil War,,1,1990s,MZ,Mozambican Civil War,,1,1970s,AO,Angolan Civil War,,1,1980s,AO,Angolan Civil War,,1,1990s,AO,Angolan Civil War,,1,1980s,AF,Civil War in Afghanistan,,1,1990s,AF,Civil War in Afghanistan,,1,2000s,AF,Civil War in Afghanistan,,1,2010s,AF,Civil War in Afghanistan,,1,1970s,SV,Salvadoran Civil War,,1,1980s,SV,Salvadoran Civil War,,1,1990s,SV,Salvadoran Civil War,,1,1980s,SD,Second Sudanese Civil War,,1,1990s,SD,Second Sudanese Civil War,,1,2000s,SD,Second Sudanese Civil War,,1,1980s,LK,Sri Lankan Civil War,,1,1990s,LK,Sri Lankan Civil War,,1,2000s,LK,Sri Lankan Civil War,,1,1980s,YE,South Yemen Civil War,,1,1980s,LR,First Liberian Civil War,,1,1990s,LR,First Liberian Civil War,,1,1990s,RW,Rwandan Civil War,,1,1990s,SN,Casamance Conflict,,1,2000s,SN,Casamance Conflict,,1,1990s,BA,Yugoslav Wars,,1,1990s,HR,Yugoslav Wars,,1,1990s,ME,Yugoslav Wars,,1,1990s,MK,Yugoslav Wars,,1,1990s,RS,Yugoslav Wars,,1,1990s,GE,Georgian Civil War,,1,1990s,SL,Sierra Leone Civil War,,1,2000s,SL,Sierra Leone Civil War,,1,1990s,DZ,Algerian Civil War,,1,2000s,DZ,Algerian Civil War,,1,1990s,TJ,Civil War in Tadjikistan,,1,1990s,BI,Burundi Civil War,,1,2000s,BI,Burundi Civil War,,1,1990s,YE,Civil War in Yemen,,1,1990s,RU,First Chechen War,,1,1990s,IQ,Iraqi Kurdish Civil War,,1,1990s,CD,First Congo War,,1,1990s,NP,Nepalese Civil War,,1,2000s,NP,Nepalese Civil War,,1,1990s,GW,Guinea-Bissau Civil War,,1,1990s,CD,Second Congo War,,1,2000s,CD,Second Congo War,,1,1990s,LR,Second Liberian War,,1,2000s,LR,Second Liberian War,,1,2000s,RU,Second Chechen War,,1,2000s,CI,First Ivorian Civil War,,1,2000s,IQ,Iraqi War,,1,2010s,IQ,Iraqi War,,1,2000s,TD,Fourth Chadian Civil War,,1,2010s,TD,Fourth Chadian Civil War,,1,2000s,CI,Second Ivorian Civil War,,1,2000s,LY,Lybian Civil War,,1,2010s,LY,Lybian Civil War,,1,2010s,ML,Mali Conflict,,1,1940s,IL,Israel Palestinian Conflict,,1,1950s,IL,Israel Palestinian Conflict,,1,1960s,IL,Israel Palestinian Conflict,,1,1970s,IL,Israel Palestinian Conflict,,1,1980s,IL,Israel Palestinian Conflict,,1,1990s,IL,Israel Palestinian Conflict,,1,2000s,IL,Israel Palestinian Conflict,,1,2010s,IL,Israel Palestinian Conflict,,1,1940s,PA,Israel Palestinian Conflict,,1,1950s,PA,Israel Palestinian Conflict,,1,1960s,PA,Israel Palestinian Conflict,,1,1970s,PA,Israel Palestinian Conflict,,1,1980s,PA,Israel Palestinian Conflict,,1,1990s,PA,Israel Palestinian Conflict,,1,2000s,PA,Israel Palestinian Conflict,,1,2010s,PA,Israel Palestinian Conflict,,1,1960s,PG,Papua Conflict,,1,1970s,PG,Papua Conflict,,1,1980s,PG,Papua Conflict,,1,1990s,PG,Papua Conflict,,1,2000s,PG,Papua Conflict,,1,2010s,PG,Papua Conflict,,1,1960s,CO,Colombian Conflict,,1,1970s,CO,Colombian Conflict,,1,1980s,CO,Colombian Conflict,,1,1990s,CO,Colombian Conflict,,1,2000s,CO,Colombian Conflict,,1,2010s,CO,Colombian Conflict,,1,1970s,PE,Peruvian Conflict,,1,1980s,PE,Peruvian Conflict,,1,1990s,PE,Peruvian Conflict,,1,2000s,PE,Peruvian Conflict,,1,2010s,PE,Peruvian Conflict,,1,1980s,SO,Somali Civil War,,1,1990s,SO,Somali Civil War,,1,2000s,SO,Somali Civil War,,1,2010s,SO,Somali Civil War,,1,2010s,SY,Syrian Civil War,,1,2010s,CF,Central African Republic Conflic,,1,2010s,SD,South Sudanese Civil War,,1,2010s,RU,Donbass War,,1,2010s,UA,Donbass War,,1,2010s,LY,Second Lybian Civil War,,1,2010s,YE,Yemeni Civil War,,1,2010s,TR,Kurdish Turkish Conflict,,1,1900s,RU,Russo Japanese War,,,11900s,JP,Russo Japanese War,,,11900s,HN,Honduran-Nicaraguan War,,,11900s,NI,Honduran-Nicaraguan War,,,11910s,IT,Italo-Turkish War,,,11910s,TR,Italo-Turkish War,,,11910s,MN,Sino-Mondolian War,,,11910s,CN,Sino-Mondolian War,,,11910s,BG,First Balkan War,,,11910s,EL,First Balkan War,,,11910s,RS,First Balkan War,,,11910s,ME,First Balkan War,,,11910s,TR,First Balkan War,,,11910s,BG,Second Balkan War,,,11910s,EL,Second Balkan War,,,11910s,RS,Second Balkan War,,,11910s,ME,Second Balkan War,,,11910s,TR,Second Balkan War,,,11910s,RO,Second Balkan War,,,11910s,BE,World War I,,,11910s,RS,World War I,,,11910s,FR,World War I,,,11910s,RU,World War I,,,11910s,UK,World War I,,,11910s,IT,World War I,,,11910s,IN,World War I,,,11910s,CN,World War I,,,11910s,CA,World War I,,,11910s,AU,World War I,,,11910s,NZ,World War I,,,11910s,UA,World War I,,,11910s,US,World War I,,,11910s,ME,World War I,,,11910s,JP,World War I,,,11910s,PT,World War I,,,11910s,RO,World War I,,,11910s,EL,World War I,,,11910s,AL,World War I,,,11910s,BR,World War I,,,11910s,AZ,World War I,,,11910s,CZ,World War I,,,11910s,SK,World War I,,,11910s,TH,World War I,,,11910s,CN,World War I,,,11910s,ZA,World War I,,,11910s,AT,World War I,,,11910s,HU,World War I,,,11910s,DE,World War I,,,11910s,TR,World War I,,,11910s,BG,World War I,,,11910s,GE,Georgian-Armenian War,,,11910s,AZ,Georgian-Armenian War,,,11910s,AF,Third Anglo-Afghan War,,,11910s,UK,Third Anglo-Afghan War,,,11910s,IN,Third Anglo-Afghan War,,,11910s,PL,Polish-Soviet War,,,11920s,PL,Polish-Soviet War,,,11910s,UA,Polish-Soviet War,,,11920s,UA,Polish-Soviet War,,,11910s,RU,Polish-Soviet War,,,11920s,RU,Polish-Soviet War,,,11920s,TR,Turkish-Armenian War,,,11920s,RU,Turkish-Armenian War,,,11920s,AZ,Turkish-Armenian War,,,11930s,BO,Chaco War,,,11930s,PY,Chaco War,,,11930s,YE,Saudi Yemeni War,,,11930s,SA,Saudi Yemeni War,,,11930s,IT,Second Italo-Ethiopian War,,,11930s,ET,Second Italo-Ethiopian War,,,11930s,CN,Second Sino-Japanese War,,,11940s,CN,Second Sino-Japanese War,,,11930s,JP,Second Sino-Japanese War,,,11940s,JP,Second Sino-Japanese War,,,11940s,PL,World War II,,,11940s,AU,World War II,,,11940s,FR,World War II,,,11940s,NZ,World War II,,,11940s,UK,World War II,,,11940s,ZA,World War II,,,11940s,CA,World War II,,,11940s,CZ,World War II,,,11940s,SK,World War II,,,11940s,DK,World War II,,,11940s,NO,World War II,,,11940s,BE,World War II,,,11940s,LU,World War II,,,11940s,NL,World War II,,,11940s,EL,World War II,,,11940s,RS,World War II,,,11940s,ME ,World War II,,,11940s,HR,World War II,,,11940s,MK,World War II,,,11940s,RU,World War II,,,11940s,CR,World War II,,,11940s,DO,World War II,,,11940s,SV,World War II,,,11940s,HT,World War II,,,11940s,HN,World War II,,,11940s,NI,World War II,,,11940s,US,World War II,,,11940s,CN,World War II,,,11940s,GT,World War II,,,11940s,CU,World War II,,,11940s,PH,World War II,,,11940s,IN,World War II,,,11940s,MX,World War II,,,11940s,BR,World War II,,,11940s,ET,World War II,,,11940s,IQ,World War II,,,11940s,BO,World War II,,,11940s,CO,World War II,,,11940s,IR,World War II,,,11940s,LR,World War II,,,11940s,PE,World War II,,,11940s,IT,World War II,,,11940s,RO,World War II,,,11940s,BG,World War II,,,11940s,AL,World War II,,,11940s,PY,World War II,,,11940s,EC,World War II,,,11940s,UY,World War II,,,11940s,VE,World War II,,,11940s,TR,World War II,,,11940s,EG,World War II,,,11940s,LB,World War II,,,11940s,SY,World War II,,,11940s,SA,World War II,,,11940s,AR,World War II,,,11940s,CL,World War II,,,11940s,DE,World War II,,,11940s,HU,World War II,,,11940s,JP,World War II,,,11940s,HR,World War II,,,11940s,SK,World War II,,,11940s,FI,World War II,,,11940s,TH,World War II,,,11930s,PL,World War II,,,11930s,AU,World War II,,,11930s,FR,World War II,,,11930s,NZ,World War II,,,11930s,UK,World War II,,,11930s,ZA,World War II,,,11930s,CA,World War II,,,11930s,CZ,World War II,,,11930s,SK,World War II,,,11930s,DK,World War II,,,11930s,NO,World War II,,,11930s,BE,World War II,,,11930s,LU,World War II,,,11930s,NL,World War II,,,11930s,EL,World War II,,,11930s,RS,World War II,,,11930s,ME ,World War II,,,11930s,HR,World War II,,,11930s,MK,World War II,,,11930s,RU,World War II,,,11930s,CR,World War II,,,11930s,DO,World War II,,,11930s,SV,World War II,,,11930s,HT,World War II,,,11930s,HN,World War II,,,11930s,NI,World War II,,,11930s,US,World War II,,,11930s,CN,World War II,,,11930s,GT,World War II,,,11930s,CU,World War II,,,11930s,PH,World War II,,,11930s,IN,World War II,,,11930s,MX,World War II,,,11930s,BR,World War II,,,11930s,ET,World War II,,,11930s,IQ,World War II,,,11930s,BO,World War II,,,11930s,CO,World War II,,,11930s,IR,World War II,,,11930s,LR,World War II,,,11930s,PE,World War II,,,11930s,IT,World War II,,,11930s,RO,World War II,,,11930s,BG,World War II,,,11930s,AL,World War II,,,11930s,PY,World War II,,,11930s,EC,World War II,,,11930s,UY,World War II,,,11930s,VE,World War II,,,11930s,TR,World War II,,,11930s,EG,World War II,,,11930s,LB,World War II,,,11930s,SY,World War II,,,11930s,SA,World War II,,,11930s,AR,World War II,,,11930s,CL,World War II,,,11930s,DE,World War II,,,11930s,HU,World War II,,,11930s,JP,World War II,,,11930s,HR,World War II,,,11930s,SK,World War II,,,11930s,FI,World War II,,,11930s,TH,World War II,,,11800s,US,First Barbary Wars,,,11800s,SE,First Barbary Wars,,,11800s,TR,First Barbary Wars,,,11800s,FR,War of the Oranges,,,11800s,ES,War of the Oranges,,,11800s,PT,War of the Oranges,,,11800s,MM,Burmese-Siamese War,,,11800s,TH,Burmese-Siamese War,,,11810s,MM,Burmese-Siamese War,,,11810s,TH,Burmese-Siamese War,,,11800s,FR,Napoleonic Wars,,,11800s,IT,Napoleonic Wars,,,11800s,ES,Napoleonic Wars,,,11800s,DE,Napoleonic Wars,,,11800s,AT,Napoleonic Wars,,,11800s,TU,Napoleonic Wars,,,11800s,UK,Napoleonic Wars,,,11800s,PT,Napoleonic Wars,,,11800s,SE,Napoleonic Wars,,,11800s,RU,Russo-Persian Wars,,,11810s,RU,Russo-Persian Wars,,,11800s,IR,Russo-Persian Wars,,,11810s,IR,Russo-Persian Wars,,,11820s,RU,Russo-Persian Wars,,,11820s,IR,Russo-Persian Wars,,,11800s,PL,Napoleonic Wars,,,11800s,NL,Napoleonic Wars,,,11800s,CH,Napoleonic Wars,,,11810s,FR,Napoleonic Wars,,,11810s,ES,Napoleonic Wars,,,11810s,UK,Napoleonic Wars,,,11810s,PT,Napoleonic Wars,,,11810s,DK,Napoleonic Wars,,,11810s,NO,Napoleonic Wars,,,11800s,DK,Napoleonic Wars,,,11800s,NO,Napoleonic Wars,,,11810s,RU,Napoleonic Wars,,,11810s,IN,Punjab War,,,11810s,UK,Punjab War,,,11810s,TR,Egyptian-Wahhabi War,,,11810s,SA,Egyptian-Wahhabi War,,,11810s,EG,Egyptian-Wahhabi War,,,11810s,AF,Afghan-Sikh Wars,,,11810s,IN,Afghan-Sikh Wars,,,11810s,NP,Anglo-Nepalese War,,,11820s,TR,Ottoman-Persian Wars,,,11820s,IR,Ottoman-Persian Wars,,,11820s,TH,Siamese-Lao War,,,11820s,LA,Siamese-Lao War,,,11820s,CO,Gran Colombia-Peru War,,,11820s,PE,Gran Colombia-Peru War,,,11820s,RU,Russo-Turkish War,,,11820s,TR,Russo-Turkish War,,,11830s,TH,Siamese-Vietnamese War,,,11830s,VN,Siamese-Vietnamese War,,,11830s,EG,Egyptian-Ottoman War,,,11830s,RU,Egyptian-Ottoman War,,,11830s,TR,Egyptian-Ottoman War,,,11830s,FR,First Carlist War,,,11830s,PT,First Carlist War,,,11830s,ES,First Carlist War,,,11830s,UK,First Carlist War,,,11840s,FR,First Carlist War,,,11840s,PT,First Carlist War,,,11840s,ES,First Carlist War,,,11840s,UK,First Carlist War,,,11830s,PE,War of the confederation,,,11830s,BO,War of the confederation,,,11830s,AR,War of the confederation,,,11830s,CL,War of the confederation,,,11830s,FR,Pastry War,,,11830s,MX,Pastry War,,,11830s,EG,Egyptian-Ottoman War,,,11840s,EG,Egyptian-Ottoman War,,,11830s,FR,Egyptian-Ottoman War,,,11840s,FR,Egyptian-Ottoman War,,,11830s,ES,Egyptian-Ottoman War,,,11840s,ES,Egyptian-Ottoman War,,,11830s,UK,Egyptian-Ottoman War,,,11840s,UK,Egyptian-Ottoman War,,,11830s,AT,Egyptian-Ottoman War,,,11840s,AT,Egyptian-Ottoman War,,,11830s,RU,Egyptian-Ottoman War,,,11840s,RU,Egyptian-Ottoman War,,,11830s,DE,Egyptian-Ottoman War,,,11840s,DE,Egyptian-Ottoman War,,,11830s,TR,Egyptian-Ottoman War,,,11840s,TR,Egyptian-Ottoman War,,,11830s,UK,First Anglo-Afghan War,,,11840s,UK,First Anglo-Afghan War,,,11830s,AF,First Anglo-Afghan War,,,11840s,AF,First Anglo-Afghan War,,,11830s,CN,First Opium War,,,11840s,CN,First Opium War,,,11830s,UK,First Opium War,,,11840s,UK,First Opium War,,,11840s,TH,Siamese-Vietnamese War,,,11840s,VN,Siamese-Vietnamese War,,,11840s,FR,Franco-Moroccan War,,,11840s,MA,Franco-Moroccan War,,,11840s,US,Mexican-American War,,,11840s,MX,Mexican-American War,,,11840s,UK,Second Anglo-Sikh War,,,11840s,IN,Second Anglo-Sikh War,,,11840s,DK,First Schleswig War,,,11840s,DE,First Schleswig War,,,11850s,DK,First Schleswig War,,,11850s,DE,First Schleswig War,,,11840s,TH,Burmese-Siamese War,,,11840s,MM,Burmese-Siamese War,,,11850s,TH,Burmese-Siamese War,,,11850s,MM,Burmese-Siamese War,,,11850s,BR,Platine War,,,11850s,UY,Platine War,,,11850s,AR,Platine War,,,11850s,UK,Second Anglo-Burmese War,,,11850s,MM,Second Anglo-Burmese War,,,11850s,ME,Montenegrin-Ottoman War,,,11850s,TR,Montenegrin-Ottoman War,,,11850s,FR,Crimean War,,,11850s,RU,Crimean War,,,11850s,BG,Crimean War,,,11850s,TR,Crimean War,,,11850s,UK,Crimean War,,,11850s,FR,Second Opium War,,,11850s,UK,Second Opium War,,,11850s,US,Second Opium War,,,11850s,CN,Second Opium War,,,11860s,UK,Second Opium War,,,11860s,US,Second Opium War,,,11860s,CN,Second Opium War,,,11850s,UK,Anglo-Persian War,,,11850s,AF,Anglo-Persian War,,,11850s,IR,Anglo-Persian War,,,11850s,ES,Hispano-Moroccan War,,,11850s,MA,Hispano-Moroccan War,,,11860s,ES,Hispano-Moroccan War,,,11860s,MA,Hispano-Moroccan War,,,11860s,FR,Franco-Mexican War,,,11860s,MX,Franco-Mexican War,,,11860s,US,Franco-Mexican War,,,11860s,AT,Franco-Mexican War,,,11860s,BE,Franco-Mexican War,,,11860s,EG,Franco-Mexican War,,,11860s,ES,Franco-Mexican War,,,11860s,UK,Franco-Mexican War,,,11860s,EC,Ecuadorian-Colombian War,,,11860s,CO,Ecuadorian-Colombian War,,,11860s,DO,Dominican Restauration War,,,11860s,ES,Dominican Restauration War,,,11860s,DE,Second Schleswig War,,,11860s,AT,Second Schleswig War,,,11860s,DK,Second Schleswig War,,,11860s,UY,Uruguayan War,,,11860s,BR,Uruguayan War,,,11860s,BT,Bhutan War,,,11860s,UK,Bhutan War,,,11860s,RU,Russo-Kokandian War,,,11860s,UZ,Russo-Kokandian War,,,11860s,PE,Chincha Islands War,,,11860s,CL,Chincha Islands War,,,11860s,EC,Chincha Islands War,,,11860s,BO,Chincha Islands War,,,11860s,ES,Chincha Islands War,,,11860s,PY,Paraguayan War,,,11860s,UY,Paraguayan War,,,11860s,AR,Paraguayan War,,,11860s,BR,Paraguayan War,,,11870s,PY,Paraguayan War,,,11870s,UY,Paraguayan War,,,11870s,AR,Paraguayan War,,,11870s,BR,Paraguayan War,,,11860s,JP,Boshin War,,,11860s,FR,Boshin War,,,11860s,ES,Teb Years' War,,,11860s,CU,Teb Years' War,,,11870s,ES,Teb Years' War,,,11870s,CU,Teb Years' War,,,11870s,FR,Franco-Prussian War,,,11870s,DE,Franco-Prussian War,,,11870s,ME,Montenegrin-Ottoman War,,,11870s,TR,Montenegrin-Ottoman War,,,11870s,RU,Russo-Turkish War,,,11870s,RS,Russo-Turkish War,,,11870s,RO,Russo-Turkish War,,,11870s,ME,Russo-Turkish War,,,11870s,BG,Russo-Turkish War,,,11870s,TR,Russo-Turkish War,,,11870s,AF,Second Anglo-Afghan War,,,11870s,UK,Second Anglo-Afghan War,,,11880s,AF,Second Anglo-Afghan War,,,11880s,UK,Second Anglo-Afghan War,,,11870s,ES,Little War,,,11870s,CU,Little War,,,11880s,ES,Little War,,,11880s,CU,Little War,,,11870s,UK,Anglo-Zulu War,,,11870s,ZA,Anglo-Zulu War,,,11870s,CL,War of the Pacific,,,11870s,PE,War of the Pacific,,,11870s,BO,War of the Pacific,,,11880s,CL,War of the Pacific,,,11880s,PE,War of the Pacific,,,11880s,BO,War of the Pacific,,,11880s,UK,First Boer War,,,11880s,ZA,First Boer War,,,11880s,SD,Mahdist War,,,11880s,EG,Mahdist War,,,11880s,UK,Mahdist War,,,11880s,IT,Mahdist War,,,11880s,BE,Mahdist War,,,11880s,ET,Mahdist War,,,11880s,FR,Sino-French War,,,11880s,CN,Sino-French War,,,11880s,RS,Serbo-Bulgarian War,,,11880s,BG,Serbo-Bulgarian War,,,11880s,UK,Third Anglo-Burmese War,,,11880s,MM,Third Anglo-Burmese War,,,11890s,FR,Franco-Siamese War,,,11890s,TH,Franco-Siamese War,,,11890s,CN,First Sino-Japanese War,,,11890s,JP,First Sino-Japanese War,,,11890s,ET,First Italo-Ethiopian War,,,11890s,IT,First Italo-Ethiopian War,,,11890s,TR,Greco-Turkish War,,,11890s,EL,Greco-Turkish War,,,11890s,US,Spanish-American War,,,11890s,CU,Spanish-American War,,,11890s,PH,Spanish-American War,,,11890s,Es,Spanish-American War,,,11890s,UK,Second Boer War,,,11890s,IN,Second Boer War,,,11890s,AU,Second Boer War,,,11890s,CA,Second Boer War,,,11890s,NZ,Second Boer War,,,11890s,ZA,Second Boer War,,,11900s,UK,Second Boer War,,,11900s,IN,Second Boer War,,,11900s,AU,Second Boer War,,,11900s,CA,Second Boer War,,,11900s,NZ,Second Boer War,,,11900s,ZA,Second Boer War,,,11890s,US,Philippine-American War,,,11890s,PH,Philippine-American War,,,11900s,US,Philippine-American War,,,11900s,PH,Philippine-American War,,,11910s,US,Philippine-American War,,,11910s,PH,Philippine-American War,,,11900s,BR,Acre War,,,11900s,BO,Acre War,,,11900s,US,Acre War,,,11890s,BR,Acre War,,,11890s,BO,Acre War,,,11890s,US,Acre War,,,11700s,RU,Great Northern War,,,11700s,DK,Great Northern War,,,11700s,NO,Great Northern War,,,11700s,PL,Great Northern War,,,11700s,LT,Great Northern War,,,11700s,DE,Great Northern War,,,11700s,SE,Great Northern War,,,11700s,UK,Great Northern War,,,11710s,RU,Great Northern War,,,11710s,DK,Great Northern War,,,11710s,NO,Great Northern War,,,11710s,PL,Great Northern War,,,11710s,LT,Great Northern War,,,11710s,DE,Great Northern War,,,11710s,SE,Great Northern War,,,11710s,UK,Great Northern War,,,11720s,RU,Great Northern War,,,11720s,DK,Great Northern War,,,11720s,NO,Great Northern War,,,11720s,PL,Great Northern War,,,11720s,LT,Great Northern War,,,11720s,DE,Great Northern War,,,11720s,SE,Great Northern War,,,11720s,UK,Great Northern War,,,11700s,AT,War of the Spanish Succession,,,11700s,DE,War of the Spanish Succession,,,11700s,UK,War of the Spanish Succession,,,11700s,NL,War of the Spanish Succession,,,11700s,PT,War of the Spanish Succession,,,11700s,ES,War of the Spanish Succession,,,11700s,FR,War of the Spanish Succession,,,11710s,AT,War of the Spanish Succession,,,11710s,DE,War of the Spanish Succession,,,11710s,UK,War of the Spanish Succession,,,11710s,NL,War of the Spanish Succession,,,11710s,PT,War of the Spanish Succession,,,11710s,ES,War of the Spanish Succession,,,11710s,FR,War of the Spanish Succession,,,11710s,IT,Ottoman-Venetian War,,,11710s,AT,Ottoman-Venetian War,,,11710s,TR,Ottoman-Venetian War,,,11710s,ES,Ottoman-Venetian War,,,11710s,MT,Ottoman-Venetian War,,,11710s,PT,Ottoman-Venetian War,,,11710s,FR,War of the Quadruple Alliance,,,11710s,UK,War of the Quadruple Alliance,,,11710s,DE,War of the Quadruple Alliance,,,11710s,NL,War of the Quadruple Alliance,,,11710s,ES,War of the Quadruple Alliance,,,11720s,FR,War of the Quadruple Alliance,,,11720s,UK,War of the Quadruple Alliance,,,11720s,DE,War of the Quadruple Alliance,,,11720s,NL,War of the Quadruple Alliance,,,11720s,ES,War of the Quadruple Alliance,,,11720s,RU,Russo-Persian Wars,,,11720s,UA,Russo-Persian Wars,,,11720s,GE,Russo-Persian Wars,,,11720s,AM,Russo-Persian Wars,,,11720s,IR,Russo-Persian Wars,,,11720s,TR,Ottoman-Persian War,,,11720s,IR,Ottoman-Persian War,,,11720s,UK,Anglo-Spanish War,,,11720s,ES,Anglo-Spanish War,,,11730s,TR,Ottoman-Persian War,,,11730s,IR,Ottoman-Persian War,,,11730s,PL,War of the Polish Succession,,,11730s,FR,War of the Polish Succession,,,11730s,ES,War of the Polish Succession,,,11730s,IT,War of the Polish Succession,,,11730s,RU,War of the Polish Succession,,,11730s,AT,War of the Polish Succession,,,11730s,ES,Spanish-Portuguese War,,,11730s,PT,Spanish-Portuguese War,,,11730s,RU,Austrian-Russian-Turkish War,,,11730s,DE,Austrian-Russian-Turkish War,,,11730s,TR,Austrian-Russian-Turkish War,,,11740s,DE,War of the Austrian Succession,,,11740s,FR,War of the Austrian Succession,,,11740s,ES,War of the Austrian Succession,,,11740s,IT,War of the Austrian Succession,,,11740s,SE,War of the Austrian Succession,,,11740s,UK,War of the Austrian Succession,,,11740s,NL,War of the Austrian Succession,,,11740s,RU,War of the Austrian Succession,,,11740s,TR,Ottoman-Persian War,,,11740s,IR,Ottoman-Persian War,,,11750s,FR,Seven Years's War,,,11750s,UK,Seven Years's War,,,11750s,IN,Seven Years's War,,,11750s,DE,Seven Years's War,,,11750s,PT,Seven Years's War,,,11750s,AT,Seven Years's War,,,11750s,RU,Seven Years's War,,,11750s,ES,Seven Years's War,,,11750s,SE,Seven Years's War,,,11760s,FR,Seven Years's War,,,11760s,UK,Seven Years's War,,,11760s,IN,Seven Years's War,,,11760s,DE,Seven Years's War,,,11760s,PT,Seven Years's War,,,11760s,AT,Seven Years's War,,,11760s,RU,Seven Years's War,,,11760s,ES,Seven Years's War,,,11760s,SE,Seven Years's War,,,11750s,MM,Burmese-Siamese War,,,11750s,TH,Burmese-Siamese War,,,11760s,MM,Burmese-Siamese War,,,11760s,TH,Burmese-Siamese War,,,11760s,MM,Sino-Burmese War,,,11760s,CN,Sino-Burmese War,,,11760s,RU,Russo-Turkish War,,,11760s,TR,Russo-Turkish War,,,11770s,RU,Russo-Turkish War,,,11770s,TR,Russo-Turkish War,,,11770s,MM,Burmese-Siamese War,,,11770s,TH,Burmese-Siamese War,,,11770s,US,American Revolutionary War,,,11770s,FR,American Revolutionary War,,,11770s,ES,American Revolutionary War,,,11770s,NL,American Revolutionary War,,,11770s,UK,American Revolutionary War,,,11780s,US,American Revolutionary War,,,11780s,FR,American Revolutionary War,,,11780s,ES,American Revolutionary War,,,11780s,NL,American Revolutionary War,,,11780s,UK,American Revolutionary War,,,11770s,ES,Spanish-Portuguese War,,,11770s,PT,Spanish-Portuguese War,,,11770s,DE,War of the Bavarian Succession,,,11770s,AT,War of the Bavarian Succession,,,11780s,DE,War of the Bavarian Succession,,,11780s,AT,War of the Bavarian Succession,,,11780s,UK,Second Anglo-Mysore War,,,11780s,IN,Second Anglo-Mysore War,,,11780s,NL,Second Anglo-Mysore War,,,11780s,FR,Second Anglo-Mysore War,,,11780s,NL,Kettle War,,,11780s,AT,Kettle War,,,11780s,MM,Burmese-Siamese War,,,11780s,TH,Burmese-Siamese War,,,11780s,US,Northern Indian War,,,11780s,UK,Northern Indian War,,,11780s,CA,Northern Indian War,,,11790s,US,Northern Indian War,,,11790s,UK,Northern Indian War,,,11790s,CA,Northern Indian War,,,11780s,AT,Austro-Turkish War,,,11780s,TR,Austro-Turkish War,,,11780s,RU,Austro-Turkish War,,,11790s,AT,Austro-Turkish War,,,11790s,TR,Austro-Turkish War,,,11790s,RU,Austro-Turkish War,,,11780s,TR,Russo-Turkish War,,,11780s,RU,Russo-Turkish War,,,11790s,TR,Russo-Turkish War,,,11790s,RU,Russo-Turkish War,,,11780s,SE,Russo-Suedish War,,,11780s,RU,Russo-Suedish War,,,11790s,SE,Russo-Suedish War,,,11790s,RU,Russo-Suedish War,,,11780s,SE,Theatre War,,,11780s,DK,Theatre War,,,11780s,NO,Theatre War,,,11780s,NP,Sino-Nepalese War,,,11780s,CN,Sino-Nepalese War,,,11790s,NP,Sino-Nepalese War,,,11790s,CN,Sino-Nepalese War,,,1,,Third Anglo-Mysore War,,,
