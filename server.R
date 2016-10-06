@@ -7,7 +7,7 @@ library(rgeos)
 library(leaflet)
 library(data.table)
 library(plm)
-
+library(lme4)
 
 meta = read.csv("data/zipf_meta.csv", sep=",", dec=".")
 meta$REFERENCE = as.character(meta$REFERENCE)
@@ -94,83 +94,36 @@ DARIUS_L<-read.csv("data/DARIUS_L.csv", sep=",", dec=".")
 full_countries <- readOGR(dsn='data/world_SimplifiedGeom.shp', layer = "world_SimplifiedGeom", 
                           verbose = F,encoding = "utf8")
 
-
-
-sumNum = function(x){sum(as.numeric(x), na.rm=TRUE)}
-stdDev = function(x){sd(as.numeric(x), na.rm=TRUE)}
-collapseRefs = function(x){paste(as.list(as.character(x), na.rm=TRUE), sep=" ", collapse = " | ")}
-raiseXToPowerY = function(x,y){sign(x)*abs(x)^y}
-AAGR_pct = function(initVal, finalVal, nPeriods){ (raiseXToPowerY((finalVal / initVal), (1 / nPeriods)) - 1 ) * 100 }
-r2.corr.mer <- function(m) {
-  lmfit <-  lm(model.response(model.frame(m)) ~ fitted(m))
-  summary(lmfit)$r.squared
-}
-
-
-
-
-
-SummaryMetaAlpha = function(table, regression = "Lotka"){
-  tab = table
-  meanAlpha = round(mean(tab$ALPHA),3)
-  medianAlpha = round(median(tab$ALPHA),3)
-  sdAlpha = round(sd(tab$ALPHA),3)
-  minAlpha = round(min(tab$ALPHA),3)
-  maxAlpha = round(max(tab$ALPHA),3)
-  estimations = dim(tab)[[1]]
-  names = c("Number of estimations", 
-            "Mean Alpha", "Median Alpha", "Standard Deviation Alpha", 
-            "Mininimum Alpha", "Maximum Alpha")
-  summ = data.frame(estimations,meanAlpha, medianAlpha, sdAlpha, minAlpha, maxAlpha)
-  Summary = data.frame(cbind(names,t(summ)))
-  colnames(Summary) = c("Statistics for Alpha", "Value")
-  return(Summary)
-}
-
-
-SummaryMetaMeta = function(table, regression = "Lotka"){
-  tab = table
-  references = length(list(unique(tab$REFERENCE))[[1]])
-  duration = max(tab$DATE) - min(tab$DATE)
-  estimations = dim(tab)[[1]]
-  pct_Agglo = round(dim(subset(tab, URBANSCALE == "MorphoCity"))[[1]] / estimations * 100,1)
-  pct_Metro = round(dim(subset(tab, URBANSCALE == "MetroArea"))[[1]] / estimations * 100,1)
-  t1 = subset(tab, !is.na(N))
-  t2 = subset(tab, !is.na(TRUNCATION_POINT))
-  medianN = median(t1$N)
-  medianTruncation = median(t2$TRUNCATION_POINT)
+cw<-read.csv("data/MetaEventsCivilWars.csv", sep=",", dec=".", na.strings = "NaN")
+wi<-read.csv("data/MetaEventsIndependenceWars.csv", sep=",", dec=".",  na.strings = "NaN")
+rv<-read.csv("data/MetaEventsRevolutions.csv", sep=",", dec=".",  na.strings = "NaN")
+iw<-read.csv("data/MetaEventsWars.csv", sep=",", dec=".",  na.strings = "NaN")
+cw$DURATION = as.factor(cw$DURATION)
+wi$DURATION = as.factor(wi$DURATION)
+rv$DURATION = as.factor(rv$DURATION)
+iw$DURATION = as.factor(iw$DURATION)
+metaEvents = rbind(iw, cw, wi, rv)
+metaEvents$DURATION = as.numeric(ifelse(metaEvents$DURATION == "ongoing", 2016 - metaEvents$DATE, metaEvents$DURATION))
+metaEvents$TYPE = substr(metaEvents$ID_EVENT, 1, 2)
+metaEvents$END = metaEvents$DATE + metaEvents$DURATION
   
-  names = c("Number of references", "Number of years covered", 
-             "% of estimations with MorphoCity", 
-            "% of estimations with MetroArea",
-            "Median Number of Cities", 
-            "Median Population Cutoff")
-  summ = data.frame(references, duration, 
-                    pct_Agglo, pct_Metro,
-                    medianN, medianTruncation)
-  Summary = data.frame(cbind(names,t(summ)))
-  colnames(Summary) = c("Meta Statistics", "Value")
-  return(Summary)
+meta$wi = 0
+meta$iw = 0
+meta$cw = 0
+meta$rv = 0
+for (i in 1:dim(meta)[1]) {
+  date = meta[i,"DATE"]
+  country = as.character(meta[i,"CNTR_ID"])
+  wi = metaEvents[metaEvents$COUNTRY_ID == country & metaEvents$DATE <= date & metaEvents$END >= date & metaEvents$TYPE == "wi",]
+  iw = metaEvents[metaEvents$COUNTRY_ID == country & metaEvents$DATE <= date & metaEvents$END >= date & metaEvents$TYPE == "iw",]
+  cw = metaEvents[metaEvents$COUNTRY_ID == country & metaEvents$DATE <= date & metaEvents$END >= date & metaEvents$TYPE == "cw",]
+  rv = metaEvents[metaEvents$COUNTRY_ID == country & metaEvents$DATE <= date & metaEvents$END >= date & metaEvents$TYPE == "rv",]
+  if (dim(wi)[1] > 0) meta[i,"wi"] = 1
+  if (dim(iw)[1] > 0) meta[i,"iw"] = 1
+  if (dim(cw)[1] > 0) meta[i,"cw"] = 1
+  if (dim(rv)[1] > 0) meta[i,"rv"] = 1
 }
-
-
-generateEstimRows <- function(i){
-  list(
-    fluidRow(
-      column(2, h5(paste("Estimate ", i, sep = ""))),
-      column(2,numericInput(paste("alphaestim", i, sep="_") , paste("Alpha ", i, sep = " "), value = "1")),
-      column(4,textInput(paste("territoryestim", i, sep="_"), paste("Territory", i, sep = " "), value = "Ex: France")),
-      column(4,textInput(paste("urbandefestim", i, sep="_"), paste("City Def.", i, sep = " "), value = "Ex: SMA, Boroughs, UN agglomerations...")),
-      column(2, " "),
-      column(4,numericInput(paste("truncestim", i, sep="_"), paste("Pop. Cutoff", i, sep = " "), value = "10000")),
-      column(2,numericInput(paste("dateestim", i, sep="_"), paste("Date", i, sep = " "), value = "2000")),
-      column(2,numericInput(paste("nCitiesestim", i, sep="_"), paste("# of cities", i, sep = " "), value = "100")),
-      column(2,numericInput(paste("r2estim", i, sep="_"), paste("R2", i, sep = " "), value = "100"))
-    ),
-    tags$hr()
-  )
-}
-
+summary(meta)
 
 r_colors <- rgb(t(col2rgb(colors()) / 255))
 names(r_colors) <- colors()
@@ -519,7 +472,6 @@ tableForTrajectoryMaps <- reactive({
   return(longitudinalAlphas)
 })
 
-
 tableForTrajectories <- reactive({
   tab = metaArxiv()
   if (input$alpha == "Lotka") tab$ALPHA = tab$ALPHALOTKA
@@ -545,7 +497,7 @@ tableForTrajectories <- reactive({
     if (longitudinalAlphas[i,"SAME_SPECIFICATIONS"] == longitudinalAlphas[i+1,"SAME_SPECIFICATIONS"]) {
       fv = longitudinalAlphas[i+1,"ALPHA"]
       iv = longitudinalAlphas[i,"ALPHA"]
-      ye = 1 / (longitudinalAlphas[i+1,"DATE"] - longitudinalAlphas[i,"DATE"])
+      ye = longitudinalAlphas[i+1,"DATE"] - longitudinalAlphas[i,"DATE"]
       median_date = (longitudinalAlphas[i,"DATE"] + longitudinalAlphas[i+1,"DATE"]) / 2
        longitudinalAlphas[i,"PCT_GROWTH_ALPHA"] =  AAGR_pct(initVal = iv, finalVal = fv, nPeriods = ye) 
        longitudinalAlphas[i,"GROWTH_DECADE"] = paste0(substr(as.character(median_date),1,3),'0s')
@@ -556,9 +508,6 @@ tableForTrajectories <- reactive({
   }
    return(longitudinalAlphas)
 })
-
-
-
 
 
   output$review = renderDataTable({
@@ -1125,8 +1074,6 @@ tableForTrajectories <- reactive({
   })
   
   
-<<<<<<< HEAD
-   
      
      output$data_trajectories = renderDataTable({
        tab = tableForTrajectoryMaps()
@@ -1158,10 +1105,7 @@ tableForTrajectories <- reactive({
        
         return(selectedTable)
      })
-=======
-  
->>>>>>> parent of 011158b... display highest and lowest alpha growth rates + group functions in global.R
-  
+
   output$mapectories <- renderLeaflet({
     countriesToMap = GrowthCountries()
     toMap = input$dynVarToMap
@@ -1379,7 +1323,6 @@ tableForTrajectories <- reactive({
    }
  )
 
-<<<<<<< HEAD
  
  
  output$downloadTrajTable <- downloadHandler(
@@ -1398,11 +1341,14 @@ tableForTrajectories <- reactive({
  metaModelDynOLS <- reactive({
    tab = tableForTrajectoryMaps()
    tab = tab[!is.na(tab$PCT_GROWTH_ALPHA),]
-   vars = input$var_dyn_meta_analysis
- 
+   tab = tab[is.finite(tab$PCT_GROWTH_ALPHA),]
+   dyn_vars = input$var_dyn_meta_analysis
+  static_vars =  input$var_static_meta_analysis
+  events = input$meta_events_meta_analysis
+    
     regressants = "PCT_GROWTH_ALPHA ~ 1 "
   
-      if ('tcam_pop' %in% vars == "TRUE"){
+      if ('tcam_pop' %in% dyn_vars == "TRUE"){
      tab$Population_Growth = ifelse(tab$GROWTH_DECADE == "1950s", tab$Pct_POP_1950s,
                                     ifelse(tab$GROWTH_DECADE == "1960s", tab$Pct_POP_1960s,
                                            ifelse(tab$GROWTH_DECADE == "1970s", tab$Pct_POP_1970s,
@@ -1410,9 +1356,10 @@ tableForTrajectories <- reactive({
                                                          ifelse(tab$GROWTH_DECADE == "1990s", tab$Pct_POP_1990s,
                                                                 ifelse(tab$GROWTH_DECADE == "2000s", tab$Pct_POP_2000s, 
                                                                        ifelse(tab$GROWTH_DECADE == "2010s",tab$Pct_POP_2010s, NA)))))))
+     
       regressants = paste0(regressants, " + Population_Growth")
       }
-      if ('tcam_gdp' %in% vars == "TRUE"){
+      if ('tcam_gdp' %in% dyn_vars == "TRUE"){
         tab$GDP_Growth =  ifelse(tab$GROWTH_DECADE == "1960s", tab$Pct_GDP_1960s,
                                        ifelse(tab$GROWTH_DECADE == "1970s", tab$Pct_GDP_1970s,
                                               ifelse(tab$GROWTH_DECADE == "1980s", tab$Pct_GDP_1980s,
@@ -1421,15 +1368,43 @@ tableForTrajectories <- reactive({
                                                                    ifelse(tab$GROWTH_DECADE == "2010s",tab$Pct_GDP_2010s, NA))))))
         regressants = paste0(regressants, " + GDP_Growth")
       }
-    if ('alpha' %in% vars == "TRUE"){
+    if ('alpha' %in% dyn_vars == "TRUE"){
       tab$Initial_Alpha = tab$ALPHA
       regressants = paste0(regressants, " + Initial_Alpha")
     }
-    if ('wwii' %in% vars == "TRUE"){
-      tab$WWII_ = ifelse(tab$GROWTH_DECADE == "1940s", 1, 0)
-      regressants = paste0(regressants, " + WWII_")
-      
-     }
+    
+   
+   
+    
+    if ('pop' %in% static_vars == "TRUE"){
+       tab$Initial_Population_ =  as.factor(ifelse(tab$TOTAL_POP <= input$PopVal2[[1]], "Small", ifelse(tab$TOTAL_POP >= input$PopVal2[[2]], "Large", " Medium")))
+      regressants = paste0(regressants, " + Initial_Population_")
+    }
+    
+    if ('gdp' %in% static_vars == "TRUE"){
+      tab$Initial_GDP_Per_Capita_ = as.factor(ifelse(tab$GDPPC <= input$GDPVal2[[1]], "Low", ifelse(tab$GDPPC >= input$GDPVal2[[2]], "High", " Medium")))
+      regressants = paste0(regressants, " + Initial_GDP_Per_Capita_")
+    }
+    
+    if ('urb' %in% static_vars == "TRUE"){
+    }
+    
+     if ('wi' %in% events == "TRUE"){
+        tab$War_Of_Independence = tab$wi
+      regressants = paste0(regressants, " + War_Of_Independence")
+    }
+    if ('iw' %in% events == "TRUE"){
+      tab$International_War = tab$iw
+      regressants = paste0(regressants, " + International_War")
+    }
+    if ('cw' %in% events == "TRUE"){
+      tab$Civil_War = tab$cw
+      regressants = paste0(regressants, " + Civil_War")
+    }
+    if ('rv' %in% events == "TRUE"){
+      tab$Revolution = tab$rv
+      regressants = paste0(regressants, " + Revolution")
+    }
     
        model = lm(regressants, data=tab, na.action = na.omit)
    return(model)
@@ -1455,8 +1430,5 @@ tableForTrajectories <- reactive({
  
  
  
- 
-=======
->>>>>>> parent of 011158b... display highest and lowest alpha growth rates + group functions in global.R
- })
+  })
 

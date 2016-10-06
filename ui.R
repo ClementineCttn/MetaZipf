@@ -448,47 +448,71 @@ tabPanel("Dynamic Analysis",
                         sliderInput("threshold_growthrate_decreasing", "Maximum AAGR* for display (%)",
                                     min = -10, max = 0, value = 0))),
                       column(12,"* AAGR = Average Annual Growth Rate"),
+                      
                       dataTableOutput('data_trajectories')#,
                       #     downloadButton("downloadTrajTable", "Download Data")
                     )
            ),
-           tabPanel("3. Contexts of growth",
-
-                    fluidRow(
-                      column(6,h4("Growth of Alpha"),
-                           h6('!! It might take a few seconds to load and update !!')),
-                    column(6,h4("Contextual Growth"),
-                           h6('!! It might take a few seconds to load and update !!')),
-                    column(4,selectInput('dynVarToMap', 'Annual Average growth of Alpha (%)',
-                                         choices = c("Mean Value" = 'meanDynAlpha',
-                                                     "Standard Deviation" = 'sdDynAlpha',
-                                                     "Number of Observations" = 'nDynAlpha'),
-                                         selected = "meanDynAlpha", multiple = F)),
-                    column(4,selectInput("decade_3", "Decade", choices = c("1950s", "1960s","1970s","1980s","1990s","2000s", "2010s"),
-                                         selected = c("1980s"), multiple=F)),
-                      column(4,selectInput('contextToMap', 'Annual Average Growth context (%)',
-                                         choices = c("GDP per Capita" = 'g_GDP',
-                                                     "Population" = 'g_pop'),
-                                         selected = "g_GDP", multiple = F)),
-
-                   column(6,leafletOutput('mapectories')),
-                   column(6,leafletOutput('mapcontext'))),
-
-
-                    tags$hr()
-           ),
-           tabPanel("4. Meta Dynamic Analysis",
+           # tabPanel("3. Contexts of growth",
+           # 
+           #          fluidRow(
+           #            column(6,h4("Growth of Alpha"),
+           #                 h6('!! It might take a few seconds to load and update !!')),
+           #          column(6,h4("Contextual Growth"),
+           #                 h6('!! It might take a few seconds to load and update !!')),
+           #          column(4,selectInput('dynVarToMap', 'Annual Average growth of Alpha (%)',
+           #                               choices = c("Mean Value" = 'meanDynAlpha',
+           #                                           "Standard Deviation" = 'sdDynAlpha',
+           #                                           "Number of Observations" = 'nDynAlpha'),
+           #                               selected = "meanDynAlpha", multiple = F)),
+           #          column(4,selectInput("decade_3", "Decade", choices = c("1950s", "1960s","1970s","1980s","1990s","2000s", "2010s"),
+           #                               selected = c("1980s"), multiple=F)),
+           #            column(4,selectInput('contextToMap', 'Annual Average Growth context (%)',
+           #                               choices = c("GDP per Capita" = 'g_GDP',
+           #                                           "Population" = 'g_pop'),
+           #                               selected = "g_GDP", multiple = F)),
+           # 
+           #         column(6,leafletOutput('mapectories')),
+           #         column(6,leafletOutput('mapcontext'))),
+           # 
+           # 
+           #          tags$hr()
+           # ),
+           tabPanel("3. Meta Dynamic Analysis",
                     h4("Select Features for the Dynamic Meta Analysis"),
                     fluidRow(
-                      column(12,checkboxGroupInput("var_dyn_meta_analysis", "Evolutive Context", 
+                      column(4,checkboxGroupInput("var_dyn_meta_analysis", "Evolutive Context", 
                                                   c("Population Growth" = "tcam_pop",
                                                     "GDP per capita Growth" = "tcam_gdp",
                                                     "Initial Alpha" = "alpha"
-                                                   
-                                                    #"World War II" = "wwii"
                                                   ),
-                                                     selected = NULL))
-                       
+                                                     selected = NULL, inline = FALSE)),
+                      column(4,checkboxGroupInput("var_static_meta_analysis", "Static Context", 
+                                                  c("Population (log)" = "pop",
+                                                    "GDP per capita (log)" = "gdp",
+                                                    "Urbanisation level" = "urb"
+                                                  ),
+                                                  selected = NULL, inline = FALSE)),
+                      column(4,checkboxGroupInput("meta_events_meta_analysis", "Event Context", 
+                                                  c("Revolution" = "rv",
+                                                    "War of Independence" = "wi",
+                                                    "Civil War" = "cw",
+                                                    "International War" = "iw"
+                                                  ),
+                                                  selected = NULL, inline = FALSE)),
+                      column(4,conditionalPanel(
+                        condition = 'input.var_dyn_meta_analysis.indexOf("tcam_pop") != -1 || input.var_dyn_meta_analysis.indexOf("tcam_gdp") != -1 ',
+                        sliderInput("rates", "Country Population (%, bounds of the medium reference class)",
+                                    min = -10, max = 10, value = c(-1, 1)))),
+                      column(4,conditionalPanel(
+                        condition = 'input.var_static_meta_analysis.indexOf("pop") != -1',
+                        sliderInput("PopVal2", "Country Population (x 1000, bounds of the medium reference class)",
+                                    min = 1, max = 1000000, value = c(10000, 100000)))),
+                      column(4,conditionalPanel(
+                        condition = 'input.var_static_meta_analysis.indexOf("gdp") != -1',
+                        sliderInput("GDPVal2", "GDP per Capita (current US$, bounds of the medium reference class)",
+                                    min = 1, max = 100000, value = c(1000, 10000))))
+                     
                     ),
                     
                     fluidRow(
@@ -501,37 +525,12 @@ tabPanel("Dynamic Analysis",
                      tableOutput('model_dyn_param')
                       
                       )
-                    ),
+                    )#,
            
                     
            
-           tabPanel("2. Geographical contexts of growth",
-                    
-                    fluidRow(
-                      column(6,h4("Growth of Alpha"),
-                           h6('!! It might take a few seconds to load and update !!')),
-                    column(6,h4("Contextual Growth"),
-                           h6('!! It might take a few seconds to load and update !!')),
-                    column(4,selectInput('dynVarToMap', 'Annual Average growth of Alpha (%)', 
-                                         choices = c("Mean Value" = 'meanDynAlpha',
-                                                     "Standard Deviation" = 'sdDynAlpha',
-                                                     "Number of Observations" = 'nDynAlpha'),
-                                         selected = "meanDynAlpha", multiple = F)),
-                    column(4,selectInput("decade_3", "Decade", choices = c("1950s", "1960s","1970s","1980s","1990s","2000s", "2010s"),
-                                         selected = c("1980s"), multiple=F)),
-                      column(4,selectInput('contextToMap', 'Annual Average Growth context (%)', 
-                                         choices = c("GDP per Capita" = 'g_GDP',
-                                                     "Population" = 'g_pop'),
-                                         selected = "g_GDP", multiple = F)),
-                  
-                   column(6,leafletOutput('mapectories')),
-                   column(6,leafletOutput('mapcontext'))),
-                   
-                   
-                    tags$hr()
-           ),
-           tabPanel("3. Projections"
-           )
+                # tabPanel("4. Projections"
+           # )
            )),
 
       tabPanel("Contribute !",
