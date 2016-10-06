@@ -51,6 +51,20 @@ pops$Pct_POP_1990s = AAGR_pct(pops$POP1990, pops$POP2000, 10)
 pops$Pct_POP_2000s = AAGR_pct(pops$POP2000, pops$POP2010, 10)
 pops$Pct_POP_2010s = AAGR_pct(pops$POP2010, pops$POP2015, 5)
 
+
+urbs = read.csv("data/UN_Urbanization_1950_2050.csv", sep=",", dec=".")
+colnames(urbs) = c("CNTR_ID", "Name", "CC", paste0("URB", 1950:2050))
+urbs[urbs == 0] <- NA
+
+urbs$Pct_URB_1950s = AAGR_pct(urbs$URB1950, urbs$URB1960, 10)
+urbs$Pct_URB_1960s = AAGR_pct(urbs$URB1960, urbs$URB1970, 10)
+urbs$Pct_URB_1970s = AAGR_pct(urbs$URB1970, urbs$URB1980, 10)
+urbs$Pct_URB_1980s = AAGR_pct(urbs$URB1980, urbs$URB1990, 10)
+urbs$Pct_URB_1990s = AAGR_pct(urbs$URB1990, urbs$URB2000, 10)
+urbs$Pct_URB_2000s = AAGR_pct(urbs$URB2000, urbs$URB2010, 10)
+urbs$Pct_URB_2010s = AAGR_pct(urbs$URB2010, urbs$URB2015, 5)
+
+
 gdps = read.csv("data/WB_GDP_1960_2015.csv", sep=",", dec=".")
 colnames(gdps) = c("CNTR_ID", "Name", "CC", paste0("GDP", 1960:2015))
 gdps[gdps == 0] <- NA
@@ -64,14 +78,19 @@ gdps[gdps == 0] <- NA
  
   meta = data.frame(meta, pops[match(meta$CNTR_ID,pops$CNTR_ID),])
 meta = data.frame(meta, gdps[match(meta$CNTR_ID,gdps$CNTR_ID),])
+meta = data.frame(meta, urbs[match(meta$CNTR_ID,urbs$CNTR_ID),])
+
 meta$TOTAL_POP = NA
-for (i in 1:dim(meta)[1]) {
-  if(meta[i,"DATE"] %in% 1950:2015) meta[i,"TOTAL_POP"] = round(as.numeric(meta[i,paste0("POP", meta[i,"DATE"])]),0)
-}
+meta$URBP = NA
 meta$GDPPC = NA
 for (i in 1:dim(meta)[1]) {
-  if(meta[i,"DATE"] %in% 1960:2015) meta[i,"GDPPC"] = round(as.numeric(meta[i,paste0("GDP", meta[i,"DATE"])]),0)
+  if(meta[i,"DATE"] %in% 1950:2015) {
+    meta[i,"TOTAL_POP"] = round(as.numeric(meta[i,paste0("POP", meta[i,"DATE"])]),0)
+    meta[i,"URBP"] = round(as.numeric(meta[i,paste0("URB", meta[i,"DATE"])]),2)
+    if(meta[i,"DATE"] %in% 1960:2015) meta[i,"GDPPC"] = round(as.numeric(meta[i,paste0("GDP", meta[i,"DATE"])]),0)
+  }
 }
+
 rownames(meta) = 1:dim(meta)[1]
 meta$REFID.1 = NULL
 meta$AUTHOR = NULL
@@ -123,8 +142,8 @@ for (i in 1:dim(meta)[1]) {
   if (dim(cw)[1] > 0) meta[i,"cw"] = 1
   if (dim(rv)[1] > 0) meta[i,"rv"] = 1
 }
-summary(meta)
 
+head(meta)
 r_colors <- rgb(t(col2rgb(colors()) / 255))
 names(r_colors) <- colors()
 
@@ -702,7 +721,7 @@ tableForTrajectories <- reactive({
     OtherSpecs = input$otherSpecs
     
     if ('alltech' %in% TechnicalSpecs == "TRUE") TechnicalSpecs = c("truncation4model", "N4model", "scale4model", "regForm")
-    if ('alltop' %in% TopicalSpecs == "TRUE") TopicalSpecs = c("urbanisation4model",  "countrySize", "countryGDP","country")
+    if ('alltop' %in% TopicalSpecs == "TRUE") TopicalSpecs = c("urbanisation4model",  "countrySize", "countryGDP","countryUrb")
     if ('allother' %in% OtherSpecs == "TRUE") OtherSpecs = c("yearOfPubli", "studySize", "studyPeriod", "studyCoverage") #"discipline"
     
     tab$Date_of_Observation = tab$DATE - 1950
@@ -744,6 +763,12 @@ tableForTrajectories <- reactive({
       tab$Country_Size_ = as.factor(ifelse(tab$TOTAL_POP <= input$PopVal[[1]], "Small", ifelse(tab$TOTAL_POP >= input$PopVal[[2]], "Large", " Medium")))
       regressants = paste0(regressants, " + Country_Size_")
       columnsToKeep = c(columnsToKeep, "Country_Size_")}
+    if ('countryUrb' %in% TopicalSpecs  == "TRUE") {
+      tab = subset(tab, URBP > 0)
+      tab$Country_Urbanization_ = as.factor(ifelse(tab$URBP <= input$UrbVal[[1]], "Low", ifelse(tab$URBP >= input$UrbVal[[2]], "High", " Medium")))
+      regressants = paste0(regressants, " + Country_Urbanization_")
+      columnsToKeep = c(columnsToKeep, "Country_Urbanization_")}
+    
     if ('countryGDP' %in% TopicalSpecs  == "TRUE") {
       tab = subset(tab, GDPPC > 0)
       tab$Country_GDP_ = as.factor(ifelse(tab$GDPPC <= input$GDPVal[[1]], "Low", ifelse(tab$GDPPC >= input$GDPVal[[2]], "High", " Medium")))
@@ -800,7 +825,7 @@ tableForTrajectories <- reactive({
     OtherSpecs = input$otherSpecs
     
     if ('alltech' %in% TechnicalSpecs == "TRUE") TechnicalSpecs = c("truncation4model", "N4model", "scale4model", "regForm")
-    if ('alltop' %in% TopicalSpecs == "TRUE") TopicalSpecs = c("urbanisation4model",  "countrySize", "countryGDP","country")
+    if ('alltop' %in% TopicalSpecs == "TRUE") TopicalSpecs = c("urbanisation4model",  "countrySize", "countryGDP","countryUrb")
     if ('allother' %in% OtherSpecs == "TRUE") OtherSpecs = c("yearOfPubli", "studySize", "studyPeriod", "studyCoverage") #"discipline"
     
     tab$Date_of_Observation = tab$DATE - 1950
@@ -852,6 +877,13 @@ tableForTrajectories <- reactive({
       regressants = paste0(regressants, " + Country_Size_")
       columnsToKeep = c(columnsToKeep, "Country_Size_")
     }
+    
+    if ('countryUrb' %in% TopicalSpecs  == "TRUE") {
+      tab = subset(tab, URBP > 0)
+      tab$Country_Urbanization_ = as.factor(ifelse(tab$URBP <= input$UrbVal[[1]], "Low", ifelse(tab$URBP >= input$UrbVal[[2]], "High", " Medium")))
+      regressants = paste0(regressants, " + Country_Urbanization_")
+      columnsToKeep = c(columnsToKeep, "Country_Urbanization_")
+      }
     
     if ('countryGDP' %in% TopicalSpecs  == "TRUE") {
       tab = subset(tab, GDPPC > 0)
@@ -1006,7 +1038,7 @@ tableForTrajectories <- reactive({
     OtherSpecs = input$otherSpecs
     
     if ('alltech' %in% TechnicalSpecs == "TRUE") TechnicalSpecs = c("truncation4model", "N4model", "scale4model", "regForm")
-    if ('alltop' %in% TopicalSpecs == "TRUE") TopicalSpecs = c("urbanisation4model",  "countrySize", "countryGDP","country")
+    if ('alltop' %in% TopicalSpecs == "TRUE") TopicalSpecs = c("urbanisation4model",  "countrySize", "countryGDP","countryUrb")
     if ('allother' %in% OtherSpecs == "TRUE") OtherSpecs = c("yearOfPubli", "studySize", "studyPeriod", "studyCoverage") #"discipline"
     
     Reference = ""
@@ -1017,9 +1049,10 @@ tableForTrajectories <- reactive({
    # if ('year4model' %in% TopicalSpecs == "TRUE") Reference = paste(Reference, " | Date of Observation: 1950", sep="")
     if ('scale4model' %in% TechnicalSpecs == "TRUE") Reference = paste(Reference, " | City Definition: LocalUnit", sep="")
     if ('countrySize' %in% TopicalSpecs  == "TRUE") Reference = paste(Reference, " | Country Size: Medium", sep="")
+    if ('countryUrb' %in% TopicalSpecs  == "TRUE") Reference = paste(Reference, " | Urbanization Level: Medium", sep="")
     if ('countryGDP' %in% TopicalSpecs  == "TRUE") Reference = paste(Reference, " | Country GDP: Medium", sep="")
     if ('discipline' %in% OtherSpecs == "TRUE") Reference = paste(Reference, " | Discipline: none", sep="")
-    if ('country' %in% TopicalSpecs  == "TRUE") Reference = paste(Reference, " | Territory: National State", sep="")
+   # if ('country' %in% TopicalSpecs  == "TRUE") Reference = paste(Reference, " | Territory: National State", sep="")
     if ('yearOfP' %in% OtherSpecs == "TRUE") Reference = paste(Reference, " | Year Of Publication: Medium", sep="")
     if ('studySize' %in% OtherSpecs == "TRUE") Reference = paste(Reference, " | Study Size: Small", sep="")
     if ('studyCoverage' %in% OtherSpecs == "TRUE") Reference = paste(Reference, " | Coverage of territories: Small", sep="")
@@ -1217,7 +1250,7 @@ tableForTrajectories <- reactive({
     allTop = input$topicalSpecs
     if("alltech" %in% allTech) updateCheckboxGroupInput(session, "technicalSpecs", selected =  c("alltech","truncation4model","N4model", "scale4model", "regForm"))
     if("allother" %in% allOther) updateCheckboxGroupInput(session, "otherSpecs", selected =  c("allother","yearOfPubli",  "studySize",  "studyPeriod", "studyCoverage"))
-    if("alltop" %in% allTop) updateCheckboxGroupInput(session, "topicalSpecs", selected =  c("alltop","country","urbanisation4model", "countrySize", "countryGDP"))
+    if("alltop" %in% allTop) updateCheckboxGroupInput(session, "topicalSpecs", selected =  c("alltop","urbanisation4model", "countrySize", "countryGDP", "countryUrb"))
     })
   
   
@@ -1359,7 +1392,18 @@ tableForTrajectories <- reactive({
      
       regressants = paste0(regressants, " + Population_Growth")
       }
-      if ('tcam_gdp' %in% dyn_vars == "TRUE"){
+    if ('tcam_urb' %in% dyn_vars == "TRUE"){
+      tab$Urbanization_Growth = ifelse(tab$GROWTH_DECADE == "1950s", tab$Pct_URB_1950s,
+                                     ifelse(tab$GROWTH_DECADE == "1960s", tab$Pct_URB_1960s,
+                                            ifelse(tab$GROWTH_DECADE == "1970s", tab$Pct_URB_1970s,
+                                                   ifelse(tab$GROWTH_DECADE == "1980s", tab$Pct_URB_1980s,
+                                                          ifelse(tab$GROWTH_DECADE == "1990s", tab$Pct_URB_1990s,
+                                                                 ifelse(tab$GROWTH_DECADE == "2000s", tab$Pct_URB_2000s, 
+                                                                        ifelse(tab$GROWTH_DECADE == "2010s",tab$Pct_URB_2010s, NA)))))))
+      
+      regressants = paste0(regressants, " + Urbanization_Growth")
+    }
+    if ('tcam_gdp' %in% dyn_vars == "TRUE"){
         tab$GDP_Growth =  ifelse(tab$GROWTH_DECADE == "1960s", tab$Pct_GDP_1960s,
                                        ifelse(tab$GROWTH_DECADE == "1970s", tab$Pct_GDP_1970s,
                                               ifelse(tab$GROWTH_DECADE == "1980s", tab$Pct_GDP_1980s,
@@ -1368,7 +1412,7 @@ tableForTrajectories <- reactive({
                                                                    ifelse(tab$GROWTH_DECADE == "2010s",tab$Pct_GDP_2010s, NA))))))
         regressants = paste0(regressants, " + GDP_Growth")
       }
-    if ('alpha' %in% dyn_vars == "TRUE"){
+    if ('alpha' %in% static_vars == "TRUE"){
       tab$Initial_Alpha = tab$ALPHA
       regressants = paste0(regressants, " + Initial_Alpha")
     }
@@ -1387,9 +1431,12 @@ tableForTrajectories <- reactive({
     }
     
     if ('urb' %in% static_vars == "TRUE"){
+      tab$Initial_Urbanization_Level_ = as.factor(ifelse(tab$URBP <= input$UrbVal2[[1]], "Low", ifelse(tab$URBP >= input$UrbVal2[[2]], "High", " Medium")))
+      regressants = paste0(regressants, " + Initial_Urbanization_Level_")
+      
     }
-    
-     if ('wi' %in% events == "TRUE"){
+ 
+       if ('wi' %in% events == "TRUE"){
         tab$War_Of_Independence = tab$wi
       regressants = paste0(regressants, " + War_Of_Independence")
     }

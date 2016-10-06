@@ -240,7 +240,10 @@ tabPanel("2. An Example of Zipf's law for cities",
              h2("COUNTRY POPULATION"), 
              HTML('Total population in thousands, from UN estimates (1950-2015) 
                       <a href=http://esa.un.org/unpd/wpp/Download/Standard/Population/">http://esa.un.org/unpd/wpp/Download/Standard/Population/</a>'),
-             h2("COUNTRY GDP"), 
+             h2("URBANIZATION LEVEL"), 
+             HTML('Proportion urban in %, from UN World Urbanization Prospect, 2014 Revision (1950-2050) 
+                  <a href=https://esa.un.org/unpd/wup/CD-ROM">https://esa.un.org/unpd/wup/CD-ROM/</a>'),
+              h2("COUNTRY GDP"), 
              HTML('GDP per capita in current US $, from World Bank estimates (1960-2015) 
                      <a href=http://data.worldbank.org/indicator/NY.GDP.PCAP.CD">http://data.worldbank.org/indicator/NY.GDP.PCAP.CD</a>'),
              
@@ -315,10 +318,11 @@ tabPanel("2. An Example of Zipf's law for cities",
                                              "Coverage of territories" = "studyCoverage"), selected = NULL, inline = FALSE)),
                column(4,checkboxGroupInput("topicalSpecs", "Territorial Variables", 
                                            c("All" = "alltop",
-                                             "Type of territory" = "country",
+                                            # "Type of territory" = "country",
                                              #  "Date of Observation" = "year4model",
                                              "Age of Urbanisation" = "urbanisation4model",
                                              "Country Population" = "countrySize",
+                                             "Urbanization Level" ="countryUrb",
                                              "Country GDP per capita" = "countryGDP"), selected = NULL, inline = FALSE)),
                
                column(6,checkboxInput("fixedEffects", "Fixed Study Effects", value = F)),
@@ -333,30 +337,36 @@ tabPanel("2. An Example of Zipf's law for cities",
                  sliderInput("NVal", "Number of cities (bounds of the medium reference class)",
                              min = 1, max = 1000, value = c(30, 300)))),
                column(4,conditionalPanel(
+                 condition = 'input.otherSpecs.indexOf("yearOfPubli") != -1 || input.otherSpecs.indexOf("allother") != -1',
+                 sliderInput("yearOfP", "Year of Publication (bounds of the medium reference class)",
+                             min = 1925, max = 2015, value = c(1975, 2000)))),
+               column(4,conditionalPanel(
+                 condition = 'input.otherSpecs.indexOf("studyPeriod") != -1 || input.otherSpecs.indexOf("allother") != -1',
+                 sliderInput("s_period", "Length of the study period (boundary between short and long periods)",
+                             min = 2, max = 200, value = 50))),
+               column(4,conditionalPanel(
+                 condition = 'input.otherSpecs.indexOf("studyCoverage") != -1 || input.otherSpecs.indexOf("allother") != -1',
+                 sliderInput("n_territories", "Territories covered by the study (boundary between few and many)",
+                             min = 2, max = 200, value = 5))),
+               column(4,conditionalPanel(
+                 condition = 'input.otherSpecs.indexOf("studySize") != -1 || input.otherSpecs.indexOf("allother") != -1',
+                 sliderInput("n_estim", "Number of estimations in the study (boundary between small and large studies)",
+                             min = 2, max = 100, value = 10)))),
+             column(4,conditionalPanel(
                  condition = 'input.topicalSpecs.indexOf("countrySize") != -1 || input.topicalSpecs.indexOf("alltop") != -1',
                  sliderInput("PopVal", "Country Population (x 1000, bounds of the medium reference class)",
                              min = 1, max = 1000000, value = c(10000, 100000)))),
              column(4,conditionalPanel(
+               condition = 'input.topicalSpecs.indexOf("countryUrb") != -1 || input.topicalSpecs.indexOf("alltop") != -1',
+               sliderInput("UrbVal", "Urbanization Level (%, bounds of the medium reference class)",
+                           min = 0, max = 100, value = c(20, 60)))),
+             column(4,conditionalPanel(
                condition = 'input.topicalSpecs.indexOf("countryGDP") != -1 || input.topicalSpecs.indexOf("alltop") != -1',
                sliderInput("GDPVal", "GDP per Capita (current US$, bounds of the medium reference class)",
                            min = 1, max = 100000, value = c(1000, 10000)))),
-             column(4,conditionalPanel(
-               condition = 'input.otherSpecs.indexOf("yearOfPubli") != -1 || input.otherSpecs.indexOf("allother") != -1',
-               sliderInput("yearOfP", "Year of Publication (bounds of the medium reference class)",
-                           min = 1925, max = 2015, value = c(1975, 2000)))),
-             column(4,conditionalPanel(
-               condition = 'input.otherSpecs.indexOf("studyPeriod") != -1 || input.otherSpecs.indexOf("allother") != -1',
-               sliderInput("s_period", "Length of the study period (boundary between short and long periods)",
-                           min = 2, max = 200, value = 50))),
-             column(4,conditionalPanel(
-               condition = 'input.otherSpecs.indexOf("studyCoverage") != -1 || input.otherSpecs.indexOf("allother") != -1',
-               sliderInput("n_territories", "Territories covered by the study (boundary between few and many)",
-                           min = 2, max = 200, value = 5))),
-             column(4,conditionalPanel(
-               condition = 'input.otherSpecs.indexOf("studySize") != -1 || input.otherSpecs.indexOf("allother") != -1',
-               sliderInput("n_estim", "Number of estimations in the study (boundary between small and large studies)",
-                           min = 2, max = 100, value = 10)))),
-     
+              
+             
+           
              fluidRow(
                tags$hr(),
                h4("Model Fit"),
@@ -484,13 +494,14 @@ tabPanel("Dynamic Analysis",
                       column(4,checkboxGroupInput("var_dyn_meta_analysis", "Evolutive Context", 
                                                   c("Population Growth" = "tcam_pop",
                                                     "GDP per capita Growth" = "tcam_gdp",
-                                                    "Initial Alpha" = "alpha"
+                                                    "Urbanization Growth" = "tcam_urb"
                                                   ),
                                                      selected = NULL, inline = FALSE)),
                       column(4,checkboxGroupInput("var_static_meta_analysis", "Static Context", 
-                                                  c("Population (log)" = "pop",
-                                                    "GDP per capita (log)" = "gdp",
-                                                    "Urbanisation level" = "urb"
+                                                  c("Initial Population" = "pop",
+                                                    "Initial GDP per capita" = "gdp",
+                                                    "Initial Urbanization level" = "urb",
+                                                    "Initial Alpha" = "alpha"
                                                   ),
                                                   selected = NULL, inline = FALSE)),
                       column(4,checkboxGroupInput("meta_events_meta_analysis", "Event Context", 
@@ -511,8 +522,13 @@ tabPanel("Dynamic Analysis",
                       column(4,conditionalPanel(
                         condition = 'input.var_static_meta_analysis.indexOf("gdp") != -1',
                         sliderInput("GDPVal2", "GDP per Capita (current US$, bounds of the medium reference class)",
-                                    min = 1, max = 100000, value = c(1000, 10000))))
-                     
+                                    min = 1, max = 100000, value = c(1000, 10000)))),
+                      column(4,conditionalPanel(
+                        condition = 'input.var_static_meta_analysis.indexOf("urb") != -1',
+                        sliderInput("UrbVal2", "Urbanization Level (%, bounds of the medium reference class)",
+                                    min = 0, max = 100, value = c(20, 60))))
+                  
+                      
                     ),
                     
                     fluidRow(
