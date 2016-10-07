@@ -436,33 +436,7 @@ tabPanel("2. An Example of Zipf's law for cities",
      )),
 tabPanel("Dynamic Analysis",
          tabsetPanel(
-           tabPanel("1. Trajectories of urban hierarchy",
-                    h2("Subset Table by:"),
-                    fluidRow(
-                      column(4,selectizeInput("territory_3", "Territory", "", multiple=T)),
-                    plotOutput('trajectories'))
-                    ),
-           tabPanel("2. Data",
-                    "Explore the growth rates of alpha to relate them to potential historical factors",
-                    h2("Subset Table by:"),
-                    fluidRow(
-                      column(4,selectInput("criteriaSubset", "Criteria", choices= c("Increasing unevenness" = "increasing",
-                                                                                    "Decreasing unevenness" = "decreasing")
-                                             , selected = c("increasing"), multiple=F)),
-                      column(4,conditionalPanel(
-                        condition = 'input.criteriaSubset.indexOf("increasing") != -1',
-                        sliderInput("threshold_growthrate_increasing", "Minimum AAGR* for display (%)",
-                                    min = 0, max = 10, value = 0))),
-                      column(4,conditionalPanel(
-                        condition = 'input.criteriaSubset.indexOf("decreasing") != -1',
-                        sliderInput("threshold_growthrate_decreasing", "Maximum AAGR* for display (%)",
-                                    min = -10, max = 0, value = 0))),
-                      column(12,"* AAGR = Average Annual Growth Rate"),
-                      
-                      dataTableOutput('data_trajectories')#,
-                      #     downloadButton("downloadTrajTable", "Download Data")
-                    )
-           ),
+        
            # tabPanel("3. Contexts of growth",
            # 
            #          fluidRow(
@@ -488,34 +462,44 @@ tabPanel("Dynamic Analysis",
            # 
            #          tags$hr()
            # ),
-           tabPanel("3. Meta Dynamic Analysis",
+           tabPanel("1. Meta Dynamic Analysis",
                     h4("Select Features for the Dynamic Meta Analysis"),
                     fluidRow(
-                      column(4,checkboxGroupInput("var_dyn_meta_analysis", "Evolutive Context", 
-                                                  c("Population Growth" = "tcam_pop",
-                                                    "GDP per capita Growth" = "tcam_gdp",
-                                                    "Urbanization Growth" = "tcam_urb"
-                                                  ),
-                                                     selected = NULL, inline = FALSE)),
                       column(4,checkboxGroupInput("var_static_meta_analysis", "Static Context", 
                                                   c("Initial Population" = "pop",
                                                     "Initial GDP per capita" = "gdp",
                                                     "Initial Urbanization level" = "urb",
-                                                    "Initial Alpha" = "alpha"
+                                                    "Initial Alpha" = "alpha",
+                                                    "Urbanization Age" = "urbanAge"
                                                   ),
                                                   selected = NULL, inline = FALSE)),
+                      column(4,checkboxGroupInput("var_dyn_meta_analysis", "Evolutive Context", 
+                                                  c("Population Growth" = "tcam_pop",
+                                                    "GDP per capita Growth" = "tcam_gdp",
+                                                    "Urbanization Growth" = "tcam_urb",
+                                                    "Date" = "t",
+                                                    "Number of Cities" = "n"
+                                                  ),
+                                                     selected = NULL, inline = FALSE)),
                       column(4,checkboxGroupInput("meta_events_meta_analysis", "Event Context", 
                                                   c("Revolution" = "rv",
                                                     "War of Independence" = "wi",
                                                     "Civil War" = "cw",
-                                                    "International War" = "iw"
+                                                    "International War" = "iw",""
                                                   ),
                                                   selected = NULL, inline = FALSE)),
                       column(4,conditionalPanel(
-                        condition = 'input.var_dyn_meta_analysis.indexOf("tcam_pop") != -1 || input.var_dyn_meta_analysis.indexOf("tcam_gdp") != -1 ',
-                        sliderInput("rates", "Country Population (%, bounds of the medium reference class)",
-                                    min = -10, max = 10, value = c(-1, 1)))),
+                        condition = 'input.var_dyn_meta_analysis.indexOf("tcam_pop") != -1 || 
+                        input.var_dyn_meta_analysis.indexOf("tcam_gdp") != -1 ||
+                        input.var_dyn_meta_analysis.indexOf("tcam_urb") != -1 ',
+                        sliderInput("rates", "Rates of Growth (%, bounds of the medium reference class)",
+                                    min = -10, max = 10, value = c(1, 5)))),
                       column(4,conditionalPanel(
+                        condition = 'input.var_dyn_meta_analysis.indexOf("n") != -1 ',
+                        sliderInput("NVal2", "Number of cities (bounds of the medium reference class)",
+                                    min = 1, max = 1000, value = c(30, 300)))),
+                      
+                       column(4,conditionalPanel(
                         condition = 'input.var_static_meta_analysis.indexOf("pop") != -1',
                         sliderInput("PopVal2", "Country Population (x 1000, bounds of the medium reference class)",
                                     min = 1, max = 1000000, value = c(10000, 100000)))),
@@ -526,8 +510,13 @@ tabPanel("Dynamic Analysis",
                       column(4,conditionalPanel(
                         condition = 'input.var_static_meta_analysis.indexOf("urb") != -1',
                         sliderInput("UrbVal2", "Urbanization Level (%, bounds of the medium reference class)",
-                                    min = 0, max = 100, value = c(20, 60))))
-                  
+                                    min = 0, max = 100, value = c(20, 60)))),
+                      column(4,conditionalPanel(
+                        condition = 'input.var_static_meta_analysis.indexOf("alpha") != -1',
+                        sliderInput("alphaVal", "Alpha at the beginning of the period (bounds of the medium reference class)",
+                                    min = 0, max = 5, value = c(0.9, 1.1), step = 0.05))),
+                      
+                      column(12,checkboxInput("sameSample2", "Compare models with the same observations", value = F))
                       
                     ),
                     
@@ -541,9 +530,35 @@ tabPanel("Dynamic Analysis",
                      tableOutput('model_dyn_param')
                       
                       )
-                    )#,
+                    ),
+           tabPanel("2. Data",
+                    "Explore the growth rates of alpha to relate them to potential historical factors",
+                    h2("Subset Table by:"),
+                    fluidRow(
+                      column(4,selectInput("criteriaSubset", "Criteria", choices= c("Increasing unevenness" = "increasing",
+                                                                                    "Decreasing unevenness" = "decreasing")
+                                           , selected = c("increasing"), multiple=F)),
+                      column(4,conditionalPanel(
+                        condition = 'input.criteriaSubset.indexOf("increasing") != -1',
+                        sliderInput("threshold_growthrate_increasing", "Minimum AAGR* for display (%)",
+                                    min = 0, max = 10, value = 0))),
+                      column(4,conditionalPanel(
+                        condition = 'input.criteriaSubset.indexOf("decreasing") != -1',
+                        sliderInput("threshold_growthrate_decreasing", "Maximum AAGR* for display (%)",
+                                    min = -10, max = 0, value = 0))),
+                      column(12,"* AAGR = Average Annual Growth Rate"),
+                      
+                      dataTableOutput('data_trajectories')#,
+                      #     downloadButton("downloadTrajTable", "Download Data")
+                    )
+           ),
+           tabPanel("3. Trajectories of urban hierarchy",
+                    h2("Subset Table by:"),
+                    fluidRow(
+                      column(4,selectizeInput("territory_3", "Territory", "", multiple=T)),
+                      plotOutput('trajectories'))
+           )
            
-                    
            
                 # tabPanel("4. Projections"
            # )
