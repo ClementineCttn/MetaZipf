@@ -9,6 +9,8 @@ library(data.table)
 library(plm)
 library(lme4)
 
+# meta[is.na(meta$URBP),c("REFID", "TERRITORY","CNTR_ID","DATE", "TOTAL_POP", "URBP")]
+# colnames(meta)
 meta = read.csv("data/zipf_meta.csv", sep=",", dec=".")
 meta$REFERENCE = as.character(meta$REFERENCE)
 meta$DECADE = as.factor(paste0(substr(meta$DATE, 1, 3), "0s"))
@@ -739,12 +741,12 @@ tableForTrajectories <- reactive({
       regressants = paste0(regressants, " + Number_Of_Cities_")
       columnsToKeep = c(columnsToKeep, "Number_Of_Cities_")}
     
-    if ('country' %in% TopicalSpecs  == "TRUE") {
-      tab = subset(tab, TERRITORY_TYPE != "")
-      tab$Territory_ = tab$TERRITORY_TYPE
-      regressants = paste0(regressants, " + Territory_") 
-      columnsToKeep = c(columnsToKeep, "Territory_")}
-    
+    # if ('country' %in% TopicalSpecs  == "TRUE") {
+    #   tab = subset(tab, TERRITORY_TYPE != "")
+    #   tab$Territory_ = tab$TERRITORY_TYPE
+    #   regressants = paste0(regressants, " + Territory_") 
+    #   columnsToKeep = c(columnsToKeep, "Territory_")}
+    # 
     if ('regForm' %in%  TechnicalSpecs == "TRUE")  {
       tab$Regression_Form_ = tab$REGRESSIONFORM
       regressants = paste0(regressants, " + Regression_Form_")
@@ -802,8 +804,9 @@ tableForTrajectories <- reactive({
     if (sameSample == T) {
       tab = subset(tab, TRUNCATION_POINT >= 0)
       tab = subset(tab, N >= 0)
-      tab = subset(tab, TERRITORY_TYPE != "")
+   #   tab = subset(tab, TERRITORY_TYPE != "")
       tab = subset(tab, URBANISATION != "")
+      tab = subset(tab, URBP > 0)
       tab = subset(tab, TOTAL_POP > 0)
       tab = subset(tab, GDPPC > 0)
       tab = tab[,columnsToKeep]
@@ -845,12 +848,12 @@ tableForTrajectories <- reactive({
       columnsToKeep = c(columnsToKeep, "Number_Of_Cities_")
       }
     
-    if ('country' %in% TopicalSpecs  == "TRUE") {
-      tab = subset(tab, TERRITORY_TYPE != "")
-      tab$Territory_ = tab$TERRITORY_TYPE
-      regressants = paste0(regressants, " + Territory_") 
-      columnsToKeep = c(columnsToKeep, "Territory_")
-      }
+    # if ('country' %in% TopicalSpecs  == "TRUE") {
+    #   tab = subset(tab, TERRITORY_TYPE != "")
+    #   tab$Territory_ = tab$TERRITORY_TYPE
+    #   regressants = paste0(regressants, " + Territory_") 
+    #   columnsToKeep = c(columnsToKeep, "Territory_")
+    #   }
     
     if ('regForm' %in%  TechnicalSpecs == "TRUE")  {
       tab$Regression_Form_ = tab$REGRESSIONFORM
@@ -926,9 +929,10 @@ tableForTrajectories <- reactive({
     if (sameSample == T) {
       tab = subset(tab, TRUNCATION_POINT >= 0)
       tab = subset(tab, N >= 0)
-      tab = subset(tab, TERRITORY_TYPE != "")
+    #  tab = subset(tab, TERRITORY_TYPE != "")
       tab = subset(tab, URBANISATION != "")
       tab = subset(tab, TOTAL_POP > 0)
+      tab = subset(tab, URBP > 0)
       tab = subset(tab, GDPPC > 0)
       tab = tab[,columnsToKeep]
       tab = tab[complete.cases(tab),]
