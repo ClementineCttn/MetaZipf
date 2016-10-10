@@ -9,8 +9,6 @@ library(data.table)
 library(plm)
 library(lme4)
 
-# meta[is.na(meta$URBP),c("REFID", "TERRITORY","CNTR_ID","DATE", "TOTAL_POP", "URBP")]
-# colnames(meta)
 meta = read.csv("data/zipf_meta.csv", sep=",", dec=".")
 meta$REFERENCE = as.character(meta$REFERENCE)
 meta$DECADE = as.factor(paste0(substr(meta$DATE, 1, 3), "0s"))
@@ -44,6 +42,7 @@ meta$SOURCE = NULL
   pops = read.csv("data/UN_Population_1950_2015.csv", sep=",", dec=".")
 colnames(pops) = c("CNTR_ID", "Name", "CC", paste0("POP", 1950:2015))
 pops[pops == 0] <- NA
+pops =  pops[pops$CNTR_ID != "",]
 
 pops$Pct_POP_1950s = AAGR_pct(pops$POP1950, pops$POP1960, 10)
 pops$Pct_POP_1960s = AAGR_pct(pops$POP1960, pops$POP1970, 10)
@@ -57,6 +56,7 @@ pops$Pct_POP_2010s = AAGR_pct(pops$POP2010, pops$POP2015, 5)
 urbs = read.csv("data/UN_Urbanization_1950_2050.csv", sep=",", dec=".")
 colnames(urbs) = c("CNTR_ID", "Name", "CC", paste0("URB", 1950:2050))
 urbs[urbs == 0] <- NA
+urbs =  urbs[urbs$CNTR_ID != "",]
 
 urbs$Pct_URB_1950s = AAGR_pct(urbs$URB1950, urbs$URB1960, 10)
 urbs$Pct_URB_1960s = AAGR_pct(urbs$URB1960, urbs$URB1970, 10)
@@ -70,14 +70,16 @@ urbs$Pct_URB_2010s = AAGR_pct(urbs$URB2010, urbs$URB2015, 5)
 gdps = read.csv("data/WB_GDP_1960_2015.csv", sep=",", dec=".")
 colnames(gdps) = c("CNTR_ID", "Name", "CC", paste0("GDP", 1960:2015))
 gdps[gdps == 0] <- NA
-  
+gdps =  gdps[gdps$CNTR_ID != "",]
+
   gdps$Pct_GDP_1960s = AAGR_pct(gdps$GDP1960, gdps$GDP1970, 10)
   gdps$Pct_GDP_1970s = AAGR_pct(gdps$GDP1970, gdps$GDP1980, 10)
   gdps$Pct_GDP_1980s = AAGR_pct(gdps$GDP1980, gdps$GDP1990, 10)
   gdps$Pct_GDP_1990s = AAGR_pct(gdps$GDP1990, gdps$GDP2000, 10)
   gdps$Pct_GDP_2000s = AAGR_pct(gdps$GDP2000, gdps$GDP2010, 10)
   gdps$Pct_GDP_2010s = AAGR_pct(gdps$GDP2010, gdps$GDP2015, 5)
- 
+  
+
   meta = data.frame(meta, pops[match(meta$CNTR_ID,pops$CNTR_ID),])
 meta = data.frame(meta, gdps[match(meta$CNTR_ID,gdps$CNTR_ID),])
 meta = data.frame(meta, urbs[match(meta$CNTR_ID,urbs$CNTR_ID),])
@@ -483,9 +485,17 @@ tableForTrajectoryMaps <- reactive({
       median_date = (longitudinalAlphas[i,"DATE"] + longitudinalAlphas[i+1,"DATE"]) / 2
       longitudinalAlphas[i,"PCT_GROWTH_ALPHA"] =  AAGR_pct(initVal = iv, finalVal = fv, nPeriods = ye) 
       longitudinalAlphas[i,"GROWTH_DECADE"] = paste0(substr(as.character(median_date),1,3),'0s')
+      
+      if(!is.na(longitudinalAlphas[i,"N"])){
+       fvn = longitudinalAlphas[i+1,"N"]
+       ivn = longitudinalAlphas[i,"N"]
+       longitudinalAlphas[i,"GN"] =  AAGR_pct(initVal = ivn, finalVal = fvn, nPeriods = ye) 
+      } else { longitudinalAlphas[i,"GN"] = NA }
+      
     } else {
       longitudinalAlphas[i,"PCT_GROWTH_ALPHA"] = NA
       longitudinalAlphas[i,"GROWTH_DECADE"] = NA
+      longitudinalAlphas[i,"GN"] = NA
     }
   }
   
@@ -1382,6 +1392,7 @@ tableForTrajectories <- reactive({
    dyn_vars = input$var_dyn_meta_analysis
   static_vars =  input$var_static_meta_analysis
   events = input$meta_events_meta_analysis
+    default = input$var_interest_meta_analysis
     
     regressants = "PCT_GROWTH_ALPHA ~ 1 "
     columnsToKeep = c("ALPHA", "PCT_GROWTH_ALPHA")
@@ -1428,20 +1439,21 @@ tableForTrajectories <- reactive({
           
     }
     
-    if ('t' %in% dyn_vars == "TRUE"){
+    if ('n' %in% dyn_vars == "TRUE"){
+     tab$Growth_of_Cities_ = as.factor(ifelse(tab$GN <= input$rates[[1]], "Slow", ifelse(tab$GN >= input$rates[[2]], "Fast", " Medium")))
+      regressants = paste0(regressants, " + Growth_of_Cities_")
+      columnsToKeep = c(columnsToKeep, "Growth_of_Cities_")
+      
+    }
+    
+    if ('t' %in% default == "TRUE"){
       tab$Date = tab$DATE - 1950
       regressants = paste0(regressants, " + Date")
       columnsToKeep = c(columnsToKeep, "Date")
       
     }
     
-    if ('n' %in% dyn_vars == "TRUE"){
-      tab$Number_of_Cities_ = as.factor(ifelse(tab$N <= input$NVal2[[1]], "Small", ifelse(tab$N >= input$NVal2[[2]], "Large", " Medium")))
-      regressants = paste0(regressants, " + Number_of_Cities_")
-      columnsToKeep = c(columnsToKeep, "Number_of_Cities_")
-      
-    }
-    
+   
     if ('urbanAge' %in% static_vars == "TRUE"){
       tab$Urbanization_Age_ = tab$URBANISATION
       regressants = paste0(regressants, " + Urbanization_Age_")
@@ -1449,7 +1461,7 @@ tableForTrajectories <- reactive({
       
     }
    
-     if ('alpha' %in% static_vars == "TRUE"){
+     if ('alpha' %in% default == "TRUE"){
       tab$Initial_Alpha_ = as.factor(ifelse(tab$ALPHA <= input$alphaVal[[1]], "Low", ifelse(tab$ALPHA >= input$alphaVal[[2]], "High", " Medium")))
       regressants = paste0(regressants, " + Initial_Alpha_")
       columnsToKeep = c(columnsToKeep, "Initial_Alpha_")

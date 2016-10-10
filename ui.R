@@ -465,11 +465,15 @@ tabPanel("Dynamic Analysis",
            tabPanel("1. Meta Dynamic Analysis",
                     h4("Select Features for the Dynamic Meta Analysis"),
                     fluidRow(
+                      column(12,checkboxGroupInput("var_interest_meta_analysis", "Default Variables", 
+                                                  c("Initial Alpha" = "alpha",
+                                                    "Date" = "t"
+                                                  ),
+                                                  selected = c("alpha", "t"), inline = TRUE)),
                       column(4,checkboxGroupInput("var_static_meta_analysis", "Static Context", 
                                                   c("Initial Population" = "pop",
                                                     "Initial GDP per capita" = "gdp",
                                                     "Initial Urbanization level" = "urb",
-                                                    "Initial Alpha" = "alpha",
                                                     "Urbanization Age" = "urbanAge"
                                                   ),
                                                   selected = NULL, inline = FALSE)),
@@ -477,7 +481,6 @@ tabPanel("Dynamic Analysis",
                                                   c("Population Growth" = "tcam_pop",
                                                     "GDP per capita Growth" = "tcam_gdp",
                                                     "Urbanization Growth" = "tcam_urb",
-                                                    "Date" = "t",
                                                     "Number of Cities" = "n"
                                                   ),
                                                      selected = NULL, inline = FALSE)),
@@ -485,21 +488,17 @@ tabPanel("Dynamic Analysis",
                                                   c("Revolution" = "rv",
                                                     "War of Independence" = "wi",
                                                     "Civil War" = "cw",
-                                                    "International War" = "iw",""
+                                                    "International War" = "iw"
                                                   ),
                                                   selected = NULL, inline = FALSE)),
                       column(4,conditionalPanel(
                         condition = 'input.var_dyn_meta_analysis.indexOf("tcam_pop") != -1 || 
                         input.var_dyn_meta_analysis.indexOf("tcam_gdp") != -1 ||
+                        input.var_dyn_meta_analysis.indexOf("n") != -1 ||
                         input.var_dyn_meta_analysis.indexOf("tcam_urb") != -1 ',
                         sliderInput("rates", "Rates of Growth (%, bounds of the medium reference class)",
                                     min = -10, max = 10, value = c(1, 5)))),
                       column(4,conditionalPanel(
-                        condition = 'input.var_dyn_meta_analysis.indexOf("n") != -1 ',
-                        sliderInput("NVal2", "Number of cities (bounds of the medium reference class)",
-                                    min = 1, max = 1000, value = c(30, 300)))),
-                      
-                       column(4,conditionalPanel(
                         condition = 'input.var_static_meta_analysis.indexOf("pop") != -1',
                         sliderInput("PopVal2", "Country Population (x 1000, bounds of the medium reference class)",
                                     min = 1, max = 1000000, value = c(10000, 100000)))),
