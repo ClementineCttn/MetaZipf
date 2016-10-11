@@ -147,7 +147,6 @@ for (i in 1:dim(meta)[1]) {
   if (dim(rv)[1] > 0) meta[i,"rv"] = 1
 }
 
-head(meta)
 r_colors <- rgb(t(col2rgb(colors()) / 255))
 names(r_colors) <- colors()
 
@@ -554,16 +553,64 @@ tableForTrajectories <- reactive({
   
   output$trajectories = renderPlot({
     tab = tableForTrajectories()
-    gp = ggplot(data = tab, aes(x=DATE, y=ALPHA, group=SAME_SPECIFICATIONS, col=SAME_SPECIFICATIONS))
    if (length(unique(tab$SAME_SPECIFICATIONS)) <= 20)  {
-      gp + geom_point() + geom_line()
+     gp = ggplot() + geom_point(data = tab, aes(x=DATE, y=ALPHA, group=SAME_SPECIFICATIONS, col=SAME_SPECIFICATIONS)) +
+       geom_line(data = tab, aes(x=DATE, y=ALPHA, group=SAME_SPECIFICATIONS, col=SAME_SPECIFICATIONS))
       } else {
-      gp + geom_point() + geom_line() + guides(colour=FALSE)
+        gp = ggplot() + geom_point(data = tab, aes(x=DATE, y=ALPHA, group=SAME_SPECIFICATIONS, col=SAME_SPECIFICATIONS)) +
+          geom_line(data = tab, aes(x=DATE, y=ALPHA, group=SAME_SPECIFICATIONS, col=SAME_SPECIFICATIONS)) +
+          guides(colour=FALSE)
       }
-  })
+    events = input$eventsToPlot
+     
+    territories = tab$CNTR_ID
+    miny = min(tab$ALPHA)
+    t1 = min(tab$DATE)
+    t2 = max(tab$DATE)
+    
+    
+    if ("iw" %in% events) {
+      iw = metaEvents[metaEvents$TYPE == "iw" & metaEvents$DATE >= t1 & 
+                        metaEvents$DATE <= t2 & metaEvents$COUNTRY_ID %in% territories,]
+      if (dim(iw)[1] > 0){
+          gp = gp + geom_vline(data = iw, aes(xintercept = DATE), col="#1e90ff") + 
+          geom_text(data = iw, aes(x = DATE, label = EVENT, hjust = 0, vjust = 0 ), y = miny,
+                    angle = 90, col="#1e90ff") + guides(size=FALSE)
+      }
+    }
+    if ("cw" %in% events) {
+      cw = metaEvents[metaEvents$TYPE == "cw" & metaEvents$DATE >= t1 & 
+                        metaEvents$DATE <= t2 & metaEvents$COUNTRY_ID %in% territories,]
+        if (dim(cw)[1] > 0){
+        gp = gp + geom_vline(data = cw, aes(xintercept = DATE), col="#2c3e50") + 
+          geom_text(data = cw, aes(x = DATE,label = EVENT, hjust = 0, vjust = 0 ), y = miny,
+                    angle = 90, col="#2c3e50") + guides(size=FALSE)
+      }
+    }
+    if ("rv" %in% events) {
+      rv = metaEvents[metaEvents$TYPE == "rv" & metaEvents$DATE >= t1 & 
+                        metaEvents$DATE <= t2 & metaEvents$COUNTRY_ID %in% territories,]
+      if (dim(rv)[1] > 0){
+        gp = gp + geom_vline(data = rv, aes(xintercept = DATE), col="#18BC9C") + 
+          geom_text(data = rv, aes(x = DATE,label = EVENT, hjust = 0, vjust = 0 ), y = miny,
+                    angle = 90, col="#18BC9C") + guides(size=FALSE)
+      }
+    }
+    if ("wi" %in% events) {
+      wi = metaEvents[metaEvents$TYPE == "wi" & metaEvents$DATE >= t1 & 
+                        metaEvents$DATE <= t2 & metaEvents$COUNTRY_ID %in% territories,]
+      if (dim(wi)[1] > 0){
+        gp = gp + geom_vline(data = wi, aes(xintercept = DATE), col="#B91838") + 
+          geom_text(data = wi, aes(x = DATE,label = EVENT, hjust = 0, vjust = 0 ), y = miny,
+                    angle = 90, col="#B91838") + guides(size=FALSE)
+      }
+    }
+      gp
+   })
   
   
-    output$DARIUS <- renderLeaflet({
+  
+      output$DARIUS <- renderLeaflet({
     cities = DARIUSSubset()
     
     leaflet() %>% addProviderTiles("CartoDB.Positron") %>%
@@ -1120,10 +1167,9 @@ tableForTrajectories <- reactive({
     
   })
   
-  
      
-     output$data_trajectories = renderDataTable({
-       tab = tableForTrajectoryMaps()
+     output$residual_trajectories = renderDataTable({
+       tab = residualTableForTrajectoryMaps()
        crit = input$criteriaSubset
        if (input$alpha == "PARETO") {
          if ( crit == "increasing") {
@@ -1134,20 +1180,20 @@ tableForTrajectories <- reactive({
        }
            
        tab$ALPHA = round(tab$ALPHA, 2)
-       tab$PCT_GROWTH_ALPHA = round(tab$PCT_GROWTH_ALPHA, 2)
+       tab$RESIDUAL_GROWTH_ALPHA = round(tab$residuals, 2)
        
        if (crit == "increasing"){
          thresh = input$threshold_growthrate_increasing
-         selectedTable = tab[tab$PCT_GROWTH_ALPHA >= thresh,]
-         selectedTable = selectedTable[order(-selectedTable$PCT_GROWTH_ALPHA),]
+         selectedTable = tab[tab$RESIDUAL_GROWTH_ALPHA >= thresh,]
+         selectedTable = selectedTable[order(-selectedTable$RESIDUAL_GROWTH_ALPHA),]
         } else {
            thresh = input$threshold_growthrate_decreasing
-         selectedTable = tab[tab$PCT_GROWTH_ALPHA <= thresh,]
-         selectedTable = selectedTable[order(selectedTable$PCT_GROWTH_ALPHA),]
+         selectedTable = tab[tab$RESIDUAL_GROWTH_ALPHA <= thresh,]
+         selectedTable = selectedTable[order(selectedTable$RESIDUAL_GROWTH_ALPHA),]
        }
        
-       selectedTable = selectedTable[,c("PCT_GROWTH_ALPHA", "ALPHA","TERRITORY", "GROWTH_DECADE", "URBANSCALE", "TRUNCATION_POINT", "REFERENCE")]
-       colnames(selectedTable) = c("AAGR* of alpha (%)", "Initial Alpha", "Territory", "Decade", "City definition","Population Cutoff", "Reference")
+       selectedTable = selectedTable[,c("RESIDUAL_GROWTH_ALPHA", "ALPHA","TERRITORY", "GROWTH_DECADE", "URBANSCALE", "TRUNCATION_POINT", "REFERENCE")]
+       colnames(selectedTable) = c("Residual AAGR* of alpha (%)", "Initial Alpha", "Territory", "Decade", "City definition","Population Cutoff", "Reference")
        selectedTable = selectedTable[complete.cases(selectedTable),]
        
         return(selectedTable)
@@ -1382,8 +1428,120 @@ tableForTrajectories <- reactive({
    }
  )
  
- 
- 
+ residualTableForTrajectoryMaps = reactive({
+   model = metaModelDynOLS()
+   residuals = model$residuals
+   
+   tab = tableForTrajectoryMaps()
+   tab = tab[!is.na(tab$PCT_GROWTH_ALPHA),]
+   tab = tab[is.finite(tab$PCT_GROWTH_ALPHA),]
+   dyn_vars = input$var_dyn_meta_analysis
+   static_vars =  input$var_static_meta_analysis
+   events = input$meta_events_meta_analysis
+   default = input$var_interest_meta_analysis
+   
+   columnsToKeep = c("ALPHA", "PCT_GROWTH_ALPHA", "TERRITORY", "GROWTH_DECADE", "URBANSCALE", "TRUNCATION_POINT", "REFERENCE")
+   
+   if ('tcam_pop' %in% dyn_vars == "TRUE"){
+     tab$Population_Growth = ifelse(tab$GROWTH_DECADE == "1950s", tab$Pct_POP_1950s,
+                                    ifelse(tab$GROWTH_DECADE == "1960s", tab$Pct_POP_1960s,
+                                           ifelse(tab$GROWTH_DECADE == "1970s", tab$Pct_POP_1970s,
+                                                  ifelse(tab$GROWTH_DECADE == "1980s", tab$Pct_POP_1980s,
+                                                         ifelse(tab$GROWTH_DECADE == "1990s", tab$Pct_POP_1990s,
+                                                                ifelse(tab$GROWTH_DECADE == "2000s", tab$Pct_POP_2000s, 
+                                                                       ifelse(tab$GROWTH_DECADE == "2010s",tab$Pct_POP_2010s, NA)))))))
+     tab$Population_Growth_ =  as.factor(ifelse(tab$Population_Growth <= input$rates[[1]], "Slow", ifelse(tab$Population_Growth >= input$rates[[2]], "Fast", " Medium")))
+     tab = tab[!is.na(tab$Population_Growth_),]
+     columnsToKeep = c(columnsToKeep, "Population_Growth_")
+   }
+   if ('tcam_urb' %in% dyn_vars == "TRUE"){
+     tab$Urbanization_Growth = ifelse(tab$GROWTH_DECADE == "1950s", tab$Pct_URB_1950s,
+                                      ifelse(tab$GROWTH_DECADE == "1960s", tab$Pct_URB_1960s,
+                                             ifelse(tab$GROWTH_DECADE == "1970s", tab$Pct_URB_1970s,
+                                                    ifelse(tab$GROWTH_DECADE == "1980s", tab$Pct_URB_1980s,
+                                                           ifelse(tab$GROWTH_DECADE == "1990s", tab$Pct_URB_1990s,
+                                                                  ifelse(tab$GROWTH_DECADE == "2000s", tab$Pct_URB_2000s, 
+                                                                         ifelse(tab$GROWTH_DECADE == "2010s",tab$Pct_URB_2010s, NA)))))))
+     tab$Urbanization_Growth_ =  as.factor(ifelse(tab$Urbanization_Growth <= input$rates[[1]], "Slow", ifelse(tab$Urbanization_Growth >= input$rates[[2]], "Fast", " Medium")))
+     tab = tab[!is.na(tab$Urbanization_Growth_),]
+     columnsToKeep = c(columnsToKeep, "Urbanization_Growth_")
+   }
+   if ('tcam_gdp' %in% dyn_vars == "TRUE"){
+     tab$GDP_Growth =  ifelse(tab$GROWTH_DECADE == "1960s", tab$Pct_GDP_1960s,
+                              ifelse(tab$GROWTH_DECADE == "1970s", tab$Pct_GDP_1970s,
+                                     ifelse(tab$GROWTH_DECADE == "1980s", tab$Pct_GDP_1980s,
+                                            ifelse(tab$GROWTH_DECADE == "1990s", tab$Pct_GDP_1990s,
+                                                   ifelse(tab$GROWTH_DECADE == "2000s", tab$Pct_GDP_2000s, 
+                                                          ifelse(tab$GROWTH_DECADE == "2010s",tab$Pct_GDP_2010s, NA))))))
+     tab$GDP_Growth_ =  as.factor(ifelse(tab$GDP_Growth <= input$rates[[1]], "Slow", ifelse(tab$GDP_Growth >= input$rates[[2]], "Fast", " Medium")))
+     tab = tab[!is.na(tab$GDP_Growth_),]
+     columnsToKeep = c(columnsToKeep, "GDP_Growth_")
+   }
+   if ('n' %in% dyn_vars == "TRUE"){
+     tab$Growth_of_Cities_ = as.factor(ifelse(tab$GN <= input$rates[[1]], "Slow", ifelse(tab$GN >= input$rates[[2]], "Fast", " Medium")))
+     tab = tab[!is.na(tab$Growth_of_Cities_),]
+     columnsToKeep = c(columnsToKeep, "Growth_of_Cities_")
+     
+   }
+   if ('t' %in% default == "TRUE"){
+     tab$Date = tab$DATE - 1950
+     columnsToKeep = c(columnsToKeep, "Date")
+   }  
+   if ('urbanAge' %in% static_vars == "TRUE"){
+     tab = tab[!is.na(tab$URBANISATION),]
+     tab$Urbanization_Age_ = tab$URBANISATION
+     columnsToKeep = c(columnsToKeep, "Urbanization_Age_")
+     
+   }
+   if ('alpha' %in% default == "TRUE"){
+     tab = tab[!is.na(tab$ALPHA),]
+     tab$Initial_Alpha_ = as.factor(ifelse(tab$ALPHA <= input$alphaVal[[1]], "Low", ifelse(tab$ALPHA >= input$alphaVal[[2]], "High", " Medium")))
+     columnsToKeep = c(columnsToKeep, "Initial_Alpha_")
+   }
+   if ('pop' %in% static_vars == "TRUE"){
+     tab$Initial_Population_ =  as.factor(ifelse(tab$TOTAL_POP <= input$PopVal2[[1]], "Small", ifelse(tab$TOTAL_POP >= input$PopVal2[[2]], "Large", " Medium")))
+     tab = tab[!is.na(tab$Initial_Population_),]
+     columnsToKeep = c(columnsToKeep, "Initial_Population_")
+   }
+   
+   if ('gdp' %in% static_vars == "TRUE"){
+     tab$Initial_GDP_Per_Capita_ = as.factor(ifelse(tab$GDPPC <= input$GDPVal2[[1]], "Low", ifelse(tab$GDPPC >= input$GDPVal2[[2]], "High", " Medium")))
+     tab = tab[!is.na(tab$Initial_GDP_Per_Capita_),]
+     columnsToKeep = c(columnsToKeep, "Initial_GDP_Per_Capita_")
+   }
+   
+   if ('urb' %in% static_vars == "TRUE"){
+     tab$Initial_Urbanization_Level_ = as.factor(ifelse(tab$URBP <= input$UrbVal2[[1]], "Low", ifelse(tab$URBP >= input$UrbVal2[[2]], "High", " Medium")))
+     tab = tab[!is.na(tab$Initial_Urbanization_Level_),]
+     columnsToKeep = c(columnsToKeep, "Initial_Urbanization_Level_")
+     
+   }
+   
+   if ('wi' %in% events == "TRUE"){
+     tab$War_Of_Independence = tab$wi
+     columnsToKeep = c(columnsToKeep, "War_Of_Independence")
+   }
+   if ('iw' %in% events == "TRUE"){
+     tab$International_War = tab$iw
+     columnsToKeep = c(columnsToKeep, "International_War")
+   }
+   if ('cw' %in% events == "TRUE"){
+     tab$Civil_War = tab$cw
+     columnsToKeep = c(columnsToKeep, "Civil_War")
+   }
+   if ('rv' %in% events == "TRUE"){
+     tab$Revolution = tab$rv
+     columnsToKeep = c(columnsToKeep, "Revolution")
+   }
+   
+     tab = tab[,columnsToKeep]
+  
+   d = tab
+   d$residuals = residuals
+   
+   return(d)
+ })
+
 
  metaModelDynOLS <- reactive({
    tab = tableForTrajectoryMaps()
@@ -1510,17 +1668,17 @@ tableForTrajectories <- reactive({
       columnsToKeep = c(columnsToKeep, "Revolution")
     }
     
-    sameSample = input$sameSample2
-    if (sameSample == T) {
-      tab = subset(tab, N >= 0)
-      tab = subset(tab, URBANISATION != "")
-      tab = subset(tab, TOTAL_POP > 0)
-      tab = subset(tab, URBP > 0)
-      tab = subset(tab, GDPPC > 0)
-      tab = tab[,columnsToKeep]
-      tab = tab[complete.cases(tab),]
-    }
-    
+    # sameSample = input$sameSample2
+    # if (sameSample == T) {
+    #   tab = subset(tab, N >= 0)
+    #   tab = subset(tab, URBANISATION != "")
+    #   tab = subset(tab, TOTAL_POP > 0)
+    #   tab = subset(tab, URBP > 0)
+    #   tab = subset(tab, GDPPC > 0)
+    #   tab = tab[,columnsToKeep]
+    #   tab = tab[complete.cases(tab),]
+    # }
+    # 
        model = lm(regressants, data=tab, na.action = na.omit)
    return(model)
  })
