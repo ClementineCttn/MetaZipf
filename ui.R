@@ -65,7 +65,7 @@ shinyUI(
                        "The present application allows interactive queries into a pool of empirical papers to represent the variation of empiricial estimations of Zipf's
                        law's exponent in the literature, with respect to the systems of cities studied and meta-information about the publication. The meta analysis
                        considers urban characteristics (age of the system, total population), the specifications of the regression used (urban definitions,
-                       truncation points, number of cities) and the discipline of the journal publishing the paper to unveil systematic deviations from the iconic 1 value."
+                       truncation points, number of cities) and the scope of the journal publishing the paper to unveil systematic deviations from the iconic 1 value."
                      ),
                      br(),
                      br(),
@@ -261,7 +261,7 @@ shinyUI(
               empirical estimations are found to be distributed widely around this value.
               The meta analysis precisely looks for explanations for this diversity, by relating the value
               of alpha to some characteristics of the urban system (territory, population, age, type of cities)
-              and to potential biases (city definition, discipline, etc.)."
+              and to potential biases (city definition, regression form, etc.)."
             ),
             tags$hr(),
             h4("Statistical Distribution of estimations"),
@@ -363,67 +363,108 @@ shinyUI(
             "2. Data",
             h6(
               "In a meta-analysis, we do not work directly with the cities' data: we use the estimations published by other researchers. The data is thus made by the result of their
-              analysis along with the description of how they made the analysis. Each observation is
-              composed of a single estimation of alpha and half a dozen other variables."
+              analysis along with the description of how they made the analysis. Each observation is thus
+              composed of a single estimation of alpha, of variables describing the regression performed, 
+              of variables describing the study scope and of additional variables describing the territory within which alpha is estimated."
             ),
             tags$hr(),
-            h4("Data for a MetaAnalysis of Zipf"),
+            h4("Default Variables"),
             #  withMathJax(h6("$$\\log(P_i) = -\\alpha \\times \\log(R_i) + \\beta + \\epsilon_i$$ $$\\log(R_i) = -\\alpha' \\times \\log(P_i) + \\beta' + \\epsilon'_i$$ ")),
             
+            h2("ALPHA"),
+            "The scaling coefficient reported in the study or its transformed value, depending on the form chosen in the first tab (Lotka or Pareto).",
+            br(),
             h2("DATE"),
-            h6("For example: 1600 in Bretagnolle et al. (2000)."),
-            "The date (and decade) to which the cities'
-            population refer. This information can be used to test the hypothesis according to which systems of cities increase
-            their level of hierarchy over time, everything else being equal.",
+            "The date of observation used in the meta analysis is the date to which the cities' population refer. We centered it on 1950 to ease the reference case interpretation of the results.",
             br(),
-            h2("URBANISATION AGE"),
-            h6("For example: 'OLD' for China."),
-            "An indication whether urbanisation is a relatively recent or ancient phenomenon in the territory.
-            'OLD' continents refer to zones of early urbanisation, in Europe, South-East Asia and the Middle East.
-            America, Oceania, Africa and central Asia are considered 'NEW' in that respect.",
-            h2("NUMBER OF CITIES"),
-            h6("For example: 60 cities in Lepetit (1990)."),
-            "The number of cities used to estimate Zipf's coefficient.",
-            br(),
-            h2("CITY DEFINITION"),
-            h6("For example: MorphoCity in Guerin-Pace (1995)."),
-            "The criteria used to identify cities. LocalUnits correspond to administrative units.
-            MorphoCities are aggregations of Local units based on density orthe built-up area.
-            MetroAreas correspond to functional aggregations of Local units based on flows (typically commuters).
-            VariaMixed indicate that the definition is heterogenous or uncommon.",
-            br(),
-            h2("POPULATION CUTOFF"),
-            h6("For example: 5000 residents in Parr (1985)."),
-            "The minimum population of the cities selected.",
-            br(),
-            # h2("DISCIPLINE"),  h6("For example: 'ECO' for the Quarterly Journal of Economics."),
-            # "The disciplines in which the journal is recognised, according to the Chicago Journal Ranking SJR. ", br(),
-            # "'ECO' refers to estimations published in journals classified in Economics,
-            # 'SOC' stands for Social Science and 'PHYS' for environmental and physical sciences journals.
-            # A journal can belong to one or more categories. We include this information as a test for disciplinary biases.",br(),
             h2("TERRITORY"),
-            "We characterize different territories based on their population and type (national boundaries, subnational regions or supra-national macroRegions).",
-            h2("COUNTRY POPULATION"),
-            HTML(
-              'Total population in thousands, from UN estimates (1950-2015)
-              <a href=http://esa.un.org/unpd/wpp/Download/Standard/Population/">http://esa.un.org/unpd/wpp/Download/Standard/Population/</a>'
-            ),
-            h2("URBANIZATION LEVEL"),
-            HTML(
-              'Proportion urban in %, from UN World Urbanization Prospect, 2014 Revision (1950-2050)
-              <a href=https://esa.un.org/unpd/wup/CD-ROM">https://esa.un.org/unpd/wup/CD-ROM/</a>'
-            ),
-            h2("COUNTRY GDP"),
-            HTML(
-              'GDP per capita in current US $, from World Bank estimates (1960-2015)
-              <a href=http://data.worldbank.org/indicator/NY.GDP.PCAP.CD">http://data.worldbank.org/indicator/NY.GDP.PCAP.CD</a>'
-            ),
+            "The territory to which the cities' population refer.",
+            br(),
             
-            #h2("R2"),  h6("For example: 99% in Bretagnolle et al. (2008)."),
-            #"The coefficient of Determination of the regression, indicating the quality of the fit. ",
+            h4("Estimation variables"),
+            h2("CITY DEFINITION"),
+            "City definitions are a categorization of original definitions reported in the papers. LocalUnits correspond to all types of local administrative units. MorphoCities are aggregations of Local units based on density or the built-up area. MetroAreas correspond to functional aggregations of Local units based on flows (typically commuters as in the American SMAs). VariaMixed indicate that the definition is heterogenous or uncommon.
+            ", br(),
+            h2("POPULATION CUTOFF"),
+            "The population cutoff of an estimation corresponds to the minimum population (if any) of the cities selected to estimate Zipf's coefficient.
+            ", br(),
+            h2("NUMBER OF CITIES"),
+            "The number of cities refers to the number of observations (cities) used to estimate Zipf's coefficient.
+            ", br(),
+            h2("REGRESSION FORM"),
+            "The regression form is a categorical variable which can take the value 'Lotka' if the estimation was performed 
+            using the regression form log(Pi) = β - α log(i) or the value 'Pareto' if the regression form chosen was: log(i) = β' - α' log(Pi). In any case, the values of α and α' were made comparable by expressing all results in the Lotka form: transforming α' in 1/α'.
+            ", br(),
+            
+          
+            h4("Study variables"),
+            h2("YEAR OF PUBLICATION"),
+            "The year of publication is that of the study.
+           ", br(),
+            h2("NUMBER OF ESTIMATES"),
+            "The number of estimates refers to the number of Zipf's coefficients reported in the study and included in this meta-analysis (i.e. those with sufficient specification details).
+            ", br(),
+            h2("PERIOD COVERED"),
+            "The period covered corresponds to the difference between the date of observation of the latest estimation and the date of observation of the earliest estimation of the study.
+            ", br(),
+            h2("NUMBER OF COUNTRIES COVERED"),
+            " The number of countries covered is the number of different territories for which an estimate is reported in the study.
+             ", br(),
+            
+            
+            h4("Territorial variables"),
+            h2("URBANISATION LEVEL"),
+            "The urbanisation level of the territory for which Zipf's coefficient is estimated corresponds to percentage of population urban according to the 2014 World Urbanization Prospects UN estimates for the years 1950-2050 .
+           ",  HTML('<a href=https://esa.un.org/unpd/wup/CD-ROM">https://esa.un.org/unpd/wup/CD-ROM/</a>'),
             br(),
+            h2("AGE OF URBANISATION"),
+            "The age of urbanisation is an indication whether urbanisation is a relatively recent or ancient phenomenon in the territory. 'OLD' continents refer to zones of early urbanisation, in Europe, South-East Asia and the Middle East. America, Oceania, Africa and central Asia are considered 'NEW' in that respect.
+            ", br(),
+            h2("TOTAL POPULATION"),
+            "The total population of the territory for which Zipf's coefficient is estimated corresponds to the UN estimates for the years 1950-2015 .
+            ", HTML('<a href=http://esa.un.org/unpd/wpp/Download/Standard/Population/">http://esa.un.org/unpd/wpp/Download/Standard/Population/</a>'),
             br(),
-            #h2("REFERENCE"), "The reference from which the estimation is taken. For example: Singer (1936).", br(),
+            h2("GDP PER CAPITA"),
+            " The GDP per Capita in current $ of the territory for which Zipf's coefficient is estimated corresponds to the World Bank estimates for the years 1960-2015 .
+            ", HTML('<a href=http://data.worldbank.org/indicator/NY.GDP.PCAP.CD">http://data.worldbank.org/indicator/NY.GDP.PCAP.CD</a>'),
+            br(),
+            
+            
+            h4("Dynamic variables"),
+            h2("POPULATION GROWTH"),
+            "The population growth of the territory for which Zipf's coefficient is estimated corresponds to the annual average growth rates of its total population (C3).
+            ", br(),
+            h2("GDP GROWTH"),
+            "The GDP growth of the territory for which Zipf's coefficient is estimated corresponds to the annual average growth rates of its GDP per Capita (C4).
+            ", br(),
+            h2("URBANISATION GROWTH"),
+            "The urbanisation growth of the territory for which Zipf's coefficient is estimated corresponds to the annual average growth rates of its urbanisation level (C1).
+            ", br(),
+            h2("GROWTH OF THE NUMBER OF CITIES"),
+            "The growth of the number of cities of the territory for which Zipf's coefficient is estimated corresponds to the annual average growth rates of the number of cities used in the estimation (A3).
+            ", br(),
+            
+            
+            h4("Event variables"),
+            h2("INTERNATIONAL WARS"),
+            "International Wars are recorded from the Wikipedia list of wars by date . Only the 196 international wars involving national States between 1700 and 2014 were selected and geocoded.
+            ",  HTML('<a https://en.wikipedia.org/wiki/Outline_of_war#Wars">https://en.wikipedia.org/wiki/Outline_of_war#Wars</a>'),
+            br(),
+            h2("CIVIL WARS"),
+            "Civil Wars are recorded from the Wikipedia list of civil wars . Only the 106 civil wars which happened at a national scale between 1775 and 2015 were selected and geocoded.
+            ",  HTML('<a https://en.wikipedia.org/wiki/List_of_civil_wars">https://en.wikipedia.org/wiki/List_of_civil_wars</a>'),
+            br(),
+            h2("REVOLUTIONS"),
+            "Revolutions are recorded from the Wikipedia list of revolutions and rebellions . Only the 107 revolutions which happened at a national scale between 1642 and 2014 were selected and geocoded.
+            ",  HTML('<a https://en.wikipedia.org/wiki/List_of_revolutions_and_rebellions">https://en.wikipedia.org/wiki/List_of_revolutions_and_rebellions</a>'),
+            br(),
+            h2("WARS OF INDEPENDENCE"),
+            "Wars of independence are recorded from the Wikipedia list of national independence days  and geocoded.
+            ", HTML('<a https://en.wikipedia.org/wiki/List_of_national_independence_days"> https://en.wikipedia.org/wiki/List_of_national_independence_days</a>'),
+            br(),
+            
+       
+            br(),
             h4("Data"),
             h2("Subset Table by:"),
             fluidRow(
@@ -454,7 +495,7 @@ shinyUI(
               "We use a multiple linear regression to test our hypotheses about the relation between
               estimated alphas and some characteristics of the urban system
               (territory, population, age, type of cities) and
-              potential biases (city definition, discipline, etc.)."
+              potential biases (city definition, study scope, etc.)."
             ),
             tags$hr(),
             "Technically, we regress
@@ -758,14 +799,14 @@ shinyUI(
                     of the intercept plus twenty times the value of the 'Date of observaton' coefficient,
                     plus the coefficients of the categories to which they belong."
                   )
-                  ),
-                tags$li(
-                  "The coefficients associated with the",
-                  tags$b("Disciplines"),
-                  "(ECO, SOC & PHYS) indicate the quantity to
-                  be added to the average alpha for studies published in journals of the given category,
-                  compared to studies published in journals non categorised as such."
-                )
+                  )#,
+                # tags$li(
+                #   "The coefficients associated with the",
+                #   tags$b("Disciplines"),
+                #   "(ECO, SOC & PHYS) indicate the quantity to
+                #   be added to the average alpha for studies published in journals of the given category,
+                #   compared to studies published in journals non categorised as such."
+                # )
                 )
                 )
             
