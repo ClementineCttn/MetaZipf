@@ -492,52 +492,24 @@ shinyUI(
           tabPanel(
             "3. Results",
             h6(
-              "We use a multiple linear regression to test our hypotheses about the relation between
-              estimated alphas and some characteristics of the urban system
-              (territory, population, age, type of cities) and
-              potential biases (city definition, study scope, etc.)."
+              "We use a multiple regression to test our hypotheses about the relation between
+              estimated alphas and the characteristics of the estimation, of the study and of the urban system considered."
             ),
             tags$hr(),
-            "Technically, we regress
-            the value of alpha by the value of other
-            characteristics Y of i,
-            resulting in the estimation of an intercept and a vector of
-            coefficients b, one for each characteristic Y, indicating the
-            intensity with which the value of alpha varies following a variation
-            of the value of Y.",
-            withMathJax(h6("$$\\alpha_i = Intercept + b * Y_i $$")),
-            "For comparability reasons, most of the characteristics Y
-            that we consider have been discretised into three ordinal categories.
-            You can modify the parameters of each discretisation, using
-            the sliders corresponding to the quantitative variables (when activated).
-            The first value in blue indicates the upper bound of the first category and
-            the second value indicates the lower bound of the third category.",
-            tags$hr(),
-            h6(
-              "For example, if you click on 'Population Cutoff', a slider appears.
-              By default, it is set to distinguish three types of estimations from the literature
-              with respect to the minimum population they consider for cities: "
-            ),
-            tags$ul(tags$li(
-              h6(
-                "Estimations where the
-                full spectrum of city sizes are considered, even cities with a population of 10,000 residents
-                (or less)."
-              )
-              ),
-              tags$li(
-                h6(
-                  "Estimations where the minimum population for cities is comprised between 10,000 and 100,000
-                  residents."
-                )
-                ),
-              tags$li(
-                h6(
-                  "Estimations where the rank-size relation is applied to large cities only
-                  (with a population cutoff over 100,000)."
-                )
-                )),
+            "Technically, we regress the value of alpha reported for the estimation k of a study s regarding the territory m at time t as follow:",
+            withMathJax(h6("$$\\alpha_{k,s,m} = Intercept + b1 * t_k + 
+                           b2 * A_k + b3 * B_s + b4 * C_m + +e_s + e_k $$")),
+
+            "where Ak represents a set of variables describing the estimation k, 
+            Bs represents variables describing the study s, 
+            Cm representsstatic variables relating to the territory m,
+            eu represents a fixed-study effect if the model selected includes fixed-effects and ek normally distributed errors.", br(),
             
+            "For comparability reasons, most of the characteristics A, B and C
+            that we consider have been discretised into ordinal categories.
+            You can modify the bounds of each discretisation using
+            the sliders appearing when the variable is included in the model.",
+          
             tags$hr(),
             
             
@@ -547,7 +519,7 @@ shinyUI(
                 4,
                 checkboxGroupInput(
                   "technicalSpecs",
-                  "Regression Specifications",
+                  "Estimation Specifications",
                   c(
                     "All" = "alltech",
                     "Population Cutoff" = "truncation4model",
