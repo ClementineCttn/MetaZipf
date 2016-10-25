@@ -1872,7 +1872,7 @@ shinyServer(function(input, output, session) {
                          10,
                          downloadButton(
                            "downloadTables",
-                           "Download and THEN PLEASE send the file to: c.cottineau@ucl.ac.uk"
+                           "Download and PLEASE send the file to: c.cottineau@ucl.ac.uk"
                          )
                        ))
     )

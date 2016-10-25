@@ -14,7 +14,7 @@ shinyUI(
       )),
     headerPanel("MetaZipf"),
     titlePanel(h2(
-      "Open Meta Review of Zipf's law with open urban data"
+      "A Dynamic and Open Meta Review of Zipf's law for cities"
     )),
     
     navlistPanel(
@@ -31,7 +31,7 @@ shinyUI(
                    tags$hr(),
                    tags$p(
                      class = "text-justify",
-                     "This application aims at presenting a crowdsourced review and meta analysis of Zipf's law estimations from the literature. ",
+                     "This application presents a dynamic and open meta analysis of Zipf's law, based on a large scale interactive review of urban literature.",
                      br(),
                      br(),
                      
@@ -51,26 +51,28 @@ shinyUI(
                          "creating a much larger review of empirical papers,
                          in particular through crowdsourcing to enhance representativity across dates, areas and study fields."
                        ),
-                       tags$li("making this database open."),
                        tags$li(
-                         "testing a broader pool of hypotheses regarding the variability of the exponent measured,
-                         to distinguish topical differences from technical biases affecting the measurement."
+                         "testing a broader pool of hypotheses regarding the variability of the exponent measured. In particular,
+                         we plug additional data to the metadatabase to describe the structure and evolution of the territories for which Zipf's law is estimated."
                        ),
+                       tags$li("focusing on the evolution of city size unevenness measured by the alpha parameter of Zipf's law. We therefore 
+                               introduce the concept of a dynamic meta analysis."),
+                       
                        tags$li(
-                         "making this meta analysis transparent, interactive and adaptable to future developments."
+                         "making this meta analysis transparent, open, interactive and adaptable to future developments."
                        )
                        ),
                      
                      tags$b(
-                       "The present application allows interactive queries into a pool of empirical papers to represent the variation of empiricial estimations of Zipf's
-                       law's exponent in the literature, with respect to the systems of cities studied and meta-information about the publication. The meta analysis
-                       considers urban characteristics (age of the system, total population), the specifications of the regression used (urban definitions,
-                       truncation points, number of cities) and the scope of the journal publishing the paper to unveil systematic deviations from the iconic 1 value."
+                       "The present application allows interactive queries into a pool of empirical papers formatted in a comparable way. It provides a summary of the 
+numeric, spatial and temporal distribution of alpha found in this vast literature. It provides a static and dynamic meta analysis of Zipf's law and its evolution over time.
+It disentangles the statistical effects of the regression specification, of fixed study effects, of characteristics of territories and their evolution, 
+as well as of historical events and public policies."
                      ),
                      br(),
                      br(),
                      HTML(
-                       'The current database covers 1702 estimations from 81 studies, spanning over more than 80 countries over 400 years.
+                       'The current database covers 1692 estimations from 81 studies, spanning over more than 80 countries over 400 years.
                        It is open for download (<a href="https://github.com/ClementineCttn/MetaZipf">https://github.com/ClementineCttn/MetaZipf</a>) and you are
                        strongly invited to contribute by submitting your own empirical estimates using the \'Contribute !\' form.'
                      ),
