@@ -502,7 +502,7 @@ shinyUI(
 
             "where Ak represents a set of variables describing the estimation k, 
             Bs represents variables describing the study s, 
-            Cm representsstatic variables relating to the territory m,
+            Cm represents static variables relating to the territory m,
             eu represents a fixed-study effect if the model selected includes fixed-effects and ek normally distributed errors.", br(),
             
             "For comparability reasons, most of the characteristics A, B and C
@@ -519,7 +519,7 @@ shinyUI(
                 4,
                 checkboxGroupInput(
                   "technicalSpecs",
-                  "Estimation Specifications",
+                  "Ak. Estimation Variables",
                   c(
                     "All" = "alltech",
                     "Population Cutoff" = "truncation4model",
@@ -535,7 +535,7 @@ shinyUI(
                 4,
                 checkboxGroupInput(
                   "otherSpecs",
-                  "Study Specifications",
+                  "Bs. Study Variables",
                   c(
                     "All" = "allother",
                     "Year of Publication" = "yearOfPubli",
@@ -552,7 +552,7 @@ shinyUI(
                 4,
                 checkboxGroupInput(
                   "topicalSpecs",
-                  "Territorial Variables",
+                  "Cm. Territorial Variables",
                   c(
                     "All" = "alltop",
                     # "Type of territory" = "country",
@@ -700,9 +700,8 @@ shinyUI(
             fluidRow(
               tags$hr(),
               h4("Model Fit"),
-              "The accuracy of the model is given by the R2 value, but it also depends on the the number of observations (here, the estimations from the literature).
-              Because a consistent information is not fully available in all the papers published,
-              the number of observations decreases when the number of explaning variables increases.",
+              "The accuracy of the model is given by the R2 value, but it also depends on the the number of observations (here, the estimations from the literature),
+              because of missing information in the reported specifications.",
               br(),
               br(),
               tableOutput('modelparameters'),
@@ -712,6 +711,7 @@ shinyUI(
               h4("Results"),
               tags$b("Intercept and Time Coefficient"),
               tableOutput('model_temporal'),
+              "Adjust the level of significance according to your requirements:",
               tags$b("Significant Coefficients"),
               tableOutput('model_significant'),
               sliderInput(
@@ -732,45 +732,18 @@ shinyUI(
                   "The ",
                   tags$b("Intercept"),
                   " gives the average value of alpha predicted for
-                  an urban system characterized by the reference categories selected. If no
-                  characteristics are selected, this value is the mean alpha measured over all studies.",
-                  
-                  htmlOutput('REFS'),
-                  h6(
-                    "For example, if 'Population Cutoff' is selected, it will give the average
-                    value of alpha expected for studies using a high population cutoff, i.e. studies
-                    where only large cities are considered."
-                  )
+                  an urban system characterized by the reference categories of the selected variables",
+                  htmlOutput('REFS')
                   ),
-                tags$li(
-                  "The coefficient for ",
-                  tags$b("Discrete Variables"),
-                  " (population cutoff,
-                  city definition, etc.), when added to the
-                  intercept, gives the average value of alpha for studies belonging to the
-                  category under consideration (compared to studies using the reference category).",
-                  h6(
-                    "For example and by default, if 'Population Cutoff' is selected,
-                    the estimate for 'Low' indicates that, on average, studies covering a wider range of city sizes
-                    find Zipf coefficients indicating a larger size disparity than studies using data on
-                    large cities only (Population Cutoff > 100,000 residents)."
-                  )
-                  ),
+               
                 tags$li(
                   "The coefficient associated with the '",
                   tags$b("Date of observation"),
                   "' indicates how much alpha varies
                   on average for each year added to the date of observation, these dates being centred on 1950.
                   If the rank-size properties of a system do not change over time, this coefficient should be
-                  equal to 0. On the contrary, significant non-zero coefficients indicate tendencies towards hierarchisation or equalisation
-                  of city sizes over time.",
-                  h6(
-                    "For example, alpha estimations for cities in 1950 exhibit, on average, the value
-                    of the intercept plus the coefficients of the categories to which they belong.
-                    Alpha estimations for cities in 1970 exhibit, on average, the value
-                    of the intercept plus twenty times the value of the 'Date of observaton' coefficient,
-                    plus the coefficients of the categories to which they belong."
-                  )
+                  equal to 0. On the contrary, significant non-zero coefficients indicate tendencies towards hierarchisation or evening
+                  of city sizes over time."
                   )#,
                 # tags$li(
                 #   "The coefficients associated with the",
@@ -822,7 +795,31 @@ shinyUI(
           # ),
           tabPanel(
             "1. Meta Dynamic Analysis",
-            h4("Select Features for the Dynamic Meta Analysis"),
+           
+            h6(
+              "We use a multiple regression to test our hypotheses about the relation between
+              the evolution of alpha values and the characteristics of the territory, of its evolution and of some events happening within the time frame considered."
+            ),
+            tags$hr(),
+            "Technically, we regress the average annual growth rate of alpha between t1 and t2 (when two or more values of alpha were reported in a study with the same specification) as follow:",
+            withMathJax(h6("$$G_{\\alpha, l, m, t1, t2} = Intercept + b1 * t_1 + 
+                           b2 * \\alpha_{t1} + b3 * C_{m, t1} + b4 * D_{m, t1, t2} + b5 * E_{m, t1, t2}  + e_l $$")),
+            
+            "where Cm represents a set of variables describing the territory m at time t1,
+            Dm represents the evolution of territorial variables between t1 and t2, 
+            Em represents events which have happened in the territory m between t1 and t2, 
+            el represents normally distributed errors.", br(),
+            
+            "For comparability reasons, most of the characteristics C and D
+            that we consider have been discretised into ordinal categories.
+            You can modify the bounds of each discretisation using
+            the sliders appearing when the variable is included in the model.",
+            
+            tags$hr(),
+            
+            
+            
+             h4("Select Features for the Dynamic Meta Analysis"),
             fluidRow(
               column(
                 12,
@@ -839,7 +836,7 @@ shinyUI(
                 4,
                 checkboxGroupInput(
                   "var_static_meta_analysis",
-                  "Static Context",
+                  "Cm. Territorial Variables",
                   c(
                     "Initial Population" = "pop",
                     "Initial GDP per capita" = "gdp",
@@ -854,7 +851,7 @@ shinyUI(
                 4,
                 checkboxGroupInput(
                   "var_dyn_meta_analysis",
-                  "Evolutive Context",
+                  "Dm. Dynamic Variables",
                   c(
                     "Population Growth" = "tcam_pop",
                     "GDP per capita Growth" = "tcam_gdp",
@@ -869,7 +866,7 @@ shinyUI(
                 4,
                 checkboxGroupInput(
                   "meta_events_meta_analysis",
-                  "Event Context",
+                  "Em. Event Variables",
                   c(
                     "Revolution" = "rv",
                     "War of Independence" = "wi",
