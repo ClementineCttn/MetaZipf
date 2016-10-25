@@ -1,11 +1,11 @@
 This repository aims at storing the materials for a meta analysis of Zipf's law for cities in the literature, available interactively:  https://clementinegeo.shinyapps.io/MetaZipf  and presented in a working paper: http://arxiv.org/abs/1606.06162.
-The application itself aims at presenting a crowdsourced review and meta analysis of Zipf's law estimations from the literature. It allows interactive queries into a pool of empirical papers to represent the variation of empiricial estimations of Zipf's law's exponent in the literature, with respect to the systems of cities studied and meta-information about the publication. The meta analysis considers urban characteristics (age of the system, total population), the specifications of the regression used (urban definitions, truncation points, number of cities) and the discipline of the journal publishing the paper to unveil systematic deviations from the iconic 1 value.
-
+The application itself aims at presenting a dynamic and open meta review of Zipf's law, based on a large scale interactive review of urban literature. It allows interactive queries into a pool of empirical papers formatted in a comparable way. It provides a summary of the numeric, spatial and temporal distribution of alpha found in this vast literature. It provides a static and dynamic meta analysis of Zipf's law and its evolution over time. It disentangles the statistical effects of the regression specification, of fixed study effects, of characteristics of territories and their evolution, as well as of historical events and public policies. 
 
 ![Alt text](https://raw.githubusercontent.com/ClementineCttn/MetaZipf/master/metaZipf_demo.gif)
 
 ## Description of main files:
 
+	
 	# data/meta_zipf.csv
 
 This table reviews and describes empirical estimations of zipf's law for cities taken from the literature, along with the specifications of the regressions and the significance of results.
@@ -13,6 +13,7 @@ This table reviews and describes empirical estimations of zipf's law for cities 
 	# data/meta_refs.csv
 
 This table reviews and describes the references from which empirical estimations are collected.
+
 
 
 ## Literature Reviewed :
