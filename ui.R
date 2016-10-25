@@ -1,5 +1,15 @@
+##########################################
+# MetaZipf | ui file
+# Clementine Cottineau, 2016
+# UCL - CASA - UDL
+##########################################
+
+
 library(shiny)
 library(leaflet)
+
+
+
 shinyUI(
   fluidPage(
     theme = "flatly_bootstrap.css",
@@ -55,8 +65,10 @@ shinyUI(
                          "testing a broader pool of hypotheses regarding the variability of the exponent measured. In particular,
                          we plug additional data to the metadatabase to describe the structure and evolution of the territories for which Zipf's law is estimated."
                        ),
-                       tags$li("focusing on the evolution of city size unevenness measured by the alpha parameter of Zipf's law. We therefore 
-                               introduce the concept of a dynamic meta analysis."),
+                       tags$li(
+                         "focusing on the evolution of city size unevenness measured by the alpha parameter of Zipf's law. We therefore
+                         introduce the concept of a dynamic meta analysis."
+                       ),
                        
                        tags$li(
                          "making this meta analysis transparent, open, interactive and adaptable to future developments."
@@ -64,10 +76,10 @@ shinyUI(
                        ),
                      
                      tags$b(
-                       "The present application allows interactive queries into a pool of empirical papers formatted in a comparable way. It provides a summary of the 
-numeric, spatial and temporal distribution of alpha found in this vast literature. It provides a static and dynamic meta analysis of Zipf's law and its evolution over time.
-It disentangles the statistical effects of the regression specification, of fixed study effects, of characteristics of territories and their evolution, 
-as well as of historical events and public policies."
+                       "The present application allows interactive queries into a pool of empirical papers formatted in a comparable way. It provides a summary of the
+                       numeric, spatial and temporal distribution of alpha found in this vast literature. It provides a static and dynamic meta analysis of Zipf's law and its evolution over time.
+                       It disentangles the statistical effects of the regression specification, of fixed study effects, of characteristics of territories and their evolution,
+                       as well as of historical events and public policies."
                      ),
                      br(),
                      br(),
@@ -79,7 +91,7 @@ as well as of historical events and public policies."
                      br(),
                      br(),
                      h5("Before starting, choose the way results will be expressed.")
-                   ),
+                     ),
                    
                    tags$hr(),
                    
@@ -366,7 +378,7 @@ as well as of historical events and public policies."
             h6(
               "In a meta-analysis, we do not work directly with the cities' data: we use the estimations published by other researchers. The data is thus made by the result of their
               analysis along with the description of how they made the analysis. Each observation is thus
-              composed of a single estimation of alpha, of variables describing the regression performed, 
+              composed of a single estimation of alpha, of variables describing the regression performed,
               of variables describing the study scope and of additional variables describing the territory within which alpha is estimated."
             ),
             tags$hr(),
@@ -386,86 +398,120 @@ as well as of historical events and public policies."
             h4("Estimation variables"),
             h2("CITY DEFINITION"),
             "City definitions are a categorization of original definitions reported in the papers. LocalUnits correspond to all types of local administrative units. MorphoCities are aggregations of Local units based on density or the built-up area. MetroAreas correspond to functional aggregations of Local units based on flows (typically commuters as in the American SMAs). VariaMixed indicate that the definition is heterogenous or uncommon.
-            ", br(),
+            ",
+            br(),
             h2("POPULATION CUTOFF"),
             "The population cutoff of an estimation corresponds to the minimum population (if any) of the cities selected to estimate Zipf's coefficient.
-            ", br(),
+            ",
+            br(),
             h2("NUMBER OF CITIES"),
             "The number of cities refers to the number of observations (cities) used to estimate Zipf's coefficient.
-            ", br(),
+            ",
+            br(),
             h2("REGRESSION FORM"),
-            "The regression form is a categorical variable which can take the value 'Lotka' if the estimation was performed 
+            "The regression form is a categorical variable which can take the value 'Lotka' if the estimation was performed
             using the regression form log(Pi) = β - α log(i) or the value 'Pareto' if the regression form chosen was: log(i) = β' - α' log(Pi). In any case, the values of α and α' were made comparable by expressing all results in the Lotka form: transforming α' in 1/α'.
-            ", br(),
+            ",
+            br(),
             
-          
+            
             h4("Study variables"),
             h2("YEAR OF PUBLICATION"),
             "The year of publication is that of the study.
-           ", br(),
+            ",
+            br(),
             h2("NUMBER OF ESTIMATES"),
             "The number of estimates refers to the number of Zipf's coefficients reported in the study and included in this meta-analysis (i.e. those with sufficient specification details).
-            ", br(),
+            ",
+            br(),
             h2("PERIOD COVERED"),
             "The period covered corresponds to the difference between the date of observation of the latest estimation and the date of observation of the earliest estimation of the study.
-            ", br(),
+            ",
+            br(),
             h2("NUMBER OF COUNTRIES COVERED"),
             " The number of countries covered is the number of different territories for which an estimate is reported in the study.
-             ", br(),
+            ",
+            br(),
             
             
             h4("Territorial variables"),
             h2("URBANISATION LEVEL"),
             "The urbanisation level of the territory for which Zipf's coefficient is estimated corresponds to percentage of population urban according to the 2014 World Urbanization Prospects UN estimates for the years 1950-2050 .
-           ",  HTML('<a href=https://esa.un.org/unpd/wup/CD-ROM">https://esa.un.org/unpd/wup/CD-ROM/</a>'),
+            ",
+            HTML(
+              '<a href=https://esa.un.org/unpd/wup/CD-ROM">https://esa.un.org/unpd/wup/CD-ROM/</a>'
+            ),
             br(),
             h2("AGE OF URBANISATION"),
             "The age of urbanisation is an indication whether urbanisation is a relatively recent or ancient phenomenon in the territory. 'OLD' continents refer to zones of early urbanisation, in Europe, South-East Asia and the Middle East. America, Oceania, Africa and central Asia are considered 'NEW' in that respect.
-            ", br(),
+            ",
+            br(),
             h2("TOTAL POPULATION"),
             "The total population of the territory for which Zipf's coefficient is estimated corresponds to the UN estimates for the years 1950-2015 .
-            ", HTML('<a href=http://esa.un.org/unpd/wpp/Download/Standard/Population/">http://esa.un.org/unpd/wpp/Download/Standard/Population/</a>'),
+            ",
+            HTML(
+              '<a href=http://esa.un.org/unpd/wpp/Download/Standard/Population/">http://esa.un.org/unpd/wpp/Download/Standard/Population/</a>'
+            ),
             br(),
             h2("GDP PER CAPITA"),
             " The GDP per Capita in current $ of the territory for which Zipf's coefficient is estimated corresponds to the World Bank estimates for the years 1960-2015 .
-            ", HTML('<a href=http://data.worldbank.org/indicator/NY.GDP.PCAP.CD">http://data.worldbank.org/indicator/NY.GDP.PCAP.CD</a>'),
+            ",
+            HTML(
+              '<a href=http://data.worldbank.org/indicator/NY.GDP.PCAP.CD">http://data.worldbank.org/indicator/NY.GDP.PCAP.CD</a>'
+            ),
             br(),
             
             
             h4("Dynamic variables"),
             h2("POPULATION GROWTH"),
             "The population growth of the territory for which Zipf's coefficient is estimated corresponds to the annual average growth rates of its total population (C3).
-            ", br(),
+            ",
+            br(),
             h2("GDP GROWTH"),
             "The GDP growth of the territory for which Zipf's coefficient is estimated corresponds to the annual average growth rates of its GDP per Capita (C4).
-            ", br(),
+            ",
+            br(),
             h2("URBANISATION GROWTH"),
             "The urbanisation growth of the territory for which Zipf's coefficient is estimated corresponds to the annual average growth rates of its urbanisation level (C1).
-            ", br(),
+            ",
+            br(),
             h2("GROWTH OF THE NUMBER OF CITIES"),
             "The growth of the number of cities of the territory for which Zipf's coefficient is estimated corresponds to the annual average growth rates of the number of cities used in the estimation (A3).
-            ", br(),
+            ",
+            br(),
             
             
             h4("Event variables"),
             h2("INTERNATIONAL WARS"),
             "International Wars are recorded from the Wikipedia list of wars by date . Only the 196 international wars involving national States between 1700 and 2014 were selected and geocoded.
-            ",  HTML('<a https://en.wikipedia.org/wiki/Outline_of_war#Wars">https://en.wikipedia.org/wiki/Outline_of_war#Wars</a>'),
+            ",
+            HTML(
+              '<a https://en.wikipedia.org/wiki/Outline_of_war#Wars">https://en.wikipedia.org/wiki/Outline_of_war#Wars</a>'
+            ),
             br(),
             h2("CIVIL WARS"),
             "Civil Wars are recorded from the Wikipedia list of civil wars . Only the 106 civil wars which happened at a national scale between 1775 and 2015 were selected and geocoded.
-            ",  HTML('<a https://en.wikipedia.org/wiki/List_of_civil_wars">https://en.wikipedia.org/wiki/List_of_civil_wars</a>'),
+            ",
+            HTML(
+              '<a https://en.wikipedia.org/wiki/List_of_civil_wars">https://en.wikipedia.org/wiki/List_of_civil_wars</a>'
+            ),
             br(),
             h2("REVOLUTIONS"),
             "Revolutions are recorded from the Wikipedia list of revolutions and rebellions . Only the 107 revolutions which happened at a national scale between 1642 and 2014 were selected and geocoded.
-            ",  HTML('<a https://en.wikipedia.org/wiki/List_of_revolutions_and_rebellions">https://en.wikipedia.org/wiki/List_of_revolutions_and_rebellions</a>'),
+            ",
+            HTML(
+              '<a https://en.wikipedia.org/wiki/List_of_revolutions_and_rebellions">https://en.wikipedia.org/wiki/List_of_revolutions_and_rebellions</a>'
+            ),
             br(),
             h2("WARS OF INDEPENDENCE"),
             "Wars of independence are recorded from the Wikipedia list of national independence days  and geocoded.
-            ", HTML('<a https://en.wikipedia.org/wiki/List_of_national_independence_days"> https://en.wikipedia.org/wiki/List_of_national_independence_days</a>'),
+            ",
+            HTML(
+              '<a https://en.wikipedia.org/wiki/List_of_national_independence_days"> https://en.wikipedia.org/wiki/List_of_national_independence_days</a>'
+            ),
             br(),
             
-       
+            
             br(),
             h4("Data"),
             h2("Subset Table by:"),
@@ -499,19 +545,24 @@ as well as of historical events and public policies."
             ),
             tags$hr(),
             "Technically, we regress the value of alpha reported for the estimation k of a study s regarding the territory m at time t as follow:",
-            withMathJax(h6("$$\\alpha_{k,s,m} = Intercept + b1 * t_k + 
-                           b2 * A_k + b3 * B_s + b4 * C_m + +e_s + e_k $$")),
-
-            "where Ak represents a set of variables describing the estimation k, 
-            Bs represents variables describing the study s, 
+            withMathJax(
+              h6(
+                "$$\\alpha_{k,s,m} = Intercept + b1 * t_k +
+                b2 * A_k + b3 * B_s + b4 * C_m + +e_s + e_k $$"
+              )
+              ),
+            
+            "where Ak represents a set of variables describing the estimation k,
+            Bs represents variables describing the study s,
             Cm represents static variables relating to the territory m,
-            eu represents a fixed-study effect if the model selected includes fixed-effects and ek normally distributed errors.", br(),
+            eu represents a fixed-study effect if the model selected includes fixed-effects and ek normally distributed errors.",
+            br(),
             
             "For comparability reasons, most of the characteristics A, B and C
             that we consider have been discretised into ordinal categories.
             You can modify the bounds of each discretisation using
             the sliders appearing when the variable is included in the model.",
-          
+            
             tags$hr(),
             
             
@@ -543,7 +594,6 @@ as well as of historical events and public policies."
                     "Year of Publication" = "yearOfPubli",
                     "Study Size" = "studySize",
                     "Length of Period Analyzed" = "studyPeriod",
-                    #"Discipline" = "discipline",
                     "Coverage of territories" = "studyCoverage"
                   ),
                   selected = NULL,
@@ -557,8 +607,6 @@ as well as of historical events and public policies."
                   "Cm. Territorial Variables",
                   c(
                     "All" = "alltop",
-                    # "Type of territory" = "country",
-                    #  "Date of Observation" = "year4model",
                     "Age of Urbanisation" = "urbanisation4model",
                     "Country Population" = "countrySize",
                     "Urbanization Level" = "countryUrb",
@@ -736,8 +784,8 @@ as well as of historical events and public policies."
                   " gives the average value of alpha predicted for
                   an urban system characterized by the reference categories of the selected variables",
                   htmlOutput('REFS')
-                  ),
-               
+                ),
+                
                 tags$li(
                   "The coefficient associated with the '",
                   tags$b("Date of observation"),
@@ -746,71 +794,37 @@ as well as of historical events and public policies."
                   If the rank-size properties of a system do not change over time, this coefficient should be
                   equal to 0. On the contrary, significant non-zero coefficients indicate tendencies towards hierarchisation or evening
                   of city sizes over time."
-                  )#,
-                # tags$li(
-                #   "The coefficients associated with the",
-                #   tags$b("Disciplines"),
-                #   "(ECO, SOC & PHYS) indicate the quantity to
-                #   be added to the average alpha for studies published in journals of the given category,
-                #   compared to studies published in journals non categorised as such."
-                # )
+                )
                 )
                 )
             
-            # h4("Visualise variation of alpha with:"),
-            # fluidRow(
-            #   column(4,selectInput("quanti", "Continuous variable (y)", choices=c("N", "TRUNCATION_POINT", "DATE"), multiple=FALSE)),
-            #   column(4,checkboxInput("log", "Log(y)", value=TRUE)),
-            #   column(4,selectInput("quali", "Categorical variable (colour)", choices=c("URBANSCALE", "COUNTRY", "DECADE", "ECO", "SOC", "PHYS"), multiple=FALSE)),
-            #   plotOutput('plot')
-            # )
-                  )
-                  )
+                )
+              )
               ),
       tabPanel(
         "D. Dynamic Analysis",
         tabsetPanel(
-          # tabPanel("3. Contexts of growth",
-          #
-          #          fluidRow(
-          #            column(6,h4("Growth of Alpha"),
-          #                 h6('!! It might take a few seconds to load and update !!')),
-          #          column(6,h4("Contextual Growth"),
-          #                 h6('!! It might take a few seconds to load and update !!')),
-          #          column(4,selectInput('dynVarToMap', 'Annual Average growth of Alpha (%)',
-          #                               choices = c("Mean Value" = 'meanDynAlpha',
-          #                                           "Standard Deviation" = 'sdDynAlpha',
-          #                                           "Number of Observations" = 'nDynAlpha'),
-          #                               selected = "meanDynAlpha", multiple = F)),
-          #          column(4,selectInput("decade_3", "Decade", choices = c("1950s", "1960s","1970s","1980s","1990s","2000s", "2010s"),
-          #                               selected = c("1980s"), multiple=F)),
-          #            column(4,selectInput('contextToMap', 'Annual Average Growth context (%)',
-          #                               choices = c("GDP per Capita" = 'g_GDP',
-          #                                           "Population" = 'g_pop'),
-          #                               selected = "g_GDP", multiple = F)),
-          #
-          #         column(6,leafletOutput('mapectories')),
-          #         column(6,leafletOutput('mapcontext'))),
-          #
-          #
-          #          tags$hr()
-          # ),
           tabPanel(
             "1. Meta Dynamic Analysis",
-           
+            
             h6(
               "We use a multiple regression to test our hypotheses about the relation between
               the evolution of alpha values and the characteristics of the territory, of its evolution and of some events happening within the time frame considered."
             ),
             tags$hr(),
             "Technically, we regress the average annual growth rate of alpha between t1 and t2 (when two or more values of alpha were reported in a study with the same specification) as follow:",
-            withMathJax(h6("$$G_{\\alpha, l, m, t1, t2} = Intercept + b1 * t_1 + 
-                           b2 * \\alpha_{t1} + b3 * C_{m, t1} + b4 * D_{m, t1, t2} + b5 * E_{m, t1, t2}  + e_l $$")),
+            withMathJax(
+              h6(
+                "$$G_{\\alpha, l, m, t1, t2} = Intercept + b1 * t_1 +
+                b2 * \\alpha_{t1} + b3 * C_{m, t1} + b4 * D_{m, t1, t2} + b5 * E_{m, t1, t2}  + e_l $$"
+              )
+              ),
             
             "where Cm represents a set of variables describing the territory m at time t1,
-            Dm represents the evolution of territorial variables between t1 and t2, 
-            Em represents events which have happened in the territory m between t1 and t2, 
-            el represents normally distributed errors.", br(),
+            Dm represents the evolution of territorial variables between t1 and t2,
+            Em represents events which have happened in the territory m between t1 and t2,
+            el represents normally distributed errors.",
+            br(),
             
             "For comparability reasons, most of the characteristics C and D
             that we consider have been discretised into ordinal categories.
@@ -821,7 +835,7 @@ as well as of historical events and public policies."
             
             
             
-             h4("Select Features for the Dynamic Meta Analysis"),
+            h4("Select Features for the Dynamic Meta Analysis"),
             fluidRow(
               column(
                 12,
@@ -1004,8 +1018,6 @@ as well as of historical events and public policies."
               tags$hr(),
               h4("Model Fit"),
               tableOutput('modeldyn_fit'),
-              # tags$b("Are fixed study effects needed? (based on pFtest)"),
-              #  textOutput('pFtest'),
               tags$hr(),
               h4("Results"),
               tags$b("Intercept and Default Variable Coefficients"),
@@ -1021,9 +1033,9 @@ as well as of historical events and public policies."
               ),
               tags$b("Non-significant Coefficients"),
               tableOutput('model_non_significant_dyn'),
-              tags$hr()  
+              tags$hr()
             )
-          ),
+            ),
           tabPanel(
             "2. Residuals",
             
@@ -1084,7 +1096,6 @@ as well as of historical events and public policies."
               
               dataTableOutput('residual_trajectories'),
               column(12, "* AAGR = Average Annual Growth Rate") #,
-              #     downloadButton("downloadTrajTable", "Download Data")
             )
           ),
           tabPanel(
@@ -1131,36 +1142,49 @@ as well as of historical events and public policies."
             tags$hr(),
             
             fluidRow(
-              column(12,conditionalPanel(
-                condition = 'input.eventsToPlot.indexOf("iw") != -1  ',
-                h6("Blue vertical lines = beginning of international wars involving the territory considered.")
-              )
-              
+              column(
+                12,
+                conditionalPanel(
+                  condition = 'input.eventsToPlot.indexOf("iw") != -1  ',
+                  h6(
+                    "Blue vertical lines = beginning of international wars involving the territory considered."
+                  )
+                )
+                
               ),
-              column(12,conditionalPanel(
-                condition = 'input.eventsToPlot.indexOf("cw") != -1 ',
-                h6( "Black vertical lines = beginning of civil wars involving the territory considered.")
-              )
+              column(
+                12,
+                conditionalPanel(
+                  condition = 'input.eventsToPlot.indexOf("cw") != -1 ',
+                  h6(
+                    "Black vertical lines = beginning of civil wars involving the territory considered."
+                  )
+                )
               ),
-              column(12,conditionalPanel(
-                condition = 'input.eventsToPlot.indexOf("rv") != -1',
-                h6( "Green vertical lines = beginning of revolutions involving the territory considered.")
-              )
+              column(
+                12,
+                conditionalPanel(
+                  condition = 'input.eventsToPlot.indexOf("rv") != -1',
+                  h6(
+                    "Green vertical lines = beginning of revolutions involving the territory considered."
+                  )
+                )
               ),
-              column(12,conditionalPanel(
-                condition = 'input.eventsToPlot.indexOf("wi") != -1',
-                h6( "Red vertical lines = beginning of independence wars involving the territory considered.")
-              )
+              column(
+                12,
+                conditionalPanel(
+                  condition = 'input.eventsToPlot.indexOf("wi") != -1',
+                  h6(
+                    "Red vertical lines = beginning of independence wars involving the territory considered."
+                  )
+                )
               )
             ),
             plotOutput('trajectories')
-          
+            
+            )
           )
           )
-          
-          # tabPanel("4. Projections"
-          # )
-        )
       ),
       
       tabPanel(
@@ -1219,12 +1243,8 @@ as well as of historical events and public policies."
           6, textInput("contributor", "Your Name", value = "")
         )),
         tags$hr(),
-        uiOutput(outputId = "nestimateRows")#,
-        #   tags$hr(),
-        #   column(4,textInput("comment", NULL, value = "Any Comment?")),
-        #   column(4,textInput("from", NULL, value = "Your E-mail")),
-        #  column(4,actionButton("sendMail", "Report your additions"))
+        uiOutput(outputId = "nestimateRows")
         )
-      )
-      )
-  )
+            )
+                   )
+    )
