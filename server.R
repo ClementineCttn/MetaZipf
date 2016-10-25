@@ -975,22 +975,25 @@ shinyServer(function(input, output, session) {
     residuals = model$residuals
     
     tab = tableForTrajectoryMaps()
-    tab = tab[!is.na(tab$PCT_GROWTH_ALPHA),]
-    tab = tab[is.finite(tab$PCT_GROWTH_ALPHA),]
+    tab = tab[!is.na(tab$PCT_GROWTH_ALPHA), ]
+    tab = tab[is.finite(tab$PCT_GROWTH_ALPHA), ]
     dyn_vars = input$var_dyn_meta_analysis
     static_vars =  input$var_static_meta_analysis
     events = input$meta_events_meta_analysis
     default = input$var_interest_meta_analysis
+    tab$ID = as.character(row.names(tab))
     
-    columnsToKeep = c(
+    columnsToKeep = c("ID",
       "ALPHA",
-      "PCT_GROWTH_ALPHA",
-      "TERRITORY",
+      "PCT_GROWTH_ALPHA")
+    
+    columnsToDisplay = tab[,c(
+      "ID", "TERRITORY",
       "GROWTH_DECADE",
       "URBANSCALE",
       "TRUNCATION_POINT",
       "REFERENCE"
-    )
+    )]
     
     if ('tcam_pop' %in% dyn_vars == "TRUE") {
       tab$Population_Growth = ifelse(
@@ -1027,7 +1030,7 @@ shinyServer(function(input, output, session) {
           " Medium"
         )
       ))
-      tab = tab[!is.na(tab$Population_Growth_),]
+      tab = tab[!is.na(tab$Population_Growth_), ]
       columnsToKeep = c(columnsToKeep, "Population_Growth_")
     }
     if ('tcam_urb' %in% dyn_vars == "TRUE") {
@@ -1065,7 +1068,7 @@ shinyServer(function(input, output, session) {
           " Medium"
         )
       ))
-      tab = tab[!is.na(tab$Urbanization_Growth_),]
+      tab = tab[!is.na(tab$Urbanization_Growth_), ]
       columnsToKeep = c(columnsToKeep, "Urbanization_Growth_")
     }
     if ('tcam_gdp' %in% dyn_vars == "TRUE") {
@@ -1095,7 +1098,7 @@ shinyServer(function(input, output, session) {
         "Slow",
         ifelse(tab$GDP_Growth >= input$ratesgdp[[2]], "Fast", " Medium")
       ))
-      tab = tab[!is.na(tab$GDP_Growth_),]
+      tab = tab[!is.na(tab$GDP_Growth_), ]
       columnsToKeep = c(columnsToKeep, "GDP_Growth_")
     }
     if ('n' %in% dyn_vars == "TRUE") {
@@ -1104,7 +1107,7 @@ shinyServer(function(input, output, session) {
         "Slow",
         ifelse(tab$GN >= input$ratesn[[2]], "Fast", " Medium")
       ))
-      tab = tab[!is.na(tab$Growth_of_Cities_),]
+      tab = tab[!is.na(tab$Growth_of_Cities_), ]
       columnsToKeep = c(columnsToKeep, "Growth_of_Cities_")
       
     }
@@ -1113,13 +1116,13 @@ shinyServer(function(input, output, session) {
       columnsToKeep = c(columnsToKeep, "Date")
     }
     if ('urbanAge' %in% static_vars == "TRUE") {
-      tab = tab[!is.na(tab$URBANISATION),]
+      tab = tab[!is.na(tab$URBANISATION), ]
       tab$Urbanization_Age_ = tab$URBANISATION
       columnsToKeep = c(columnsToKeep, "Urbanization_Age_")
       
     }
     if ('alpha' %in% default == "TRUE") {
-      tab = tab[!is.na(tab$ALPHA),]
+      tab = tab[!is.na(tab$ALPHA), ]
       tab$Initial_Alpha_ = as.factor(ifelse(
         tab$ALPHA <= input$alphaVal[[1]],
         "Low",
@@ -1133,7 +1136,7 @@ shinyServer(function(input, output, session) {
         "Small",
         ifelse(tab$TOTAL_POP >= input$PopVal2[[2]], "Large", " Medium")
       ))
-      tab = tab[!is.na(tab$Initial_Population_),]
+      tab = tab[!is.na(tab$Initial_Population_), ]
       columnsToKeep = c(columnsToKeep, "Initial_Population_")
     }
     
@@ -1143,7 +1146,7 @@ shinyServer(function(input, output, session) {
         "Low",
         ifelse(tab$GDPPC >= input$GDPVal2[[2]], "High", " Medium")
       ))
-      tab = tab[!is.na(tab$Initial_GDP_Per_Capita_),]
+      tab = tab[!is.na(tab$Initial_GDP_Per_Capita_), ]
       columnsToKeep = c(columnsToKeep, "Initial_GDP_Per_Capita_")
     }
     
@@ -1153,7 +1156,7 @@ shinyServer(function(input, output, session) {
         "Low",
         ifelse(tab$URBP >= input$UrbVal2[[2]], "High", " Medium")
       ))
-      tab = tab[!is.na(tab$Initial_Urbanization_Level_),]
+      tab = tab[!is.na(tab$Initial_Urbanization_Level_), ]
       columnsToKeep = c(columnsToKeep, "Initial_Urbanization_Level_")
       
     }
@@ -1175,9 +1178,20 @@ shinyServer(function(input, output, session) {
       columnsToKeep = c(columnsToKeep, "Revolution")
     }
     
-    tab = tab[, columnsToKeep]
+    sameSample = input$sameSample2
+    if (sameSample == T) {
+      tab = subset(tab, N >= 0)
+      tab = subset(tab, URBANISATION != "")
+      tab = subset(tab, TOTAL_POP > 0)
+      tab = subset(tab, URBP > 0)
+      tab = subset(tab, GDPPC > 0)
+      tab = tab[, columnsToKeep]
+      tab = tab[complete.cases(tab),]
+    } else {tab = tab[, columnsToKeep]}
     
-    d = tab
+    
+  
+    d = data.frame(tab, columnsToDisplay[match(tab$ID, columnsToDisplay$ID),])
     d$residuals = residuals
     
     return(d)
