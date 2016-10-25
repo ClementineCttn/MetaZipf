@@ -1024,8 +1024,18 @@ shinyUI(
           ),
           tabPanel(
             "2. Residuals",
-            "Explore the residual growth rates of alpha in search for other historical factors",
-            h2("Subset Table by:"),
+            
+            
+            h6(
+              "In this tab, you can explore the residual growth rates of alpha to search for other historical factors absent from the dynamic model."
+            ),
+            tags$hr(),
+            "Given the low predictive power of the dynamic models, the residuals still encapsulate most of the empirical information.
+            Looking overestimated and underestimated observations can suggest other factors affecting the evolution of the city size unevenness.
+            For example, rebalancing policies can be evaluated if a country at a certain period systematically appear in the overestimated residuals.",
+            tags$hr(),
+            
+            h4("Select the type of residuals to display:"),
             fluidRow(
               column(
                 4,
@@ -1033,8 +1043,8 @@ shinyUI(
                   "criteriaSubset",
                   "Criteria",
                   choices = c(
-                    "More divergence than expected" = "increasing",
-                    "More convergence than expected" = "decreasing"
+                    "Underestimated growth of alpha" = "increasing",
+                    "Overestimated growth of alpha" = "decreasing"
                   )
                   ,
                   selected = c("increasing"),
@@ -1077,7 +1087,15 @@ shinyUI(
           ),
           tabPanel(
             "3. Trajectories",
-            h2("Subset Table by:"),
+            
+            h6(
+              "In this tab, you can explore the trajectories of alpha values over time for a given set of estimation specifications."
+            ),
+            tags$hr(),
+            "Represent your intuitions of policy and events effects on the value of alpha by considering its evolution over for all specification sets reported longitudinally in the literature.",
+            tags$hr(),
+            
+            h4("Select territories for which to display the trajectories:"),
             fluidRow(
               column(4, selectizeInput("territory_3", "Territory", "", multiple = T)),
               column(
@@ -1108,11 +1126,35 @@ shinyUI(
                   )
                 )
             ),
+            tags$hr(),
             
+            fluidRow(
+              column(12,conditionalPanel(
+                condition = 'input.eventsToPlot.indexOf("iw") != -1  ',
+                h6("Blue vertical lines = beginning of international wars involving the territory considered.")
+              )
+              
+              ),
+              column(12,conditionalPanel(
+                condition = 'input.eventsToPlot.indexOf("cw") != -1 ',
+                h6( "Black vertical lines = beginning of civil wars involving the territory considered.")
+              )
+              ),
+              column(12,conditionalPanel(
+                condition = 'input.eventsToPlot.indexOf("rv") != -1',
+                h6( "Green vertical lines = beginning of revolutions involving the territory considered.")
+              )
+              ),
+              column(12,conditionalPanel(
+                condition = 'input.eventsToPlot.indexOf("wi") != -1',
+                h6( "Red vertical lines = beginning of independence wars involving the territory considered.")
+              )
+              )
+            ),
             plotOutput('trajectories')
-            )
-          )
           
+          )
+          )
           
           # tabPanel("4. Projections"
           # )
