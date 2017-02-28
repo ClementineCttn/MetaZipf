@@ -578,7 +578,8 @@ shinyUI(
                     "Population Cutoff" = "truncation4model",
                     "Number of Cities" = "N4model",
                     "City definition" = "scale4model",
-                    "Regression Form" = "regForm"
+                    "Regression form" = "regForm",
+                    "Estimation method" = "olsOrnot"
                   ),
                   selected = NULL,
                   inline = FALSE

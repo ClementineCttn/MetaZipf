@@ -665,7 +665,7 @@ shinyServer(function(input, output, session) {
     OtherSpecs = input$otherSpecs
     
     if ('alltech' %in% TechnicalSpecs == "TRUE")
-      TechnicalSpecs = c("truncation4model", "N4model", "scale4model", "regForm")
+      TechnicalSpecs = c("truncation4model", "N4model", "scale4model", "regForm", "olsOrnot")
     if ('alltop' %in% TopicalSpecs == "TRUE")
       TopicalSpecs = c("urbanisation4model",
                        "countrySize",
@@ -707,6 +707,11 @@ shinyServer(function(input, output, session) {
       tab$Regression_Form_ = tab$REGRESSIONFORM
       regressants = paste0(regressants, " + Regression_Form_")
       columnsToKeep = c(columnsToKeep, "Regression_Form_")
+    }
+    if('olsOrnot' %in%  TechnicalSpecs == "TRUE")  {
+      tab$Estimation_Method_ = tab$ESTIMATION
+      regressants = paste0(regressants, " + Estimation_Method_")
+      columnsToKeep = c(columnsToKeep, "Estimation_Method_")
     }
     if ('scale4model' %in% TechnicalSpecs == "TRUE")  {
       tab$City_Definition_ = tab$URBANSCALE
@@ -817,7 +822,7 @@ shinyServer(function(input, output, session) {
     OtherSpecs = input$otherSpecs
     
     if ('alltech' %in% TechnicalSpecs == "TRUE")
-      TechnicalSpecs = c("truncation4model", "N4model", "scale4model", "regForm")
+      TechnicalSpecs = c("truncation4model", "N4model", "scale4model", "regForm", "olsOrnot")
     if ('alltop' %in% TopicalSpecs == "TRUE")
       TopicalSpecs = c("urbanisation4model",
                        "countrySize",
@@ -859,6 +864,12 @@ shinyServer(function(input, output, session) {
       tab$Regression_Form_ = tab$REGRESSIONFORM
       regressants = paste0(regressants, " + Regression_Form_")
       columnsToKeep = c(columnsToKeep, "Regression_Form_")
+    }
+    
+    if ('olsOrnot' %in%  TechnicalSpecs == "TRUE")  {
+      tab$Estimation_Method_ = tab$ESTIMATION
+      regressants = paste0(regressants, " + Estimation_Method_")
+      columnsToKeep = c(columnsToKeep, "Estimation_Method_")
     }
     
     if ('scale4model' %in% TechnicalSpecs == "TRUE")  {
@@ -1858,7 +1869,7 @@ shinyServer(function(input, output, session) {
     OtherSpecs = input$otherSpecs
     
     if ('alltech' %in% TechnicalSpecs == "TRUE")
-      TechnicalSpecs = c("truncation4model", "N4model", "scale4model", "regForm")
+      TechnicalSpecs = c("truncation4model", "N4model", "scale4model", "regForm", "olsOrnot")
     if ('alltop' %in% TopicalSpecs == "TRUE")
       TopicalSpecs = c("urbanisation4model",
                        "countrySize",
@@ -1879,6 +1890,8 @@ shinyServer(function(input, output, session) {
       Reference = paste(Reference, " | Number of cities: Medium", sep = "")
     if ('regForm' %in% TechnicalSpecs == "TRUE")
       Reference = paste(Reference, " | Regression Form: Lotka", sep = "")
+    if ('olsOrnot' %in% TechnicalSpecs == "TRUE")
+      Reference = paste(Reference, " | Estimation Method: OLS", sep = "")
     # if ('year4model' %in% TopicalSpecs == "TRUE") Reference = paste(Reference, " | Date of Observation: 1950", sep="")
     if ('scale4model' %in% TechnicalSpecs == "TRUE")
       Reference = paste(Reference, " | City Definition: LocalUnit", sep = "")
@@ -2251,7 +2264,8 @@ shinyServer(function(input, output, session) {
           "truncation4model",
           "N4model",
           "scale4model",
-          "regForm"
+          "regForm",
+          "olsOrnot"
         )
       )
     if ("allother" %in% allOther)
