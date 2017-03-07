@@ -608,6 +608,7 @@ shinyUI(
                   "Cm. Territorial Variables",
                   c(
                     "All" = "alltop",
+                    "Date of observation" = "time",
                     "Age of Urbanisation" = "urbanisation4model",
                     "Country Population" = "countrySize",
                     "Urbanization Level" = "countryUrb",
@@ -717,6 +718,16 @@ shinyUI(
                   max = 1000000,
                   value = c(10000, 100000)
                 )
+              ),
+              conditionalPanel(
+                condition = 'input.topicalSpecs.indexOf("countrySize") != -1 || input.topicalSpecs.indexOf("alltop") != -1',
+                sliderInput(
+                  "PopVal",
+                  "Country Population (x 1000, bounds of the medium reference class)",
+                  min = 1,
+                  max = 1000000,
+                  value = c(10000, 100000)
+                )
               )
             ),
             column(
@@ -735,13 +746,13 @@ shinyUI(
             column(
               4,
               conditionalPanel(
-                condition = 'input.topicalSpecs.indexOf("countryGDP") != -1 || input.topicalSpecs.indexOf("alltop") != -1',
+                condition = 'input.topicalSpecs.indexOf("time") != -1 || input.topicalSpecs.indexOf("alltop") != -1',
                 sliderInput(
-                  "GDPVal",
+                  "nTime",
                   "GDP per Capita (current US$, bounds of the medium reference class)",
-                  min = 1,
-                  max = 100000,
-                  value = c(1000, 10000)
+                  min = 1700,
+                  max = 2010,
+                  value = c(1950, 2000)
                 )
               )
             ),
@@ -760,7 +771,7 @@ shinyUI(
               #  textOutput('pFtest'),
               tags$hr(),
               h4("Results"),
-              tags$b("Intercept and Time Coefficient"),
+              tags$b("Intercept Coefficient"),
               tableOutput('model_temporal'),
               "Adjust the level of significance according to your requirements:",
               tags$b("Significant Coefficients"),
@@ -926,7 +937,7 @@ shinyUI(
                 conditionalPanel(
                   condition = 'input.var_static_meta_analysis.indexOf("gdp") != -1',
                   sliderInput(
-                    "GDPVal2",
+                    "GDPVal",
                     "GDP per Capita (current US$, bounds of the medium reference class)",
                     min = 1,
                     max = 100000,

@@ -56,6 +56,7 @@ meta = data.frame(meta, min_year_by_study[match(meta$REFERENCE, min_year_by_stud
 pops = read.csv("data/UN_Population_1950_2015.csv",
                 sep = ",",
                 dec = ".")
+
 colnames(pops) = c("CNTR_ID", "Name", "CC", paste0("POP", 1950:2015))
 pops[pops == 0] <- NA
 pops =  pops[pops$CNTR_ID != "",]
@@ -99,6 +100,7 @@ gdps$Pct_GDP_2010s = AAGR_pct(gdps$GDP2010, gdps$GDP2015, 5)
 meta = data.frame(meta, pops[match(meta$CNTR_ID, pops$CNTR_ID),])
 meta = data.frame(meta, gdps[match(meta$CNTR_ID, gdps$CNTR_ID),])
 meta = data.frame(meta, urbs[match(meta$CNTR_ID, urbs$CNTR_ID),])
+head(meta)
 meta$TOTAL_POP = NA
 meta$URBP = NA
 meta$GDPPC = NA
@@ -206,7 +208,6 @@ for (i in 1:dim(meta)[1]) {
 
 r_colors <- rgb(t(col2rgb(colors()) / 255))
 names(r_colors) <- colors()
-
 
 
 ##############################
@@ -667,7 +668,8 @@ shinyServer(function(input, output, session) {
     if ('alltech' %in% TechnicalSpecs == "TRUE")
       TechnicalSpecs = c("truncation4model", "N4model", "scale4model", "regForm", "olsOrnot")
     if ('alltop' %in% TopicalSpecs == "TRUE")
-      TopicalSpecs = c("urbanisation4model",
+      TopicalSpecs = c("time",
+                      "urbanisation4model",
                        "countrySize",
                        "countryGDP",
                        "countryUrb")
@@ -677,9 +679,8 @@ shinyServer(function(input, output, session) {
                      "studyPeriod",
                      "studyCoverage") #"discipline"
     
-    tab$Date_of_Observation = tab$DATE - 1950
-    regressants = "ALPHA ~ 1 + Date_of_Observation"
-    columnsToKeep = c("ALPHA", "Date_of_Observation")
+    regressants = "ALPHA ~ 1"
+    columnsToKeep = c("ALPHA")
     if ('truncation4model' %in% TechnicalSpecs == "TRUE") {
       tab$Population_Cutoff_ = as.factor(ifelse(
         tab$TRUNCATION_POINT <= input$truncVal[[1]],
@@ -701,6 +702,15 @@ shinyServer(function(input, output, session) {
       ))
       regressants = paste0(regressants, " + Number_Of_Cities_")
       columnsToKeep = c(columnsToKeep, "Number_Of_Cities_")
+    }
+    if ('time' %in% TopicalSpecs == "TRUE")  {
+      tab$Date_of_Observation = as.factor(ifelse(
+        tab$DATE <= input$nTime[[1]],
+        "Small",
+        ifelse(tab$DATE >= input$nTime[[2]], "Large", " Medium")
+      ))
+      regressants = paste0(regressants, " + Date_of_Observation")
+      columnsToKeep = c(columnsToKeep, "Date_of_Observation")
     }
     
     if ('regForm' %in%  TechnicalSpecs == "TRUE")  {
@@ -744,6 +754,7 @@ shinyServer(function(input, output, session) {
       regressants = paste0(regressants, " + Country_Urbanization_")
       columnsToKeep = c(columnsToKeep, "Country_Urbanization_")
     }
+  
     
     if ('countryGDP' %in% TopicalSpecs  == "TRUE") {
       tab = subset(tab, GDPPC > 0)
@@ -824,7 +835,8 @@ shinyServer(function(input, output, session) {
     if ('alltech' %in% TechnicalSpecs == "TRUE")
       TechnicalSpecs = c("truncation4model", "N4model", "scale4model", "regForm", "olsOrnot")
     if ('alltop' %in% TopicalSpecs == "TRUE")
-      TopicalSpecs = c("urbanisation4model",
+      TopicalSpecs = c("time",
+                       "urbanisation4model",
                        "countrySize",
                        "countryGDP",
                        "countryUrb")
@@ -834,9 +846,8 @@ shinyServer(function(input, output, session) {
                      "studyPeriod",
                      "studyCoverage") #"discipline"
     
-    tab$Date_of_Observation = tab$DATE - 1950
-    regressants = "ALPHA ~ Date_of_Observation"
-    columnsToKeep = c("REFID", "ALPHA", "Date_of_Observation")
+    regressants = "ALPHA ~ 1"
+    columnsToKeep = c("REFID", "ALPHA")
     if ('truncation4model' %in% TechnicalSpecs == "TRUE") {
       tab$Population_Cutoff_ = as.factor(ifelse(
         tab$TRUNCATION_POINT <= input$truncVal[[1]],
@@ -884,7 +895,15 @@ shinyServer(function(input, output, session) {
       regressants = paste0(regressants, " + Urbanisation_Age_")
       columnsToKeep = c(columnsToKeep, "Urbanisation_Age_")
     }
-    
+    if ('time' %in% TopicalSpecs == "TRUE")  {
+      tab$Date_of_Observation = as.factor(ifelse(
+        tab$DATE <= input$nTime[[1]],
+        "Small",
+        ifelse(tab$DATE >= input$nTime[[2]], "Large", " Medium")
+      ))
+      regressants = paste0(regressants, " + Date_of_Observation")
+      columnsToKeep = c(columnsToKeep, "Date_of_Observation")
+    }
     if ('countrySize' %in% TopicalSpecs  == "TRUE") {
       tab = subset(tab, TOTAL_POP > 0)
       tab$Country_Size_ = as.factor(ifelse(
@@ -1804,6 +1823,7 @@ shinyServer(function(input, output, session) {
     }
   }, include.rownames = FALSE)
   
+  
   output$model_temporal = renderTable({
     fixedEffect = input$fixedEffects
     if (fixedEffect == T) {
@@ -1812,7 +1832,10 @@ shinyServer(function(input, output, session) {
       model = metaModelOLS()
     }
     mod = as.data.frame(summary(model)$coefficients)
-    temporal = mod[rownames(mod) %in% c("(Intercept)", "Date_of_Observation"),]
+    temporal = mod[rownames(mod) %in% c("(Intercept)"),]
+    temporal = data.frame(rownames(temporal), temporal)
+    colnames(temporal)[1] = "Intercept"
+    
     return(temporal)
   }, digits = 3)
   
@@ -1836,7 +1859,9 @@ shinyServer(function(input, output, session) {
       sign = input$significance / 100
       significant = round(mod[mod$`Pr(>|t|)` <= sign,], 3)
     }
-    significant = significant[!rownames(significant) %in% c("(Intercept)", "Date_of_Observation"),]
+    significant = significant[!rownames(significant) %in% c("(Intercept)"),]
+    significant = data.frame(rownames(significant), significant)
+    colnames(significant)[1] = "Variable"
     return(significant)
   }, digits = 3)
   
@@ -1860,6 +1885,9 @@ shinyServer(function(input, output, session) {
       sign = input$significance / 100
       non_significant = mod[mod$`Pr(>|t|)` > sign,]
     }
+    non_significant = data.frame(rownames(non_significant), non_significant)
+    colnames(non_significant)[1] = "Variable"
+    
     return(non_significant)
   })
   
@@ -1871,7 +1899,7 @@ shinyServer(function(input, output, session) {
     if ('alltech' %in% TechnicalSpecs == "TRUE")
       TechnicalSpecs = c("truncation4model", "N4model", "scale4model", "regForm", "olsOrnot")
     if ('alltop' %in% TopicalSpecs == "TRUE")
-      TopicalSpecs = c("urbanisation4model",
+      TopicalSpecs = c("time","urbanisation4model",
                        "countrySize",
                        "countryGDP",
                        "countryUrb")
@@ -1892,6 +1920,8 @@ shinyServer(function(input, output, session) {
       Reference = paste(Reference, " | Regression Form: Lotka", sep = "")
     if ('olsOrnot' %in% TechnicalSpecs == "TRUE")
       Reference = paste(Reference, " | Estimation Method: OLS", sep = "")
+    if ('time' %in% TopicalSpecs == "TRUE")
+      Reference = paste(Reference, " | Date of Observation: ", input$nTime[[1]], "-", input$nTime[[2]], sep = "")
     # if ('year4model' %in% TopicalSpecs == "TRUE") Reference = paste(Reference, " | Date of Observation: 1950", sep="")
     if ('scale4model' %in% TechnicalSpecs == "TRUE")
       Reference = paste(Reference, " | City Definition: LocalUnit", sep = "")
@@ -1935,7 +1965,6 @@ shinyServer(function(input, output, session) {
     model = metaModelDynOLS()
     mod = as.data.frame(summary(model)$coefficients)
     temporal = mod[rownames(mod) %in% c("(Intercept)",
-                                        "Date",
                                         "Initial_Alpha_Low",
                                         "Initial_Alpha_High"),]
     return(temporal)
@@ -1948,7 +1977,6 @@ shinyServer(function(input, output, session) {
     sign = input$significance / 100
     significant = round(mod[mod$`Pr(>|t|)` <= sign,], 3)
     significant = significant[!rownames(significant) %in% c("(Intercept)",
-                                                            "Date",
                                                             "Initial_Alpha_Low",
                                                             "Initial_Alpha_High"),]
     return(significant)
@@ -1961,7 +1989,6 @@ shinyServer(function(input, output, session) {
     sign = input$significance / 100
     non_significant = mod[mod$`Pr(>|t|)` > sign,]
     non_significant = non_significant[!rownames(non_significant) %in% c("(Intercept)",
-                                                                        "Date",
                                                                         "Initial_Alpha_Low",
                                                                         "Initial_Alpha_High"),]
     return(non_significant)
@@ -2286,6 +2313,7 @@ shinyServer(function(input, output, session) {
         "topicalSpecs",
         selected =  c(
           "alltop",
+          "time",
           "urbanisation4model",
           "countrySize",
           "countryGDP",
