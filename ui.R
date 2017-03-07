@@ -389,7 +389,7 @@ shinyUI(
             "The scaling coefficient reported in the study or its transformed value, depending on the form chosen in the first tab (Lotka or Pareto).",
             br(),
             h2("DATE"),
-            "The date of observation used in the meta analysis is the date to which the cities' population refer. We centered it on 1950 to ease the reference case interpretation of the results.",
+            "The date of observation used in the meta analysis is the date to which the cities' population refer.",
             br(),
             h2("TERRITORY"),
             "The territory to which the cities' population refer.",
@@ -547,8 +547,7 @@ shinyUI(
             "Technically, we regress the value of alpha reported for the estimation k of a study s regarding the territory m at time t as follow:",
             withMathJax(
               h6(
-                "$$\\alpha_{k,s,m} = Intercept + b1 * t_k +
-                b2 * A_k + b3 * B_s + b4 * C_m + +e_s + e_k $$"
+                "$$\\alpha_{k,s,m} = Intercept + b1 * A_k + b2 * B_s + b3 * C_m + +e_s + e_k $$"
               )
               ),
             
@@ -620,11 +619,15 @@ shinyUI(
               ),
               
               column(
-                6,
+                4,
                 checkboxInput("fixedEffects", "Fixed Study Effects", value = F)
               ),
               column(
-                6,
+                4,
+                checkboxInput("fixedCountryEffects", "Fixed Country Effects", value = F)
+              ),
+              column(
+                4,
                 checkboxInput("sameSample", "Compare models with the same observations", value = F)
               ),
               
@@ -752,7 +755,7 @@ shinyUI(
                   "GDP per Capita (current US$, bounds of the medium reference class)",
                   min = 1700,
                   max = 2010,
-                  value = c(1950, 2000)
+                  value = c(1940, 2000)
                 )
               )
             ),
@@ -773,9 +776,9 @@ shinyUI(
               h4("Results"),
               tags$b("Intercept Coefficient"),
               tableOutput('model_temporal'),
-              "Adjust the level of significance according to your requirements:",
               tags$b("Significant Coefficients"),
               tableOutput('model_significant'),
+              br(),"Adjust the level of significance according to your requirements:",
               sliderInput(
                 "significance",
                 "Significance level (%)",
@@ -796,16 +799,6 @@ shinyUI(
                   " gives the average value of alpha predicted for
                   an urban system characterized by the reference categories of the selected variables",
                   htmlOutput('REFS')
-                ),
-                
-                tags$li(
-                  "The coefficient associated with the '",
-                  tags$b("Date of observation"),
-                  "' indicates how much alpha varies
-                  on average for each year added to the date of observation, these dates being centred on 1950.
-                  If the rank-size properties of a system do not change over time, this coefficient should be
-                  equal to 0. On the contrary, significant non-zero coefficients indicate tendencies towards hierarchisation or evening
-                  of city sizes over time."
                 )
                 )
                 )

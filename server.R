@@ -706,8 +706,8 @@ shinyServer(function(input, output, session) {
     if ('time' %in% TopicalSpecs == "TRUE")  {
       tab$Date_of_Observation = as.factor(ifelse(
         tab$DATE <= input$nTime[[1]],
-        "Small",
-        ifelse(tab$DATE >= input$nTime[[2]], "Large", " Medium")
+        "Early",
+        ifelse(tab$DATE >= input$nTime[[2]], "Late", " Intermediate")
       ))
       regressants = paste0(regressants, " + Date_of_Observation")
       columnsToKeep = c(columnsToKeep, "Date_of_Observation")
@@ -847,7 +847,7 @@ shinyServer(function(input, output, session) {
                      "studyCoverage") #"discipline"
     
     regressants = "ALPHA ~ 1"
-    columnsToKeep = c("REFID", "ALPHA")
+    columnsToKeep = c("REFID", "CNTR_ID", "ALPHA")
     if ('truncation4model' %in% TechnicalSpecs == "TRUE") {
       tab$Population_Cutoff_ = as.factor(ifelse(
         tab$TRUNCATION_POINT <= input$truncVal[[1]],
@@ -990,9 +990,18 @@ shinyServer(function(input, output, session) {
       tab = tab[complete.cases(tab),]
     }
     
-    
+    if (input$fixedEffects == T & input$fixedCountryEffects == F) {
+      formulaModel = paste0(regressants, " + ( 1 | REFID)")
+    }
+    if (input$fixedEffects == F & input$fixedCountryEffects == T) {
+      formulaModel = paste0(regressants, " + ( 1 | CNTR_ID)")
+    }
+    if (input$fixedEffects == T & input$fixedCountryEffects == T) {
+      formulaModel = paste0(regressants, " + ( 1 | REFID) + (1 | CNTR_ID)")
+    }
+      
     model = lmer(
-      as.formula(paste0(regressants, " + ( 1 | REFID)")),
+      as.formula(formulaModel),
       data = tab,
       REML = F,
       na.action = na.omit
@@ -1796,7 +1805,7 @@ shinyServer(function(input, output, session) {
   ######  Tab C.3
   
   output$modelparameters = renderTable({
-    if (input$fixedEffects == T) {
+    if (input$fixedEffects == T | input$fixedCountryEffects == T) {
       model = metaModelFixed()
       R2 = r2.corr.mer(model) * 100
       vc <- VarCorr(model)
@@ -1808,10 +1817,10 @@ shinyServer(function(input, output, session) {
       TotalVarMnnull <- InterVarMnnull + IntraVarMnnull
       ShareInterVar <- InterVarMnnull / TotalVarMnnull
       R2between = ShareInterVar * R2
-      R2within = R2 - R2between
+     # R2within = R2 - R2between
       Observations = length(model@frame$ALPHA)
-      summ = data.frame(R2within, R2between, Observations)
-      colnames(summ) = c("R2 within (%)", "R2 between (%)", "Number of Estimations")
+      summ = data.frame(R2, R2between, Observations)
+      colnames(summ) = c("R2 (%)", "Share of inter-group variance (%)", "Number of Estimations")
       return(summ)
     } else {
       model = metaModelOLS()
@@ -1826,7 +1835,7 @@ shinyServer(function(input, output, session) {
   
   output$model_temporal = renderTable({
     fixedEffect = input$fixedEffects
-    if (fixedEffect == T) {
+    if (input$fixedEffects == T | input$fixedCountryEffects == T) {
       model = metaModelFixed()
     } else {
       model = metaModelOLS()
@@ -1840,7 +1849,7 @@ shinyServer(function(input, output, session) {
   }, digits = 3)
   
   output$model_significant = renderTable({
-    if (input$fixedEffects == T) {
+    if (input$fixedEffects == T | input$fixedCountryEffects == T) {
       model = metaModelFixed()
       mod = as.data.frame(summary(model)$coefficients)
       sign = input$significance / 100
@@ -1866,7 +1875,7 @@ shinyServer(function(input, output, session) {
   }, digits = 3)
   
   output$model_non_significant = renderTable({
-    if (input$fixedEffects == T) {
+    if (input$fixedEffects == T | input$fixedCountryEffects == T) {
       model = metaModelFixed()
       mod = as.data.frame(summary(model)$coefficients)
       sign = input$significance / 100
