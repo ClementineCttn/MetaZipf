@@ -131,7 +131,7 @@ shinyUI(
                      checkboxInput(
                        "Arxiv",
                        "Reproduce the analyses of the arXiv paper (reference collection ends in June 2016)",
-                       value = TRUE
+                       value = FALSE
                      )
                    ),
                    column(
@@ -752,7 +752,7 @@ shinyUI(
                 condition = 'input.topicalSpecs.indexOf("time") != -1 || input.topicalSpecs.indexOf("alltop") != -1',
                 sliderInput(
                   "nTime",
-                  "GDP per Capita (current US$, bounds of the medium reference class)",
+                  "Date of observation (bounds of the medium reference class)",
                   min = 1700,
                   max = 2010,
                   value = c(1940, 2000)

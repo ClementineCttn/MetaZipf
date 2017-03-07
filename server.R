@@ -898,8 +898,8 @@ shinyServer(function(input, output, session) {
     if ('time' %in% TopicalSpecs == "TRUE")  {
       tab$Date_of_Observation = as.factor(ifelse(
         tab$DATE <= input$nTime[[1]],
-        "Small",
-        ifelse(tab$DATE >= input$nTime[[2]], "Large", " Medium")
+        "Early",
+        ifelse(tab$DATE >= input$nTime[[2]], "Late", " Intermediate")
       ))
       regressants = paste0(regressants, " + Date_of_Observation")
       columnsToKeep = c(columnsToKeep, "Date_of_Observation")
