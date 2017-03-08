@@ -849,29 +849,18 @@ shinyUI(
             
             h4("Select Features for the Dynamic Meta Analysis"),
             fluidRow(
-              column(
-                12,
-                checkboxGroupInput(
-                  "var_interest_meta_analysis",
-                  "Default Variables",
-                  c("Initial Alpha" = "alpha",
-                    "Date" = "t"),
-                  selected = NULL,
-                  inline = TRUE
-                )
-              ),
+              
               column(
                 4,
                 checkboxGroupInput(
                   "var_static_meta_analysis",
                   "Cm. Territorial Variables",
-                  c(
+                  c("Initial Alpha" = "alpha",
                     "Initial Population" = "pop",
                     "Initial GDP per capita" = "gdp",
-                    "Initial Urbanization level" = "urb",
-                    "Urbanization Age" = "urbanAge"
+                    "Initial Urbanization level" = "urb"
                   ),
-                  selected = NULL,
+                  selected = c('alpha'),
                   inline = FALSE
                 )
               ),
@@ -880,7 +869,7 @@ shinyUI(
                 checkboxGroupInput(
                   "var_dyn_meta_analysis",
                   "Dm. Dynamic Variables",
-                  c(
+                  c("Date" = "t",
                     "Population Growth" = "tcam_pop",
                     "GDP per capita Growth" = "tcam_gdp",
                     "Urbanization Growth" = "tcam_urb",
@@ -908,7 +897,7 @@ shinyUI(
               column(
                 4,
                 conditionalPanel(
-                  condition = 'input.var_interest_meta_analysis.indexOf("alpha") != -1',
+                  condition = 'input.var_static_meta_analysis.indexOf("alpha") != -1',
                   sliderInput(
                     "alphaVal",
                     "Alpha at the beginning of the period (bounds of the medium reference class)",
@@ -1017,7 +1006,7 @@ shinyUI(
               
               column(
                 6,
-                checkboxInput("fixedEffects2", "Fixed Study Effects", value = F)
+                checkboxInput("fixedEffects2", "Fixed Effect Panel Model", value = F)
               ),
               column(
                 6,

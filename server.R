@@ -209,7 +209,6 @@ for (i in 1:dim(meta)[1]) {
 r_colors <- rgb(t(col2rgb(colors()) / 255))
 names(r_colors) <- colors()
 
-
 ##############################
 ######  Outputs functions
 ##############################
@@ -1256,7 +1255,6 @@ shinyServer(function(input, output, session) {
     dyn_vars = input$var_dyn_meta_analysis
     static_vars =  input$var_static_meta_analysis
     events = input$meta_events_meta_analysis
-    default = input$var_interest_meta_analysis
     
     regressants = "PCT_GROWTH_ALPHA ~ 1 "
     columnsToKeep = c("ALPHA", "PCT_GROWTH_ALPHA")
@@ -1385,22 +1383,14 @@ shinyServer(function(input, output, session) {
       
     }
     
-    if ('t' %in% default == "TRUE") {
+    if ('t' %in% dyn_vars == "TRUE") {
       tab$Date = tab$DATE - 1950
       regressants = paste0(regressants, " + Date")
       columnsToKeep = c(columnsToKeep, "Date")
       
     }
     
-    
-    if ('urbanAge' %in% static_vars == "TRUE") {
-      tab$Urbanization_Age_ = tab$URBANISATION
-      regressants = paste0(regressants, " + Urbanization_Age_")
-      columnsToKeep = c(columnsToKeep, "Urbanization_Age_")
-      
-    }
-    
-    if ('alpha' %in% default == "TRUE") {
+     if ('alpha' %in% static_vars == "TRUE") {
       tab$Initial_Alpha_ = as.factor(ifelse(
         tab$ALPHA <= input$alphaVal[[1]],
         "Low",
@@ -1489,8 +1479,7 @@ shinyServer(function(input, output, session) {
     dyn_vars = input$var_dyn_meta_analysis
     static_vars =  input$var_static_meta_analysis
     events = input$meta_events_meta_analysis
-    default = input$var_interest_meta_analysis
-    
+  
     regressants = "PCT_GROWTH_ALPHA ~ 1 "
     columnsToKeep = c("REFID", "SAME_SPECIFICATIONS", "ALPHA", "PCT_GROWTH_ALPHA", "DATE")
     
@@ -1631,7 +1620,7 @@ shinyServer(function(input, output, session) {
       
     }
     
-    if ('t' %in% default == "TRUE") {
+    if ('t' %in% dyn_vars == "TRUE") {
       tab$Date = tab$DATE - 1950
       regressants = paste0(regressants, " + Date")
       columnsToKeep = c(columnsToKeep, "Date")
@@ -1639,14 +1628,8 @@ shinyServer(function(input, output, session) {
     }
     
     
-    if ('urbanAge' %in% static_vars == "TRUE") {
-      tab$Urbanization_Age_ = tab$URBANISATION
-      regressants = paste0(regressants, " + Urbanization_Age_")
-      columnsToKeep = c(columnsToKeep, "Urbanization_Age_")
-      
-    }
-    
-    if ('alpha' %in% default == "TRUE") {
+  
+    if ('alpha' %in% static_vars == "TRUE") {
       tab$Initial_Alpha_ = as.factor(ifelse(
         tab$ALPHA <= input$alphaVal[[1]],
         "Low",
@@ -1732,6 +1715,9 @@ shinyServer(function(input, output, session) {
     # )
       model <- plm(as.formula(regressants), data=tab, index=c("SAME_SPECIFICATIONS", "DATE"), model="within")
       
+     #  mod <- plm(PCT_GROWTH_ALPHA ~ 1+ Urbanization_Age_, data=tab, index=c("SAME_SPECIFICATIONS", "DATE"), model="within")
+     # mod
+     # summary(mod)
       # model <- plm(PCT_GROWTH_ALPHA ~ 1, data=tab, index=c("SAME_SPECIFICATIONS", "DATE"), model="within")
       # summary(model)   
       return(model)
@@ -2234,20 +2220,10 @@ shinyServer(function(input, output, session) {
   output$modeldyn_fit  = renderTable({
     if (input$fixedEffects2 == T ) {
       model = metaModelDynFixed()
-      R2 = r2.corr.mer(model) * 100
-      vc <- VarCorr(model)
-      vc.tab <- as.data.frame(vc)
-      vc.tabinter <- vc.tab [1,]
-      vc.tabintra <- vc.tab [2,]
-      InterVarMnnull <- vc.tabinter$vcov
-      IntraVarMnnull <- vc.tabintra$vcov
-      TotalVarMnnull <- InterVarMnnull + IntraVarMnnull
-      ShareInterVar <- InterVarMnnull / TotalVarMnnull
-      R2between = ShareInterVar * R2
-      # R2within = R2 - R2between
-      Observations = length(model@frame$PCT_GROWTH_ALPHA)
-      summ = data.frame(R2, R2between, Observations)
-      colnames(summ) = c("R2 (%)", "Share of inter-group variance (%)", "Number of Estimations")
+      R2 = summary(model)$r.squared[1] * 100
+     Observations = length(model$model$PCT_GROWTH_ALPHA)
+      summ = data.frame(R2, Observations)
+      colnames(summ) = c("R2 (%)", "Number of Estimations")
     } else {
     model = metaModelDynOLS()
     R2 = summary(model)$r.squared * 100
@@ -2261,13 +2237,17 @@ shinyServer(function(input, output, session) {
   output$model_temporal_dyn = renderTable({
     if (input$fixedEffects2 == T) {
       model = metaModelDynFixed()
+      n = length(unique(attr(model$model$PCT_GROWTH_ALPHA, "index")[,'SAME_SPECIFICATIONS']))
+      temporal = data.frame("Number of groups/intercepts", n)
+      colnames(temporal) = NULL
     } else {
     model = metaModelDynOLS()
-    }
     mod = as.data.frame(summary(model)$coefficients)
     temporal = mod[rownames(mod) %in% c("(Intercept)"),]
     temporal = data.frame(rownames(temporal), temporal)
     colnames(temporal)[1] = "Intercept"
+    
+    }
     return(temporal)
   }, digits = 3)
   
@@ -2275,22 +2255,11 @@ shinyServer(function(input, output, session) {
     sign = input$significance_dyn / 100
     if (input$fixedEffects2 == T) {
       model = metaModelDynFixed()
-      mod = as.data.frame(summary(model)$coefficients)
-      sign = input$significance / 100
-      if (sign <= 0.1)
-        tTestValue = 1.282
-      if (sign < 0.05)
-        tTestValue = 1.645
-      if (sign < 0.025)
-        tTestValue = 1.960
-      if (sign < 0.01)
-        tTestValue = 2.326
-      significant = round(mod[abs(mod$`t value`) >= tTestValue,], 3)
     } else {
     model = metaModelDynOLS()
+    }
     mod = as.data.frame(summary(model)$coefficients)
     significant = round(mod[mod$`Pr(>|t|)` <= sign,], 3)
-    }
     significant = significant[!rownames(significant) %in% c("(Intercept)"),]
     significant = data.frame(rownames(significant), significant)
     colnames(significant)[1] = "Variable"
@@ -2301,24 +2270,12 @@ shinyServer(function(input, output, session) {
     sign = input$significance_dyn / 100
     if (input$fixedEffects2 == T) {
       model = metaModelDynFixed()
-      mod = as.data.frame(summary(model)$coefficients)
-      sign = input$significance / 100
-      if (sign <= 0.1)
-        tTestValue = 1.282
-      if (sign < 0.05)
-        tTestValue = 1.645
-      if (sign < 0.025)
-        tTestValue = 1.960
-      if (sign < 0.01)
-        tTestValue = 2.326
-      non_significant = mod[abs(mod$`t value`) < tTestValue,]
-    } else {
+       } else {
     model = metaModelDynOLS()
+       }
     mod = as.data.frame(summary(model)$coefficients)
-    sign = input$significance / 100
     non_significant = mod[mod$`Pr(>|t|)` > sign,]
     non_significant = non_significant[!rownames(non_significant) %in% c("(Intercept)"),]
-    }
     non_significant = data.frame(rownames(non_significant), non_significant)
     colnames(non_significant)[1] = "Variable"
     return(non_significant)
@@ -2682,6 +2639,7 @@ shinyServer(function(input, output, session) {
     ))))
   })
   
+
   observe({
     tab = metaArxiv()
     if (input$alpha == "Lotka")
