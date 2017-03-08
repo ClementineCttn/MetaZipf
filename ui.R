@@ -547,7 +547,7 @@ shinyUI(
             "Technically, we regress the value of alpha reported for the estimation k of a study s regarding the territory m at time t as follow:",
             withMathJax(
               h6(
-                "$$\\alpha_{k,s,m} = Intercept + b1 * A_k + b2 * B_s + b3 * C_m + +e_s + e_k $$"
+                "$$\\alpha_{k,s,m} = Intercept + b1 * A_k + b2 * B_s + b3 * C_m + e_s + e_k $$"
               )
               ),
             
@@ -630,7 +630,11 @@ shinyUI(
                 4,
                 checkboxInput("sameSample", "Compare models with the same observations", value = F)
               ),
-              
+              # column(
+              #   6,
+              #   checkboxInput("standardize", "Standardise variables: (x - mean(x)) / sd(x)", value = F)
+              # ),
+              # 
               column(
                 4,
                 conditionalPanel(
@@ -712,17 +716,7 @@ shinyUI(
             ),
             column(
               4,
-              conditionalPanel(
-                condition = 'input.topicalSpecs.indexOf("countrySize") != -1 || input.topicalSpecs.indexOf("alltop") != -1',
-                sliderInput(
-                  "PopVal",
-                  "Country Population (x 1000, bounds of the medium reference class)",
-                  min = 1,
-                  max = 1000000,
-                  value = c(10000, 100000)
-                )
-              ),
-              conditionalPanel(
+               conditionalPanel(
                 condition = 'input.topicalSpecs.indexOf("countrySize") != -1 || input.topicalSpecs.indexOf("alltop") != -1',
                 sliderInput(
                   "PopVal",
@@ -743,6 +737,19 @@ shinyUI(
                   min = 0,
                   max = 100,
                   value = c(20, 60)
+                )
+              )
+            ),
+            column(
+              4,
+              conditionalPanel(
+                condition = 'input.topicalSpecs.indexOf("countryGDP") != -1 || input.topicalSpecs.indexOf("alltop") != -1',
+                sliderInput(
+                  "GDPVal",
+                  "GDP per Capita (current US$, bounds of the medium reference class)",
+                  min = 1,
+                  max = 100000,
+                  value = c(1000, 10000)
                 )
               )
             ),
@@ -849,7 +856,7 @@ shinyUI(
                   "Default Variables",
                   c("Initial Alpha" = "alpha",
                     "Date" = "t"),
-                  selected = c("alpha", "t"),
+                  selected = NULL,
                   inline = TRUE
                 )
               ),
@@ -930,7 +937,7 @@ shinyUI(
                 conditionalPanel(
                   condition = 'input.var_static_meta_analysis.indexOf("gdp") != -1',
                   sliderInput(
-                    "GDPVal",
+                    "GDPVal2",
                     "GDP per Capita (current US$, bounds of the medium reference class)",
                     min = 1,
                     max = 100000,
@@ -1009,7 +1016,11 @@ shinyUI(
               ),
               
               column(
-                12,
+                6,
+                checkboxInput("fixedEffects2", "Fixed Study Effects", value = F)
+              ),
+              column(
+                6,
                 checkboxInput(
                   "sameSample2",
                   "Compare models with the same observations",
@@ -1025,7 +1036,7 @@ shinyUI(
               tableOutput('modeldyn_fit'),
               tags$hr(),
               h4("Results"),
-              tags$b("Intercept and Default Variable Coefficients"),
+              tags$b("Intercept"),
               tableOutput('model_temporal_dyn'),
               tags$b("Significant Coefficients"),
               tableOutput('model_significant_dyn'),

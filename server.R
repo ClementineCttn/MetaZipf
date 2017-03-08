@@ -411,10 +411,8 @@ shinyServer(function(input, output, session) {
   
   tableForTrajectoryMaps <- reactive({
     tab = metaArxiv()
-    if (input$alpha == "Lotka")
-      tab$ALPHA = tab$ALPHALOTKA
-    if (input$alpha  == "Pareto")
-      tab$ALPHA = tab$ALPHAPARETO
+    if (input$alpha == "Lotka")tab$ALPHA = tab$ALPHALOTKA
+    if (input$alpha  == "Pareto") tab$ALPHA = tab$ALPHAPARETO
     terr = unique(as.character(tab$TERRITORY))
     longitudinalAlphas = tab[tab$TRUNCATION != "" &
                                tab$TERRITORY %in% terr, ]
@@ -424,6 +422,8 @@ shinyServer(function(input, output, session) {
         longitudinalAlphas$REFID,
         longitudinalAlphas$TERRITORY,
         longitudinalAlphas$URBANSCALE,
+        longitudinalAlphas$ESTIMATION,
+
         longitudinalAlphas$TRUNCATION,
         longitudinalAlphas$N,
         sep = "_"
@@ -432,6 +432,7 @@ shinyServer(function(input, output, session) {
         longitudinalAlphas$REFID,
         longitudinalAlphas$TERRITORY,
         longitudinalAlphas$URBANSCALE,
+        longitudinalAlphas$ESTIMATION,
         longitudinalAlphas$TRUNCATION_POINT,
         sep = "_"
       )
@@ -482,13 +483,12 @@ shinyServer(function(input, output, session) {
     longitudinalAlphas = longitudinalAlphas[is.finite(longitudinalAlphas$PCT_GROWTH_ALPHA),]
     return(longitudinalAlphas)
   })
-  
+ 
+
   tableForTrajectories <- reactive({
     tab = metaArxiv()
-    if (input$alpha == "Lotka")
-      tab$ALPHA = tab$ALPHALOTKA
-    if (input$alpha  == "Pareto")
-      tab$ALPHA = tab$ALPHAPARETO
+    if (input$alpha == "Lotka")  tab$ALPHA = tab$ALPHALOTKA
+    if (input$alpha  == "Pareto") tab$ALPHA = tab$ALPHAPARETO
     terr = input$territory_3
     if (length(terr) >= 1) {
       tab = tab[tab$TERRITORY %in% terr,]
@@ -504,6 +504,7 @@ shinyServer(function(input, output, session) {
         longitudinalAlphas$REFID,
         longitudinalAlphas$TERRITORY,
         longitudinalAlphas$URBANSCALE,
+        longitudinalAlphas$ESTIMATION,
         longitudinalAlphas$TRUNCATION,
         longitudinalAlphas$N,
         sep = "_"
@@ -511,7 +512,8 @@ shinyServer(function(input, output, session) {
       paste(
         longitudinalAlphas$REFID,
         longitudinalAlphas$TERRITORY,
-        longitudinalAlphas$URBANSCALE,
+         longitudinalAlphas$URBANSCALE,
+        longitudinalAlphas$ESTIMATION,
         longitudinalAlphas$TRUNCATION_POINT,
         sep = "_"
       )
@@ -546,6 +548,7 @@ shinyServer(function(input, output, session) {
     }
     return(longitudinalAlphas)
   })
+  
   
   GrowthCountries <- reactive({
     c_shp <-
@@ -704,13 +707,13 @@ shinyServer(function(input, output, session) {
       columnsToKeep = c(columnsToKeep, "Number_Of_Cities_")
     }
     if ('time' %in% TopicalSpecs == "TRUE")  {
-      tab$Date_of_Observation = as.factor(ifelse(
+      tab$Date_of_Observation_ = as.factor(ifelse(
         tab$DATE <= input$nTime[[1]],
         "Early",
         ifelse(tab$DATE >= input$nTime[[2]], "Late", " Intermediate")
       ))
-      regressants = paste0(regressants, " + Date_of_Observation")
-      columnsToKeep = c(columnsToKeep, "Date_of_Observation")
+      regressants = paste0(regressants, " + Date_of_Observation_")
+      columnsToKeep = c(columnsToKeep, "Date_of_Observation_")
     }
     
     if ('regForm' %in%  TechnicalSpecs == "TRUE")  {
@@ -816,7 +819,8 @@ shinyServer(function(input, output, session) {
       tab = tab[complete.cases(tab),]
     }
     
-    
+
+
     model = lm(regressants, data = tab, na.action = na.omit)
     return(model)
   })
@@ -896,13 +900,13 @@ shinyServer(function(input, output, session) {
       columnsToKeep = c(columnsToKeep, "Urbanisation_Age_")
     }
     if ('time' %in% TopicalSpecs == "TRUE")  {
-      tab$Date_of_Observation = as.factor(ifelse(
+      tab$Date_of_Observation_ = as.factor(ifelse(
         tab$DATE <= input$nTime[[1]],
         "Early",
         ifelse(tab$DATE >= input$nTime[[2]], "Late", " Intermediate")
       ))
-      regressants = paste0(regressants, " + Date_of_Observation")
-      columnsToKeep = c(columnsToKeep, "Date_of_Observation")
+      regressants = paste0(regressants, " + Date_of_Observation_")
+      columnsToKeep = c(columnsToKeep, "Date_of_Observation_")
     }
     if ('countrySize' %in% TopicalSpecs  == "TRUE") {
       tab = subset(tab, TOTAL_POP > 0)
@@ -1008,6 +1012,11 @@ shinyServer(function(input, output, session) {
     )
     return(model)
   })
+  
+  
+  
+  
+  
   
   residualTableForTrajectoryMaps = reactive({
     model = metaModelDynOLS()
@@ -1235,6 +1244,10 @@ shinyServer(function(input, output, session) {
     
     return(d)
   })
+  
+  
+  
+  
   
   metaModelDynOLS <- reactive({
     tab = tableForTrajectoryMaps()
@@ -1465,6 +1478,263 @@ shinyServer(function(input, output, session) {
     
     model = lm(regressants, data = tab, na.action = na.omit)
     return(model)
+  })
+    
+    
+  
+  metaModelDynFixed <- reactive({
+    tab = tableForTrajectoryMaps()
+    tab = tab[!is.na(tab$PCT_GROWTH_ALPHA),]
+    tab = tab[is.finite(tab$PCT_GROWTH_ALPHA),]
+    dyn_vars = input$var_dyn_meta_analysis
+    static_vars =  input$var_static_meta_analysis
+    events = input$meta_events_meta_analysis
+    default = input$var_interest_meta_analysis
+    
+    regressants = "PCT_GROWTH_ALPHA ~ 1 "
+    columnsToKeep = c("REFID", "SAME_SPECIFICATIONS", "ALPHA", "PCT_GROWTH_ALPHA", "DATE")
+    
+    if ('tcam_pop' %in% dyn_vars == "TRUE") {
+      tab$Population_Growth = ifelse(
+        tab$GROWTH_DECADE == "1950s",
+        tab$Pct_POP_1950s,
+        ifelse(
+          tab$GROWTH_DECADE == "1960s",
+          tab$Pct_POP_1960s,
+          ifelse(
+            tab$GROWTH_DECADE == "1970s",
+            tab$Pct_POP_1970s,
+            ifelse(
+              tab$GROWTH_DECADE == "1980s",
+              tab$Pct_POP_1980s,
+              ifelse(
+                tab$GROWTH_DECADE == "1990s",
+                tab$Pct_POP_1990s,
+                ifelse(
+                  tab$GROWTH_DECADE == "2000s",
+                  tab$Pct_POP_2000s,
+                  ifelse(tab$GROWTH_DECADE == "2010s", tab$Pct_POP_2010s, NA)
+                )
+              )
+            )
+          )
+        )
+      )
+      
+      
+      tab$Population_Growth_ =  as.factor(ifelse(
+        tab$Population_Growth <= input$ratespop[[1]],
+        "Slow",
+        ifelse(
+          tab$Population_Growth >= input$ratespop[[2]],
+          "Fast",
+          " Medium"
+        )
+      ))
+      
+      
+      # tab$Population_Growth_ =  as.factor(ifelse(
+      #   tab$Population_Growth <= 1,
+      #   "Slow",
+      #   ifelse(
+      #     tab$Population_Growth >= 5,
+      #     "Fast",
+      #     " Medium"
+      #   )
+      # ))
+      
+      regressants = paste0(regressants, " + Population_Growth_")
+      columnsToKeep = c(columnsToKeep, "Population_Growth_")
+      
+    }
+    if ('tcam_urb' %in% dyn_vars == "TRUE") {
+      tab$Urbanization_Growth = ifelse(
+        tab$GROWTH_DECADE == "1950s",
+        tab$Pct_URB_1950s,
+        ifelse(
+          tab$GROWTH_DECADE == "1960s",
+          tab$Pct_URB_1960s,
+          ifelse(
+            tab$GROWTH_DECADE == "1970s",
+            tab$Pct_URB_1970s,
+            ifelse(
+              tab$GROWTH_DECADE == "1980s",
+              tab$Pct_URB_1980s,
+              ifelse(
+                tab$GROWTH_DECADE == "1990s",
+                tab$Pct_URB_1990s,
+                ifelse(
+                  tab$GROWTH_DECADE == "2000s",
+                  tab$Pct_URB_2000s,
+                  ifelse(tab$GROWTH_DECADE == "2010s", tab$Pct_URB_2010s, NA)
+                )
+              )
+            )
+          )
+        )
+      )
+      tab$Urbanization_Growth_ =  as.factor(ifelse(
+        tab$Urbanization_Growth <= input$ratesurb[[1]],
+        "Slow",
+        ifelse(
+          tab$Urbanization_Growth >= input$ratesurb[[2]],
+          "Fast",
+          " Medium"
+        )
+      ))
+      
+      regressants = paste0(regressants, " + Urbanization_Growth_")
+      columnsToKeep = c(columnsToKeep, "Urbanization_Growth_")
+      
+    }
+    if ('tcam_gdp' %in% dyn_vars == "TRUE") {
+      tab$GDP_Growth =  ifelse(
+        tab$GROWTH_DECADE == "1960s",
+        tab$Pct_GDP_1960s,
+        ifelse(
+          tab$GROWTH_DECADE == "1970s",
+          tab$Pct_GDP_1970s,
+          ifelse(
+            tab$GROWTH_DECADE == "1980s",
+            tab$Pct_GDP_1980s,
+            ifelse(
+              tab$GROWTH_DECADE == "1990s",
+              tab$Pct_GDP_1990s,
+              ifelse(
+                tab$GROWTH_DECADE == "2000s",
+                tab$Pct_GDP_2000s,
+                ifelse(tab$GROWTH_DECADE == "2010s", tab$Pct_GDP_2010s, NA)
+              )
+            )
+          )
+        )
+      )
+      tab$GDP_Growth_ =  as.factor(ifelse(
+        tab$GDP_Growth <= input$ratesgdp[[1]],
+        "Slow",
+        ifelse(tab$GDP_Growth >= input$ratesgdp[[2]], "Fast", " Medium")
+      ))
+      
+      regressants = paste0(regressants, " + GDP_Growth_")
+      columnsToKeep = c(columnsToKeep, "GDP_Growth_")
+      
+    }
+    
+    if ('n' %in% dyn_vars == "TRUE") {
+      tab$Growth_of_Cities_ = as.factor(ifelse(
+        tab$GN <= input$ratesn[[1]],
+        "Slow",
+        ifelse(tab$GN >= input$ratesn[[2]], "Fast", " Medium")
+      ))
+      regressants = paste0(regressants, " + Growth_of_Cities_")
+      columnsToKeep = c(columnsToKeep, "Growth_of_Cities_")
+      
+    }
+    
+    if ('t' %in% default == "TRUE") {
+      tab$Date = tab$DATE - 1950
+      regressants = paste0(regressants, " + Date")
+      columnsToKeep = c(columnsToKeep, "Date")
+      
+    }
+    
+    
+    if ('urbanAge' %in% static_vars == "TRUE") {
+      tab$Urbanization_Age_ = tab$URBANISATION
+      regressants = paste0(regressants, " + Urbanization_Age_")
+      columnsToKeep = c(columnsToKeep, "Urbanization_Age_")
+      
+    }
+    
+    if ('alpha' %in% default == "TRUE") {
+      tab$Initial_Alpha_ = as.factor(ifelse(
+        tab$ALPHA <= input$alphaVal[[1]],
+        "Low",
+        ifelse(tab$ALPHA >= input$alphaVal[[2]], "High", " Medium")
+      ))
+      regressants = paste0(regressants, " + Initial_Alpha_")
+      columnsToKeep = c(columnsToKeep, "Initial_Alpha_")
+    }
+    
+    
+    
+    
+    if ('pop' %in% static_vars == "TRUE") {
+      tab$Initial_Population_ =  as.factor(ifelse(
+        tab$TOTAL_POP <= input$PopVal2[[1]],
+        "Small",
+        ifelse(tab$TOTAL_POP >= input$PopVal2[[2]], "Large", " Medium")
+      ))
+      regressants = paste0(regressants, " + Initial_Population_")
+      columnsToKeep = c(columnsToKeep, "Initial_Population_")
+    }
+    
+    if ('gdp' %in% static_vars == "TRUE") {
+      tab$Initial_GDP_Per_Capita_ = as.factor(ifelse(
+        tab$GDPPC <= input$GDPVal2[[1]],
+        "Low",
+        ifelse(tab$GDPPC >= input$GDPVal2[[2]], "High", " Medium")
+      ))
+      regressants = paste0(regressants, " + Initial_GDP_Per_Capita_")
+      columnsToKeep = c(columnsToKeep, "Initial_GDP_Per_Capita_")
+    }
+    
+    if ('urb' %in% static_vars == "TRUE") {
+      tab$Initial_Urbanization_Level_ = as.factor(ifelse(
+        tab$URBP <= input$UrbVal2[[1]],
+        "Low",
+        ifelse(tab$URBP >= input$UrbVal2[[2]], "High", " Medium")
+      ))
+      regressants = paste0(regressants, " + Initial_Urbanization_Level_")
+      columnsToKeep = c(columnsToKeep, "Initial_Urbanization_Level_")
+      
+    }
+    
+    if ('wi' %in% events == "TRUE") {
+      tab$War_Of_Independence = tab$wi
+      regressants = paste0(regressants, " + War_Of_Independence")
+      columnsToKeep = c(columnsToKeep, "War_Of_Independence")
+    }
+    if ('iw' %in% events == "TRUE") {
+      tab$International_War = tab$iw
+      regressants = paste0(regressants, " + International_War")
+      columnsToKeep = c(columnsToKeep, "International_War")
+    }
+    if ('cw' %in% events == "TRUE") {
+      tab$Civil_War = tab$cw
+      regressants = paste0(regressants, " + Civil_War")
+      columnsToKeep = c(columnsToKeep, "Civil_War")
+    }
+    if ('rv' %in% events == "TRUE") {
+      tab$Revolution = tab$rv
+      regressants = paste0(regressants, " + Revolution")
+      columnsToKeep = c(columnsToKeep, "Revolution")
+    }
+    
+    sameSample = input$sameSample2
+    if (sameSample == T) {
+      tab = subset(tab, N >= 0)
+      tab = subset(tab, URBANISATION != "")
+      tab = subset(tab, TOTAL_POP > 0)
+      tab = subset(tab, URBP > 0)
+      tab = subset(tab, GDPPC > 0)
+      tab = tab[, columnsToKeep]
+      tab = tab[complete.cases(tab),]
+    }
+    
+    #   formulaModel = paste0(regressants, " + ( 1 | REFID)")
+ 
+    # model = lmer(
+    #   as.formula(formulaModel),
+    #   data = tab,
+    #   REML = F,
+    #   na.action = na.omit
+    # )
+      model <- plm(as.formula(regressants), data=tab, index=c("SAME_SPECIFICATIONS", "DATE"), model="within")
+      
+      # model <- plm(PCT_GROWTH_ALPHA ~ 1, data=tab, index=c("SAME_SPECIFICATIONS", "DATE"), model="within")
+      # summary(model)   
+      return(model)
   })
   
   
@@ -1962,44 +2232,95 @@ shinyServer(function(input, output, session) {
   ######  Tab D.1
 
   output$modeldyn_fit  = renderTable({
+    if (input$fixedEffects2 == T ) {
+      model = metaModelDynFixed()
+      R2 = r2.corr.mer(model) * 100
+      vc <- VarCorr(model)
+      vc.tab <- as.data.frame(vc)
+      vc.tabinter <- vc.tab [1,]
+      vc.tabintra <- vc.tab [2,]
+      InterVarMnnull <- vc.tabinter$vcov
+      IntraVarMnnull <- vc.tabintra$vcov
+      TotalVarMnnull <- InterVarMnnull + IntraVarMnnull
+      ShareInterVar <- InterVarMnnull / TotalVarMnnull
+      R2between = ShareInterVar * R2
+      # R2within = R2 - R2between
+      Observations = length(model@frame$PCT_GROWTH_ALPHA)
+      summ = data.frame(R2, R2between, Observations)
+      colnames(summ) = c("R2 (%)", "Share of inter-group variance (%)", "Number of Estimations")
+    } else {
     model = metaModelDynOLS()
     R2 = summary(model)$r.squared * 100
     Observations = summary(model)$df[[2]] + summary(model)$df[[1]]
     summ = data.frame(R2, Observations) #round(akaike,0)
     colnames(summ) = c("R2 of regression (%)", "Number of Estimations") #"AIC",
+    }
     return(summ)
   }, include.rownames = FALSE)
   
   output$model_temporal_dyn = renderTable({
+    if (input$fixedEffects2 == T) {
+      model = metaModelDynFixed()
+    } else {
     model = metaModelDynOLS()
+    }
     mod = as.data.frame(summary(model)$coefficients)
-    temporal = mod[rownames(mod) %in% c("(Intercept)",
-                                        "Initial_Alpha_Low",
-                                        "Initial_Alpha_High"),]
+    temporal = mod[rownames(mod) %in% c("(Intercept)"),]
+    temporal = data.frame(rownames(temporal), temporal)
+    colnames(temporal)[1] = "Intercept"
     return(temporal)
   }, digits = 3)
   
   output$model_significant_dyn = renderTable({
     sign = input$significance_dyn / 100
+    if (input$fixedEffects2 == T) {
+      model = metaModelDynFixed()
+      mod = as.data.frame(summary(model)$coefficients)
+      sign = input$significance / 100
+      if (sign <= 0.1)
+        tTestValue = 1.282
+      if (sign < 0.05)
+        tTestValue = 1.645
+      if (sign < 0.025)
+        tTestValue = 1.960
+      if (sign < 0.01)
+        tTestValue = 2.326
+      significant = round(mod[abs(mod$`t value`) >= tTestValue,], 3)
+    } else {
     model = metaModelDynOLS()
     mod = as.data.frame(summary(model)$coefficients)
-    sign = input$significance / 100
     significant = round(mod[mod$`Pr(>|t|)` <= sign,], 3)
-    significant = significant[!rownames(significant) %in% c("(Intercept)",
-                                                            "Initial_Alpha_Low",
-                                                            "Initial_Alpha_High"),]
+    }
+    significant = significant[!rownames(significant) %in% c("(Intercept)"),]
+    significant = data.frame(rownames(significant), significant)
+    colnames(significant)[1] = "Variable"
     return(significant)
   }, digits = 3)
   
   output$model_non_significant_dyn = renderTable({
     sign = input$significance_dyn / 100
+    if (input$fixedEffects2 == T) {
+      model = metaModelDynFixed()
+      mod = as.data.frame(summary(model)$coefficients)
+      sign = input$significance / 100
+      if (sign <= 0.1)
+        tTestValue = 1.282
+      if (sign < 0.05)
+        tTestValue = 1.645
+      if (sign < 0.025)
+        tTestValue = 1.960
+      if (sign < 0.01)
+        tTestValue = 2.326
+      non_significant = mod[abs(mod$`t value`) < tTestValue,]
+    } else {
     model = metaModelDynOLS()
     mod = as.data.frame(summary(model)$coefficients)
     sign = input$significance / 100
     non_significant = mod[mod$`Pr(>|t|)` > sign,]
-    non_significant = non_significant[!rownames(non_significant) %in% c("(Intercept)",
-                                                                        "Initial_Alpha_Low",
-                                                                        "Initial_Alpha_High"),]
+    non_significant = non_significant[!rownames(non_significant) %in% c("(Intercept)"),]
+    }
+    non_significant = data.frame(rownames(non_significant), non_significant)
+    colnames(non_significant)[1] = "Variable"
     return(non_significant)
   })
   
@@ -2375,6 +2696,7 @@ shinyServer(function(input, output, session) {
         longitudinalAlphas$REFID,
         longitudinalAlphas$TERRITORY,
         longitudinalAlphas$URBANSCALE,
+        longitudinalAlphas$ESTIMATION,
         longitudinalAlphas$TRUNCATION,
         longitudinalAlphas$N,
         sep = "_"
@@ -2383,6 +2705,7 @@ shinyServer(function(input, output, session) {
         longitudinalAlphas$REFID,
         longitudinalAlphas$TERRITORY,
         longitudinalAlphas$URBANSCALE,
+        longitudinalAlphas$ESTIMATION,
         longitudinalAlphas$TRUNCATION_POINT,
         sep = "_"
       )
