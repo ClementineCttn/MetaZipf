@@ -860,7 +860,7 @@ shinyUI(
                     "Initial GDP per capita" = "gdp",
                     "Initial Urbanization level" = "urb"
                   ),
-                  selected = c('alpha'),
+                  selected = NULL,
                   inline = FALSE
                 )
               ),
