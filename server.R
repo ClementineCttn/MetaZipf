@@ -209,6 +209,29 @@ for (i in 1:dim(meta)[1]) {
 r_colors <- rgb(t(col2rgb(colors()) / 255))
 names(r_colors) <- colors()
 
+meta$SAME_SPECIFICATIONS = ifelse(
+  meta$TRUNCATION == "sample size",
+  paste(
+    meta$REFID,
+    meta$TERRITORY,
+    meta$URBANSCALE,
+    meta$ESTIMATION,
+    
+    meta$TRUNCATION,
+    meta$N,
+    sep = "_"
+  ),
+  paste(
+    meta$REFID,
+    meta$TERRITORY,
+    meta$URBANSCALE,
+    meta$ESTIMATION,
+    meta$TRUNCATION_POINT,
+    sep = "_"
+  )
+)
+
+
 ##############################
 ######  Outputs functions
 ##############################
