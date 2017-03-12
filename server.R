@@ -1390,7 +1390,11 @@ shinyServer(function(input, output, session) {
   
   
   residualTableForTrajectoryMaps = reactive({
-    model = metaModelDynOLS()
+    if(input$fixedEffects2 == TRUE){
+      model = metaModelDynFixed()
+    } else {
+      model = metaModelDynOLS()
+    }
     residuals = model$residuals
     
     tab = tableForTrajectoryMaps()
