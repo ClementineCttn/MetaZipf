@@ -617,19 +617,29 @@ shinyUI(
                   inline = FALSE
                 )
               ),
+             
               
               column(
-                4,
-                checkboxInput("fixedEffects", "Fixed Study Effects", value = F)
+                7,
+                selectInput(
+                  "modelSpec",
+                  "Type of meta analysis model",
+                  c(
+                    "OLS" =  "ols",
+                    "Fixed Study Effects" = "fixedStudyEffects",
+                    "Fixed Country Effects" = "fixedCountryEffects",
+                    "Fixed Effects Panel Model" = "fixedPanelEffects",
+                    "Random Effects Panel Model" = "randomPanelEffects"
+                  ),
+                  selected = "ols",
+                  multiple = F
+                )
               ),
               column(
-                4,
-                checkboxInput("fixedCountryEffects", "Fixed Country Effects", value = F)
-              ),
-              column(
-                4,
+              5,
                 checkboxInput("sameSample", "Compare models with the same observations", value = F)
               ),
+              
               # column(
               #   6,
               #   checkboxInput("standardize", "Standardise variables: (x - mean(x)) / sd(x)", value = F)
@@ -777,6 +787,14 @@ shinyUI(
               br(),
               br(),
               tableOutput('modelparameters'),
+              
+              column(
+                12,
+                conditionalPanel(
+                  condition = 'input.modelSpec.indexOf("randomPanelEffects") != -1',
+                  textOutput('pFtest')
+                )
+              ),
               # tags$b("Are fixed study effects needed? (based on pFtest)"),
               #  textOutput('pFtest'),
               tags$hr(),
