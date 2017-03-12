@@ -1898,17 +1898,7 @@ shinyServer(function(input, output, session) {
       ))
       
       
-      # tab$Population_Growth_ =  as.factor(ifelse(
-      #   tab$Population_Growth <= 1,
-      #   "Slow",
-      #   ifelse(
-      #     tab$Population_Growth >= 5,
-      #     "Fast",
-      #     " Medium"
-      #   )
-      # ))
-      
-      regressants = paste0(regressants, " + Population_Growth_")
+        regressants = paste0(regressants, " + Population_Growth_")
       columnsToKeep = c(columnsToKeep, "Population_Growth_")
       
     }
@@ -2081,22 +2071,9 @@ shinyServer(function(input, output, session) {
       tab = tab[complete.cases(tab),]
     }
     
-    #   formulaModel = paste0(regressants, " + ( 1 | REFID)")
- 
-    # model = lmer(
-    #   as.formula(formulaModel),
-    #   data = tab,
-    #   REML = F,
-    #   na.action = na.omit
-    # )
-      model <- plm(as.formula(regressants), data=tab, index=c("SAME_SPECIFICATIONS", "DATE"), model="within")
+        model <- plm(as.formula(regressants), data=tab, index=c("SAME_SPECIFICATIONS", "DATE"), model="within")
       
-     #  mod <- plm(PCT_GROWTH_ALPHA ~ 1+ Urbanization_Age_, data=tab, index=c("SAME_SPECIFICATIONS", "DATE"), model="within")
-     # mod
-     # summary(mod)
-      # model <- plm(PCT_GROWTH_ALPHA ~ 1, data=tab, index=c("SAME_SPECIFICATIONS", "DATE"), model="within")
-      # summary(model)   
-      return(model)
+       return(model)
   })
   
   
@@ -2170,7 +2147,6 @@ shinyServer(function(input, output, session) {
     cities = DARIUSSubset()
     
     leaflet() %>% addProviderTiles("CartoDB.Positron") %>%
-      #  setView(lng=75, lat=58, zoom=3) %>%
       addCircleMarkers(
         data = cities,
         radius = ~ sqrt(0.1 * Population),

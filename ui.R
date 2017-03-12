@@ -408,6 +408,12 @@ shinyUI(
             "The number of cities refers to the number of observations (cities) used to estimate Zipf's coefficient.
             ",
             br(),
+            h2("ESTIMATION METHOD"),
+            "The estimation method is a categorical variable which can take the value 'OLS' if the estimation was performed
+            using the Ordinal Least Squares Method on logged varibles, 'GI' if it used Gabaix & Ibragimov's trick of replacing
+            ranks by <ranks - 1/2>, 'MC' if it used Markov Chains and 'ML' if it used Maximum Likelihood Estimation.
+            ",
+            br(),
             h2("REGRESSION FORM"),
             "The regression form is a categorical variable which can take the value 'Lotka' if the estimation was performed
             using the regression form log(Pi) = β - α log(i) or the value 'Pareto' if the regression form chosen was: log(i) = β' - α' log(Pi). In any case, the values of α and α' were made comparable by expressing all results in the Lotka form: transforming α' in 1/α'.
@@ -547,14 +553,15 @@ shinyUI(
             "Technically, we regress the value of alpha reported for the estimation k of a study s regarding the territory m at time t as follow:",
             withMathJax(
               h6(
-                "$$\\alpha_{k,s,m} = Intercept + b1 * A_k + b2 * B_s + b3 * C_m + e_s + e_k $$"
+                "$$\\alpha_{k,s,m} = Intercept + b1 * A_k + b2 * B_s + b3 * C_m + e_s + e_c + e_k $$"
               )
               ),
             
             "where Ak represents a set of variables describing the estimation k,
             Bs represents variables describing the study s,
             Cm represents static variables relating to the territory m,
-            eu represents a fixed-study effect if the model selected includes fixed-effects and ek normally distributed errors.",
+            es and ec represent respectively a fixed-study and fixed-country effect if the model selected includes fixed-effects,
+            ek represents normally distributed errors.",
             br(),
             
             "For comparability reasons, most of the characteristics A, B and C
@@ -845,14 +852,14 @@ shinyUI(
             "Technically, we regress the average annual growth rate of alpha between t1 and t2 (when two or more values of alpha were reported in a study with the same specification) as follow:",
             withMathJax(
               h6(
-                "$$G_{\\alpha, l, m, t1, t2} = Intercept + b1 * t_1 +
-                b2 * \\alpha_{t1} + b3 * C_{m, t1} + b4 * D_{m, t1, t2} + b5 * E_{m, t1, t2}  + e_l $$"
+                "$$G_{\\alpha, l, m, t1, t2} = Intercept + b1 * C_{m, t1} + b2 * D_{m, t1, t2} + b3 * E_{m, t1, t2} + e_p + e_l $$"
               )
               ),
             
             "where Cm represents a set of variables describing the territory m at time t1,
             Dm represents the evolution of territorial variables between t1 and t2,
             Em represents events which have happened in the territory m between t1 and t2,
+ep represents a fixed effect in the panel models,
             el represents normally distributed errors.",
             br(),
             
@@ -910,6 +917,19 @@ shinyUI(
                   ),
                   selected = NULL,
                   inline = FALSE
+                )
+              ),
+              
+              column(
+                6,
+                checkboxInput("fixedEffects2", "Fixed Effect Panel Model", value = F)
+              ),
+              column(
+                6,
+                checkboxInput(
+                  "sameSample2",
+                  "Compare models with the same observations",
+                  value = F
                 )
               ),
               column(
@@ -1020,20 +1040,8 @@ shinyUI(
                     step = 0.5
                   )
                 )
-              ),
-              
-              column(
-                6,
-                checkboxInput("fixedEffects2", "Fixed Effect Panel Model", value = F)
-              ),
-              column(
-                6,
-                checkboxInput(
-                  "sameSample2",
-                  "Compare models with the same observations",
-                  value = F
-                )
               )
+       
               
             ),
             
@@ -1143,7 +1151,8 @@ shinyUI(
                     "International Wars" = "iw",
                     "Civil Wars" = "cw",
                     "Revolutions" = "rv",
-                    "Wars of Independence" = "wi"
+                    "Wars of Independence" = "wi",
+                    " "=""
                   ),
                   inline = F
                 )
