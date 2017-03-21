@@ -126,16 +126,23 @@ shinyUI(
                                 ))
                                 ),
                    tags$hr(),
-                   fluidRow(column(
+                   "Select the references to include in the analysis...",
+                   fluidRow(
+                     column(
+                     6,
+                     selectizeInput("references", "References", "", multiple = T)
+                     )
+                  ,
+                   column(
                      6,
                      checkboxInput(
                        "Arxiv",
-                       "Reproduce the analyses of the arXiv paper (reference collection ends in June 2016)",
+                       "...Or reproduce the analyses of the arXiv paper (reference collection ends in June 2016)",
                        value = FALSE
                      )
                    ),
                    column(
-                     6,
+                     12,
                      HTML(
                        'Cottineau C. , 2016, « MetaZipf. (Re)producing knowledge about city size distributions », Arxiv.org, <a href="https://arxiv.org/abs/1606.06162">https://arxiv.org/abs/1606.06162</a>'
                      )

@@ -379,8 +379,18 @@ shinyServer(function(input, output, session) {
   
   metaArxiv = reactive({
     tab = meta
-    if (input$Arxiv == TRUE)
+    if (input$Arxiv == TRUE){
       tab = subset(tab, ARXIV == 1)
+    } else {
+      
+      refList = input$references
+      
+      if('All' %in% refList){
+        tab = tab
+      } else {
+      tab = subset(tab, REFERENCE %in% refList)
+      }
+    }
     return(tab)
   })
   
@@ -3059,7 +3069,16 @@ shinyServer(function(input, output, session) {
     ))))
   })
   
-
+  observe({
+    inRefFile <- meta
+    if (is.null(inRefFile))
+      return(NULL)
+    updateSelectInput(session, "references", choices = c('All',sort(unique(
+      as.character(inRefFile$REFERENCE)
+    ))))
+  })
+  
+  
   observe({
     tab = metaArxiv()
     if (input$alpha == "Lotka")
