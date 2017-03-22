@@ -1050,9 +1050,9 @@ Veneri_2013,PARETO,_OLS,1.253,0.798,99,2001,FUA,MetroArea,34,50000,Canada,Countr
 Malecki_1980,LOTKA,_OLS,1.27,0.787,97,1950,incorporated places,LocalUnit,33,50000,American MidWest,Region,RECENT,,NORTH AMERICA,AMERICA,50000,,Mal80Env
 Malecki_1980,LOTKA,_OLS,1.269,0.788,96.8,1960,incorporated places,LocalUnit,33,50000,American MidWest,Region,RECENT,,NORTH AMERICA,AMERICA,50000,,Mal80Env
 Malecki_1980,LOTKA,_OLS,1.264,0.791,97.6,1970,incorporated places,LocalUnit,33,50000,American MidWest,Region,RECENT,,NORTH AMERICA,AMERICA,50000,,Mal80Env
-Soo_2005,PARETO,ML,1.155668554,0.8653,,1999,cities citypopulation_de,LocalUnit,33,0,Kazakhstan,Country,RECENT,KZ,CENTRAL ASIA,ASIA,0,,Soo05Reg
+Soo_2005,PARETO,ML,1.155668554,0.8653,,1999,cities citypopulation_de,LocalUnit,33,0,Kazakhstan,Country,OLD,KZ,CENTRAL ASIA,ASIA,0,,Soo05Reg
 Soo_2005,PARETO,ML,1.233501912,0.8107,,1997,cities citypopulation_de,LocalUnit,33,0,Mozambique,Country,OLD,MZ,EUROPE,EUROPE,0,,Soo05Reg
-Soo_2005,PARETO,_OLS,1.04,0.962,,1999,cities citypopulation_de,LocalUnit,33,0,Kazakhstan,Country,RECENT,KZ,CENTRAL ASIA,ASIA,0,,Soo05Reg
+Soo_2005,PARETO,_OLS,1.04,0.962,,1999,cities citypopulation_de,LocalUnit,33,0,Kazakhstan,Country,OLD,KZ,CENTRAL ASIA,ASIA,0,,Soo05Reg
 Soo_2005,PARETO,_OLS,1.164,0.859,,1997,cities citypopulation_de,LocalUnit,33,0,Mozambique,Country,OLD,MZ,EUROPE,EUROPE,0,,Soo05Reg
 Kumar_Subbarayan_2014,LOTKA,_OLS,0.905,1.104972376,98.7,1981,Municipalities,LocalUnit,32,75000,Andhra Pradesh,Region,OLD,,SOUTH EAST ASIA,ASIA,75000,,Kum14Jou
 Schaffar_Dimou_2012,PARETO,GI,0.57,1.755,,1994,administrative units,LocalUnit,32,1000000,China,Country,OLD,CN,SOUTH EAST ASIA,ASIA,1000000,,Sch12Reg
@@ -1154,7 +1154,7 @@ Soo_2005,PARETO,_OLS,1.423,0.703,,1991,agglomerations citypopulation_de,MorphoCi
 Soo_2005,PARETO,_OLS,1.133,0.883,,1999,agglomerations citypopulation_de,MorphoCity,19,0,Norway,Country,OLD,NO,EUROPE,EUROPE,0,,Soo05Reg
 Soo_2005,PARETO,_OLS,0.986,1.014,,1992,cities citypopulation_de,LocalUnit,19,0,Paraguay,Country,RECENT,PY,SOUTH AMERICA,AMERICA,0,,Soo05Reg
 Subbarayan_al_2011,LOTKA,_OLS,0.89,1.123595506,96.01,1951,cities and towns,LocalUnit,19,50000,Tamil Nadu,Region,OLD,,SOUTH EAST ASIA,ASIA,50000,,Sub11Int
-Necula_al_2010,PARETO,GI,0.607199565,1.646905,,1999,Cities (annual United Nations Demographic Yearbooks),LocalUnit,19,100000,Kazakhstan,Country,RECENT,KZ,CENTRAL ASIA,ASIA,100000,,Nec10GDN
+Necula_al_2010,PARETO,GI,0.607199565,1.646905,,1999,Cities (annual United Nations Demographic Yearbooks),LocalUnit,19,100000,Kazakhstan,Country,OLD,KZ,CENTRAL ASIA,ASIA,100000,,Nec10GDN
 Ezzahid_2015,PARETO,_OLS,1.185,0.844,96,1994,agglomerations,MorphoCity,18,100000,Morocco,Country,RECENT,MA,AFRICA,AFRICA,100000,,Ezz15Rev
 Ezzahid_2015,PARETO,GI,1.015228426,0.985,95,1994,agglomerations,MorphoCity,18,100000,Morocco,Country,RECENT,MA,AFRICA,AFRICA,100000,,Ezz15Rev
 Kamecke_1990,PARETO,_OLS,0.909,1.1,,1980,UN yearbook city proper,LocalUnit,18,100000,Canada,Country,RECENT,CA,NORTH AMERICA,AMERICA,100000,,Kam90Jou
@@ -1165,9 +1165,9 @@ Soo_2005,PARETO,ML,1.027010373,0.9737,,2000,agglomerations citypopulation_de,Mor
 Soo_2005,PARETO,_OLS,1.01,0.99,,2000,agglomerations citypopulation_de,MorphoCity,18,0,Brazil,Country,RECENT,BR,SOUTH AMERICA,AMERICA,0,,Soo05Reg
 Giesen_Sudekum_2011,PARETO,_OLS,0.826,1.21,93.2,1997,administrative cities,LocalUnit,17,11946,"Saarland, Germany",Region,OLD,,EUROPE,EUROPE,11946,,Gie10Jou
 Kamecke_1990,PARETO,_OLS,1.087,0.92,,1980,UN yearbook city proper,LocalUnit,17,100000,Venezuela,Country,RECENT,VE,SOUTH AMERICA,AMERICA,100000,,Kam90Jou
-Soo_2005,PARETO,ML,0.661769572,1.5111,,1997,cities citypopulation_de,LocalUnit,17,0,Uzbekistan,Country,RECENT,UZ,CENTRAL ASIA,ASIA,0,,Soo05Reg
-Soo_2005,PARETO,_OLS,0.953,1.049,,1997,cities citypopulation_de,LocalUnit,17,0,Uzbekistan,Country,RECENT,UZ,CENTRAL ASIA,ASIA,0,,Soo05Reg
-Necula_al_2010,PARETO,GI,0.789848239,1.266066,,1999,Cities (annual United Nations Demographic Yearbooks),LocalUnit,17,100000,Uzbekistan,Country,RECENT,UZ,CENTRAL ASIA,ASIA,100000,,Nec10GDN
+Soo_2005,PARETO,ML,0.661769572,1.5111,,1997,cities citypopulation_de,LocalUnit,17,0,Uzbekistan,Country,OLD,UZ,CENTRAL ASIA,ASIA,0,,Soo05Reg
+Soo_2005,PARETO,_OLS,0.953,1.049,,1997,cities citypopulation_de,LocalUnit,17,0,Uzbekistan,Country,OLD,UZ,CENTRAL ASIA,ASIA,0,,Soo05Reg
+Necula_al_2010,PARETO,GI,0.789848239,1.266066,,1999,Cities (annual United Nations Demographic Yearbooks),LocalUnit,17,100000,Uzbekistan,Country,OLD,UZ,CENTRAL ASIA,ASIA,100000,,Nec10GDN
 Ezzahid_2015,PARETO,_OLS,1.042,0.96,92,1982,city proper,LocalUnit,16,100000,Morocco,Country,RECENT,MA,AFRICA,AFRICA,100000,,Ezz15Rev
 Ezzahid_2015,PARETO,GI,0.877192982,1.14,92,1982,city proper,LocalUnit,16,100000,Morocco,Country,RECENT,MA,AFRICA,AFRICA,100000,,Ezz15Rev
 Kumar_Subbarayan_2014,LOTKA,_OLS,0.443,2.257336343,93.9,1951,Municipalities,LocalUnit,16,50000,Andhra Pradesh,Region,OLD,,SOUTH EAST ASIA,ASIA,50000,,Kum14Jou
@@ -1227,12 +1227,12 @@ Necula_al_2010,PARETO,GI,1.213386075,0.82414,,1897,Cities (annual United Nations
 Guerin-Pace_1995,LOTKA,_OLS,1.1,0.909,90,1831,agglomerations,MorphoCity,7,50000,France,Country,OLD,FR,EUROPE,EUROPE,50000,,Gue95Urb
 Guerin-Pace_1995,LOTKA,_OLS,1.13,0.885,86,1831,agglomerations,MorphoCity,5,100000,France,Country,OLD,FR,EUROPE,EUROPE,100000,,Gue95Urb
 Kumar_Subbarayan_2014,LOTKA,_OLS,0.269,3.717472119,97.8,1951,Municipalities,LocalUnit,5,100000,Andhra Pradesh,Region,OLD,,SOUTH EAST ASIA,ASIA,100000,,Kum14Jou
-Necula_al_2010,PARETO,GI,0.794331649,1.25892,,1999,Cities (annual United Nations Demographic Yearbooks),LocalUnit,5,100000,Turkmenistan,Country,RECENT,TM,CENTRAL ASIA,ASIA,100000,,Nec10GDN
+Necula_al_2010,PARETO,GI,0.794331649,1.25892,,1999,Cities (annual United Nations Demographic Yearbooks),LocalUnit,5,100000,Turkmenistan,Country,OLD,TM,CENTRAL ASIA,ASIA,100000,,Nec10GDN
 Necula_al_2010,PARETO,GI,1.280649135,0.780854,,2007,Cities (annual United Nations Demographic Yearbooks),LocalUnit,4,100000,Georgia,Country,OLD,GE,EUROPE,EUROPE,100000,,Nec10GDN
 Necula_al_2010,PARETO,GI,1.573779573,0.635413,,2007,Cities (annual United Nations Demographic Yearbooks),LocalUnit,3,100000,Armenia,Country,OLD,AM,EUROPE,EUROPE,100000,,Nec10GDN
 Necula_al_2010,PARETO,GI,1.349995883,0.740743,,2007,Cities (annual United Nations Demographic Yearbooks),LocalUnit,3,100000,Azerbaijan,Country,OLD,AZ,EUROPE,EUROPE,100000,,Nec10GDN
-Necula_al_2010,PARETO,GI,1.165537843,0.857973,,1999,Cities (annual United Nations Demographic Yearbooks),LocalUnit,2,100000,Kyrgyzstan,Country,RECENT,KG,CENTRAL ASIA,ASIA,100000,,Nec10GDN
-Necula_al_2010,PARETO,GI,1.208393501,0.827545,,1999,Cities (annual United Nations Demographic Yearbooks),LocalUnit,2,100000,Tajikistan,Country,RECENT,TJ,CENTRAL ASIA,ASIA,100000,,Nec10GDN
+Necula_al_2010,PARETO,GI,1.165537843,0.857973,,1999,Cities (annual United Nations Demographic Yearbooks),LocalUnit,2,100000,Kyrgyzstan,Country,OLD,KG,CENTRAL ASIA,ASIA,100000,,Nec10GDN
+Necula_al_2010,PARETO,GI,1.208393501,0.827545,,1999,Cities (annual United Nations Demographic Yearbooks),LocalUnit,2,100000,Tajikistan,Country,OLD,TJ,CENTRAL ASIA,ASIA,100000,,Nec10GDN
 Benguigui_Blumenfeld_2007,LOTKA,_OLS,0.82,1.22,,2003,cities,LocalUnit,,100000,Brazil,Country,RECENT,BR,SOUTH AMERICA,AMERICA,100000,,Ben07Com
 Benguigui_Blumenfeld_2007,LOTKA,_OLS,1.25,0.8,,2001,urban areas,MorphoCity,,100000,Canada,Country,RECENT,CA,NORTH AMERICA,AMERICA,100000,,Ben07Com
 Benguigui_Blumenfeld_2007,LOTKA,_OLS,1.12,0.893,,2003,cities,LocalUnit,,100000,Colombia,Country,RECENT,CO,SOUTH AMERICA,AMERICA,100000,,Ben07Com
@@ -1605,10 +1605,10 @@ Moriconi-Ebrard_1993,LOTKA,_OLS,0.88,1.136,99.2,1950,morphological agglomeration
 Moriconi-Ebrard_1993,LOTKA,_OLS,0.91,1.099,99.3,1960,morphological agglomerations,MorphoCity,,10000,Japan,Country,OLD,JP,SOUTH EAST ASIA,ASIA,10000,,Mor93LUr
 Moriconi-Ebrard_1993,LOTKA,_OLS,0.99,1.01,99.3,1970,morphological agglomerations,MorphoCity,,10000,Japan,Country,OLD,JP,SOUTH EAST ASIA,ASIA,10000,,Mor93LUr
 Moriconi-Ebrard_1993,LOTKA,_OLS,1.03,0.971,99.5,1980,morphological agglomerations,MorphoCity,,10000,Japan,Country,OLD,JP,SOUTH EAST ASIA,ASIA,10000,,Mor93LUr
-Moriconi-Ebrard_1993,LOTKA,_OLS,0.99,1.01,95.7,1950,morphological agglomerations,MorphoCity,,10000,Kazakhstan,Country,RECENT,KZ,CENTRAL ASIA,ASIA,10000,,Mor93LUr
-Moriconi-Ebrard_1993,LOTKA,_OLS,1.09,0.917,96.3,1960,morphological agglomerations,MorphoCity,,10000,Kazakhstan,Country,RECENT,KZ,CENTRAL ASIA,ASIA,10000,,Mor93LUr
-Moriconi-Ebrard_1993,LOTKA,_OLS,1.12,0.893,94.7,1970,morphological agglomerations,MorphoCity,,10000,Kazakhstan,Country,RECENT,KZ,CENTRAL ASIA,ASIA,10000,,Mor93LUr
-Moriconi-Ebrard_1993,LOTKA,_OLS,1.17,0.855,97.5,1980,morphological agglomerations,MorphoCity,,10000,Kazakhstan,Country,RECENT,KZ,CENTRAL ASIA,ASIA,10000,,Mor93LUr
+Moriconi-Ebrard_1993,LOTKA,_OLS,0.99,1.01,95.7,1950,morphological agglomerations,MorphoCity,,10000,Kazakhstan,Country,OLD,KZ,CENTRAL ASIA,ASIA,10000,,Mor93LUr
+Moriconi-Ebrard_1993,LOTKA,_OLS,1.09,0.917,96.3,1960,morphological agglomerations,MorphoCity,,10000,Kazakhstan,Country,OLD,KZ,CENTRAL ASIA,ASIA,10000,,Mor93LUr
+Moriconi-Ebrard_1993,LOTKA,_OLS,1.12,0.893,94.7,1970,morphological agglomerations,MorphoCity,,10000,Kazakhstan,Country,OLD,KZ,CENTRAL ASIA,ASIA,10000,,Mor93LUr
+Moriconi-Ebrard_1993,LOTKA,_OLS,1.17,0.855,97.5,1980,morphological agglomerations,MorphoCity,,10000,Kazakhstan,Country,OLD,KZ,CENTRAL ASIA,ASIA,10000,,Mor93LUr
 Moriconi-Ebrard_1993,LOTKA,_OLS,1.18,0.847,97.3,1980,morphological agglomerations,MorphoCity,,10000,Lithuania,Country,OLD,LT,EUROPE,EUROPE,10000,,Mor93LUr
 Moriconi-Ebrard_1993,LOTKA,_OLS,1.08,0.926,94.3,1980,morphological agglomerations,MorphoCity,,10000,Madagascar,Country,RECENT,MG,AFRICA,AFRICA,10000,,Mor93LUr
 Moriconi-Ebrard_1993,LOTKA,_OLS,1.08,0.926,97.9,1960,morphological agglomerations,MorphoCity,,10000,Malaysia,Country,OLD,MY,SOUTH EAST ASIA,ASIA,10000,,Mor93LUr
@@ -1721,9 +1721,9 @@ Moriconi-Ebrard_1993,LOTKA,_OLS,1.13,0.885,99.8,1950,morphological agglomeration
 Moriconi-Ebrard_1993,LOTKA,_OLS,1.17,0.855,99.8,1960,morphological agglomerations,MorphoCity,,10000,United States of America,Country,RECENT,US,NORTH AMERICA,AMERICA,10000,,Mor93LUr
 Moriconi-Ebrard_1993,LOTKA,_OLS,1.2,0.833,99.9,1970,morphological agglomerations,MorphoCity,,10000,United States of America,Country,RECENT,US,NORTH AMERICA,AMERICA,10000,,Mor93LUr
 Moriconi-Ebrard_1993,LOTKA,_OLS,1.21,0.826,99.8,1980,morphological agglomerations,MorphoCity,,10000,United States of America,Country,RECENT,US,NORTH AMERICA,AMERICA,10000,,Mor93LUr
-Moriconi-Ebrard_1993,LOTKA,_OLS,1.21,0.826,97.7,1960,morphological agglomerations,MorphoCity,,10000,Uzbekistan,Country,RECENT,UZ,CENTRAL ASIA,ASIA,10000,,Mor93LUr
-Moriconi-Ebrard_1993,LOTKA,_OLS,1.19,0.84,97.9,1970,morphological agglomerations,MorphoCity,,10000,Uzbekistan,Country,RECENT,UZ,CENTRAL ASIA,ASIA,10000,,Mor93LUr
-Moriconi-Ebrard_1993,LOTKA,_OLS,1.12,0.893,98.8,1980,morphological agglomerations,MorphoCity,,10000,Uzbekistan,Country,RECENT,UZ,CENTRAL ASIA,ASIA,10000,,Mor93LUr
+Moriconi-Ebrard_1993,LOTKA,_OLS,1.21,0.826,97.7,1960,morphological agglomerations,MorphoCity,,10000,Uzbekistan,Country,OLD,UZ,CENTRAL ASIA,ASIA,10000,,Mor93LUr
+Moriconi-Ebrard_1993,LOTKA,_OLS,1.19,0.84,97.9,1970,morphological agglomerations,MorphoCity,,10000,Uzbekistan,Country,OLD,UZ,CENTRAL ASIA,ASIA,10000,,Mor93LUr
+Moriconi-Ebrard_1993,LOTKA,_OLS,1.12,0.893,98.8,1980,morphological agglomerations,MorphoCity,,10000,Uzbekistan,Country,OLD,UZ,CENTRAL ASIA,ASIA,10000,,Mor93LUr
 Moriconi-Ebrard_1993,LOTKA,_OLS,1.11,0.901,98.8,1950,morphological agglomerations,MorphoCity,,10000,Venezuela,Country,RECENT,VE,SOUTH AMERICA,AMERICA,10000,,Mor93LUr
 Moriconi-Ebrard_1993,LOTKA,_OLS,1.18,0.847,98.4,1960,morphological agglomerations,MorphoCity,,10000,Venezuela,Country,RECENT,VE,SOUTH AMERICA,AMERICA,10000,,Mor93LUr
 Moriconi-Ebrard_1993,LOTKA,_OLS,1.23,0.813,98.6,1970,morphological agglomerations,MorphoCity,,10000,Venezuela,Country,RECENT,VE,SOUTH AMERICA,AMERICA,10000,,Mor93LUr
