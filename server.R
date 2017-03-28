@@ -209,6 +209,27 @@ for (i in 1:dim(meta)[1]) {
 r_colors <- rgb(t(col2rgb(colors()) / 255))
 names(r_colors) <- colors()
 
+meta$SAME_SPECIFICATIONS = ifelse(
+  meta$TRUNCATION == "sample size",
+  paste(
+    meta$REFID,
+    meta$TERRITORY,
+    meta$URBANSCALE,
+    meta$ESTIMATION,
+    
+    meta$TRUNCATION,
+    meta$N,
+    sep = "_"
+  ),
+  paste(
+    meta$REFID,
+    meta$TERRITORY,
+    meta$URBANSCALE,
+    meta$ESTIMATION,
+    meta$TRUNCATION_POINT,
+    sep = "_"
+  )
+)
 ##############################
 ######  Outputs functions
 ##############################
@@ -358,8 +379,18 @@ shinyServer(function(input, output, session) {
   
   metaArxiv = reactive({
     tab = meta
-    if (input$Arxiv == TRUE)
+    if (input$Arxiv == TRUE){
       tab = subset(tab, ARXIV == 1)
+    } else {
+      
+      refList = input$references
+      
+      if('All' %in% refList){
+        tab = tab
+      } else {
+      tab = subset(tab, REFERENCE %in% refList)
+      }
+    }
     return(tab)
   })
   
@@ -682,7 +713,7 @@ shinyServer(function(input, output, session) {
                      "studyCoverage") #"discipline"
     
     regressants = "ALPHA ~ 1"
-    columnsToKeep = c("ALPHA")
+    columnsToKeep = c("ALPHA", "DATE")
     if ('truncation4model' %in% TechnicalSpecs == "TRUE") {
       tab$Population_Cutoff_ = as.factor(ifelse(
         tab$TRUNCATION_POINT <= input$truncVal[[1]],
@@ -824,6 +855,7 @@ shinyServer(function(input, output, session) {
     return(model)
   })
   
+  
   metaModelFixed <- reactive({
     tab = metaArxiv()
     if (input$alpha == "Lotka")
@@ -850,7 +882,7 @@ shinyServer(function(input, output, session) {
                      "studyCoverage") #"discipline"
     
     regressants = "ALPHA ~ 1"
-    columnsToKeep = c("REFID", "CNTR_ID", "ALPHA")
+    columnsToKeep = c("REFID", "CNTR_ID", "ALPHA" )
     if ('truncation4model' %in% TechnicalSpecs == "TRUE") {
       tab$Population_Cutoff_ = as.factor(ifelse(
         tab$TRUNCATION_POINT <= input$truncVal[[1]],
@@ -993,16 +1025,14 @@ shinyServer(function(input, output, session) {
       tab = tab[complete.cases(tab),]
     }
     
-    if (input$fixedEffects == T & input$fixedCountryEffects == F) {
+ 
+    if (input$modelSpec == "fixedStudyEffects") {
       formulaModel = paste0(regressants, " + ( 1 | REFID)")
     }
-    if (input$fixedEffects == F & input$fixedCountryEffects == T) {
+    if (input$modelSpec == "fixedCountryEffects") {
       formulaModel = paste0(regressants, " + ( 1 | CNTR_ID)")
     }
-    if (input$fixedEffects == T & input$fixedCountryEffects == T) {
-      formulaModel = paste0(regressants, " + ( 1 | REFID) + (1 | CNTR_ID)")
-    }
-      
+ 
     model = lmer(
       as.formula(formulaModel),
       data = tab,
@@ -1013,12 +1043,368 @@ shinyServer(function(input, output, session) {
   })
   
   
+  metaModelRandomPanel <- reactive({
+    tab = metaArxiv()
+    if (input$alpha == "Lotka")
+      tab$ALPHA = tab$ALPHALOTKA
+    if (input$alpha == "Pareto")
+      tab$ALPHA = tab$ALPHAPARETO
+    
+    TechnicalSpecs = input$technicalSpecs
+    TopicalSpecs = input$topicalSpecs
+    OtherSpecs = input$otherSpecs
+    
+    if ('alltech' %in% TechnicalSpecs == "TRUE")
+      TechnicalSpecs = c("truncation4model", "N4model", "scale4model", "regForm", "olsOrnot")
+    if ('alltop' %in% TopicalSpecs == "TRUE")
+      TopicalSpecs = c("time",
+                       "urbanisation4model",
+                       "countrySize",
+                       "countryGDP",
+                       "countryUrb")
+    if ('allother' %in% OtherSpecs == "TRUE")
+      OtherSpecs = c("yearOfPubli",
+                     "studySize",
+                     "studyPeriod",
+                     "studyCoverage") #"discipline"
+    
+    regressants = "ALPHA ~ 1"
+    columnsToKeep = c("REFID", "CNTR_ID", "ALPHA", "SAME_SPECIFICATIONS", "DATE")
+    if ('truncation4model' %in% TechnicalSpecs == "TRUE") {
+      tab$Population_Cutoff_ = as.factor(ifelse(
+        tab$TRUNCATION_POINT <= input$truncVal[[1]],
+        "Low",
+        ifelse(
+          tab$TRUNCATION_POINT >= input$truncVal[[2]],
+          "High",
+          " Medium"
+        )
+      ))
+      regressants = paste0(regressants, " + Population_Cutoff_")
+      columnsToKeep = c(columnsToKeep, "Population_Cutoff_")
+    }
+    if ('N4model' %in% TechnicalSpecs == "TRUE")  {
+      tab$Number_Of_Cities_ = as.factor(ifelse(
+        tab$N <= input$NVal[[1]],
+        "Small",
+        ifelse(tab$N >= input$NVal[[2]], "Large", " Medium")
+      ))
+      regressants = paste0(regressants, " + Number_Of_Cities_")
+      columnsToKeep = c(columnsToKeep, "Number_Of_Cities_")
+    }
+    
+    if ('regForm' %in%  TechnicalSpecs == "TRUE")  {
+      tab$Regression_Form_ = tab$REGRESSIONFORM
+      regressants = paste0(regressants, " + Regression_Form_")
+      columnsToKeep = c(columnsToKeep, "Regression_Form_")
+    }
+    
+    if ('olsOrnot' %in%  TechnicalSpecs == "TRUE")  {
+      tab$Estimation_Method_ = tab$ESTIMATION
+      regressants = paste0(regressants, " + Estimation_Method_")
+      columnsToKeep = c(columnsToKeep, "Estimation_Method_")
+    }
+    
+    if ('scale4model' %in% TechnicalSpecs == "TRUE")  {
+      tab$City_Definition_ = tab$URBANSCALE
+      regressants = paste0(regressants, " + City_Definition_")
+      columnsToKeep = c(columnsToKeep, "City_Definition_")
+    }
+    
+    if ('urbanisation4model' %in% TopicalSpecs == "TRUE") {
+      tab = subset(tab, URBANISATION != "")
+      tab$Urbanisation_Age_ = tab$URBANISATION
+      regressants = paste0(regressants, " + Urbanisation_Age_")
+      columnsToKeep = c(columnsToKeep, "Urbanisation_Age_")
+    }
+    if ('time' %in% TopicalSpecs == "TRUE")  {
+      tab$Date_of_Observation_ = as.factor(ifelse(
+        tab$DATE <= input$nTime[[1]],
+        "Early",
+        ifelse(tab$DATE >= input$nTime[[2]], "Late", " Intermediate")
+      ))
+      regressants = paste0(regressants, " + Date_of_Observation_")
+      columnsToKeep = c(columnsToKeep, "Date_of_Observation_")
+    }
+    if ('countrySize' %in% TopicalSpecs  == "TRUE") {
+      tab = subset(tab, TOTAL_POP > 0)
+      tab$Country_Size_ = as.factor(ifelse(
+        tab$TOTAL_POP <= input$PopVal[[1]],
+        "Small",
+        ifelse(tab$TOTAL_POP >= input$PopVal[[2]], "Large", " Medium")
+      ))
+      regressants = paste0(regressants, " + Country_Size_")
+      columnsToKeep = c(columnsToKeep, "Country_Size_")
+    }
+    
+    if ('countryUrb' %in% TopicalSpecs  == "TRUE") {
+      tab = subset(tab, URBP > 0)
+      tab$Country_Urbanization_ = as.factor(ifelse(
+        tab$URBP <= input$UrbVal[[1]],
+        "Low",
+        ifelse(tab$URBP >= input$UrbVal[[2]], "High", " Medium")
+      ))
+      regressants = paste0(regressants, " + Country_Urbanization_")
+      columnsToKeep = c(columnsToKeep, "Country_Urbanization_")
+    }
+    
+    if ('countryGDP' %in% TopicalSpecs  == "TRUE") {
+      tab = subset(tab, GDPPC > 0)
+      tab$Country_GDP_ = as.factor(ifelse(
+        tab$GDPPC <= input$GDPVal[[1]],
+        "Low",
+        ifelse(tab$GDPPC >= input$GDPVal[[2]], "High", " Medium")
+      ))
+      regressants = paste0(regressants, " + Country_GDP_")
+      columnsToKeep = c(columnsToKeep, "Country_GDP_")
+    }
+    
+    if ('yearOfPubli' %in% OtherSpecs  == "TRUE") {
+      tab$Year_Of_Publication_ = as.factor(ifelse(
+        tab$YEARPUB <= input$yearOfP[[1]],
+        "Early",
+        ifelse(tab$YEARPUB >= input$yearOfP[[2]], "Recent", " Medium")
+      ))
+      regressants = paste0(regressants, " + Year_Of_Publication_")
+      columnsToKeep = c(columnsToKeep, "Year_Of_Publication_")
+    }
+    
+    if ('studySize' %in% OtherSpecs  == "TRUE") {
+      tab$Study_Size_ = as.factor(ifelse(
+        tab$N_ESTIM == 1,
+        "Single",
+        ifelse(tab$N_ESTIM >= input$n_estim, "Large", " Small")
+      ))
+      regressants = paste0(regressants, " + Study_Size_")
+      columnsToKeep = c(columnsToKeep, "Study_Size_")
+    }
+    
+    if ('studyCoverage' %in% OtherSpecs  == "TRUE") {
+      tab$Territorial_Coverage_ = as.factor(ifelse(
+        tab$N_COUNTRIES == 1,
+        "Single",
+        ifelse(tab$N_COUNTRIES >= input$n_territories, "Large", " Small")
+      ))
+      regressants = paste0(regressants, " + Territorial_Coverage_")
+      columnsToKeep = c(columnsToKeep, "Territorial_Coverage_")
+    }
+    
+    if ('studyPeriod' %in% OtherSpecs  == "TRUE") {
+      tab$Period_Analysed_ = as.factor(ifelse(
+        tab$StudyPeriod == 0,
+        "Cross_section",
+        ifelse(tab$StudyPeriod >= input$s_period, "Long", " Short")
+      ))
+      regressants = paste0(regressants, " + Period_Analysed_")
+      columnsToKeep = c(columnsToKeep, "Period_Analysed_")
+    }
+    
+    
+    sameSample = input$sameSample
+    if (sameSample == T) {
+      tab = subset(tab, TRUNCATION_POINT >= 0)
+      tab = subset(tab, N >= 0)
+      tab = subset(tab, URBANISATION != "")
+      tab = subset(tab, TOTAL_POP > 0)
+      tab = subset(tab, URBP > 0)
+      tab = subset(tab, GDPPC > 0)
+      tab = tab[, columnsToKeep]
+      tab = tab[complete.cases(tab),]
+    }
+    
+    
+    model = plm(as.formula(regressants), data=tab, index=c("SAME_SPECIFICATIONS", "DATE"), model="random")
+    
+    return(model)
+  })
+  
+  
+  
+  metaModelFixedPanel <- reactive({
+    tab = metaArxiv()
+    if (input$alpha == "Lotka")
+      tab$ALPHA = tab$ALPHALOTKA
+    if (input$alpha == "Pareto")
+      tab$ALPHA = tab$ALPHAPARETO
+    
+    TechnicalSpecs = input$technicalSpecs
+    TopicalSpecs = input$topicalSpecs
+    OtherSpecs = input$otherSpecs
+    
+    if ('alltech' %in% TechnicalSpecs == "TRUE")
+      TechnicalSpecs = c("truncation4model", "N4model", "scale4model", "regForm", "olsOrnot")
+    if ('alltop' %in% TopicalSpecs == "TRUE")
+      TopicalSpecs = c("time",
+                       "urbanisation4model",
+                       "countrySize",
+                       "countryGDP",
+                       "countryUrb")
+    if ('allother' %in% OtherSpecs == "TRUE")
+      OtherSpecs = c("yearOfPubli",
+                     "studySize",
+                     "studyPeriod",
+                     "studyCoverage") #"discipline"
+    
+    regressants = "ALPHA ~ 1"
+    columnsToKeep = c("REFID", "CNTR_ID", "ALPHA", "SAME_SPECIFICATIONS", "DATE")
+    if ('truncation4model' %in% TechnicalSpecs == "TRUE") {
+      tab$Population_Cutoff_ = as.factor(ifelse(
+        tab$TRUNCATION_POINT <= input$truncVal[[1]],
+        "Low",
+        ifelse(
+          tab$TRUNCATION_POINT >= input$truncVal[[2]],
+          "High",
+          " Medium"
+        )
+      ))
+      regressants = paste0(regressants, " + Population_Cutoff_")
+      columnsToKeep = c(columnsToKeep, "Population_Cutoff_")
+    }
+    if ('N4model' %in% TechnicalSpecs == "TRUE")  {
+      tab$Number_Of_Cities_ = as.factor(ifelse(
+        tab$N <= input$NVal[[1]],
+        "Small",
+        ifelse(tab$N >= input$NVal[[2]], "Large", " Medium")
+      ))
+      regressants = paste0(regressants, " + Number_Of_Cities_")
+      columnsToKeep = c(columnsToKeep, "Number_Of_Cities_")
+    }
+    
+    if ('regForm' %in%  TechnicalSpecs == "TRUE")  {
+      tab$Regression_Form_ = tab$REGRESSIONFORM
+      regressants = paste0(regressants, " + Regression_Form_")
+      columnsToKeep = c(columnsToKeep, "Regression_Form_")
+    }
+    
+    if ('olsOrnot' %in%  TechnicalSpecs == "TRUE")  {
+      tab$Estimation_Method_ = tab$ESTIMATION
+      regressants = paste0(regressants, " + Estimation_Method_")
+      columnsToKeep = c(columnsToKeep, "Estimation_Method_")
+    }
+    
+    if ('scale4model' %in% TechnicalSpecs == "TRUE")  {
+      tab$City_Definition_ = tab$URBANSCALE
+      regressants = paste0(regressants, " + City_Definition_")
+      columnsToKeep = c(columnsToKeep, "City_Definition_")
+    }
+    
+    if ('urbanisation4model' %in% TopicalSpecs == "TRUE") {
+      tab = subset(tab, URBANISATION != "")
+      tab$Urbanisation_Age_ = tab$URBANISATION
+      regressants = paste0(regressants, " + Urbanisation_Age_")
+      columnsToKeep = c(columnsToKeep, "Urbanisation_Age_")
+    }
+    if ('time' %in% TopicalSpecs == "TRUE")  {
+      tab$Date_of_Observation_ = as.factor(ifelse(
+        tab$DATE <= input$nTime[[1]],
+        "Early",
+        ifelse(tab$DATE >= input$nTime[[2]], "Late", " Intermediate")
+      ))
+      regressants = paste0(regressants, " + Date_of_Observation_")
+      columnsToKeep = c(columnsToKeep, "Date_of_Observation_")
+    }
+    if ('countrySize' %in% TopicalSpecs  == "TRUE") {
+      tab = subset(tab, TOTAL_POP > 0)
+      tab$Country_Size_ = as.factor(ifelse(
+        tab$TOTAL_POP <= input$PopVal[[1]],
+        "Small",
+        ifelse(tab$TOTAL_POP >= input$PopVal[[2]], "Large", " Medium")
+      ))
+      regressants = paste0(regressants, " + Country_Size_")
+      columnsToKeep = c(columnsToKeep, "Country_Size_")
+    }
+    
+    if ('countryUrb' %in% TopicalSpecs  == "TRUE") {
+      tab = subset(tab, URBP > 0)
+      tab$Country_Urbanization_ = as.factor(ifelse(
+        tab$URBP <= input$UrbVal[[1]],
+        "Low",
+        ifelse(tab$URBP >= input$UrbVal[[2]], "High", " Medium")
+      ))
+      regressants = paste0(regressants, " + Country_Urbanization_")
+      columnsToKeep = c(columnsToKeep, "Country_Urbanization_")
+    }
+    
+    if ('countryGDP' %in% TopicalSpecs  == "TRUE") {
+      tab = subset(tab, GDPPC > 0)
+      tab$Country_GDP_ = as.factor(ifelse(
+        tab$GDPPC <= input$GDPVal[[1]],
+        "Low",
+        ifelse(tab$GDPPC >= input$GDPVal[[2]], "High", " Medium")
+      ))
+      regressants = paste0(regressants, " + Country_GDP_")
+      columnsToKeep = c(columnsToKeep, "Country_GDP_")
+    }
+    
+    if ('yearOfPubli' %in% OtherSpecs  == "TRUE") {
+      tab$Year_Of_Publication_ = as.factor(ifelse(
+        tab$YEARPUB <= input$yearOfP[[1]],
+        "Early",
+        ifelse(tab$YEARPUB >= input$yearOfP[[2]], "Recent", " Medium")
+      ))
+      regressants = paste0(regressants, " + Year_Of_Publication_")
+      columnsToKeep = c(columnsToKeep, "Year_Of_Publication_")
+    }
+    
+    if ('studySize' %in% OtherSpecs  == "TRUE") {
+      tab$Study_Size_ = as.factor(ifelse(
+        tab$N_ESTIM == 1,
+        "Single",
+        ifelse(tab$N_ESTIM >= input$n_estim, "Large", " Small")
+      ))
+      regressants = paste0(regressants, " + Study_Size_")
+      columnsToKeep = c(columnsToKeep, "Study_Size_")
+    }
+    
+    if ('studyCoverage' %in% OtherSpecs  == "TRUE") {
+      tab$Territorial_Coverage_ = as.factor(ifelse(
+        tab$N_COUNTRIES == 1,
+        "Single",
+        ifelse(tab$N_COUNTRIES >= input$n_territories, "Large", " Small")
+      ))
+      regressants = paste0(regressants, " + Territorial_Coverage_")
+      columnsToKeep = c(columnsToKeep, "Territorial_Coverage_")
+    }
+    
+    if ('studyPeriod' %in% OtherSpecs  == "TRUE") {
+      tab$Period_Analysed_ = as.factor(ifelse(
+        tab$StudyPeriod == 0,
+        "Cross_section",
+        ifelse(tab$StudyPeriod >= input$s_period, "Long", " Short")
+      ))
+      regressants = paste0(regressants, " + Period_Analysed_")
+      columnsToKeep = c(columnsToKeep, "Period_Analysed_")
+    }
+    
+    
+    sameSample = input$sameSample
+    if (sameSample == T) {
+      tab = subset(tab, TRUNCATION_POINT >= 0)
+      tab = subset(tab, N >= 0)
+      tab = subset(tab, URBANISATION != "")
+      tab = subset(tab, TOTAL_POP > 0)
+      tab = subset(tab, URBP > 0)
+      tab = subset(tab, GDPPC > 0)
+      tab = tab[, columnsToKeep]
+      tab = tab[complete.cases(tab),]
+    }
+    
+    
+    model = plm(as.formula(regressants), data=tab, index=c("SAME_SPECIFICATIONS", "DATE"), model="within")
+    
+    return(model)
+  })
+  
   
   
   
   
   residualTableForTrajectoryMaps = reactive({
-    model = metaModelDynOLS()
+    if(input$fixedEffects2 == TRUE){
+      model = metaModelDynFixed()
+    } else {
+      model = metaModelDynOLS()
+    }
     residuals = model$residuals
     
     tab = tableForTrajectoryMaps()
@@ -2036,8 +2422,26 @@ shinyServer(function(input, output, session) {
   
   ######  Tab C.3
   
+
+  output$pFtest = renderText({
+  
+    random = metaModelRandomPanel()
+    fixed = metaModelFixedPanel()
+    if(!is.null(random) & !is.null(fixed)){
+    if(phtest(fixed, random)$p.value < 0.05) {
+     test = "You should favour a fixed effect panel model."
+    } else { 
+      test = "The random effect panel model is justified."
+    } } else { 
+      test = "Error or empty models."
+    }
+    return(test)
+         
+  })
+  
   output$modelparameters = renderTable({
-    if (input$fixedEffects == T | input$fixedCountryEffects == T) {
+    
+    if (input$modelSpec == "fixedStudyEffects" | input$modelSpec =="fixedCountryEffects") {
       model = metaModelFixed()
       R2 = r2.corr.mer(model) * 100
       vc <- VarCorr(model)
@@ -2053,25 +2457,52 @@ shinyServer(function(input, output, session) {
       Observations = length(model@frame$ALPHA)
       summ = data.frame(R2, R2between, Observations)
       colnames(summ) = c("R2 (%)", "Share of inter-group variance (%)", "Number of Estimations")
-      return(summ)
-    } else {
-      model = metaModelOLS()
-      R2 = summary(model)$r.squared * 100
-      Observations = summary(model)$df[[2]] + summary(model)$df[[1]]
-      summ = data.frame(R2, Observations)
-      colnames(summ) = c("R2 of regression (%)", "Number of Estimations")
-      return(summ)
+    } 
+    
+    
+       if (input$modelSpec == "randomPanelEffects") {
+        model = metaModelRandomPanel()
+        R2 = summary(model)$r.squared[1] * 100
+        Observations = length(model$model$ALPHA)
+        summ = data.frame(R2, Observations)
+        colnames(summ) = c("R2 (%)", "Number of Estimations")
+       }
+        
+      if (input$modelSpec == "fixedPanelEffects") {
+         model = metaModelFixedPanel()
+         R2 = summary(model)$r.squared[1] * 100
+         Observations = length(model$model$ALPHA)
+         summ = data.frame(R2, Observations)
+         colnames(summ) = c("R2 (%)", "Number of Estimations")
+       }
+         
+    if (input$modelSpec == "ols") {
+        model = metaModelOLS()
+        R2 = summary(model)$r.squared * 100
+        Observations = summary(model)$df[[2]] + summary(model)$df[[1]]
+        summ = data.frame(R2, Observations)
+        colnames(summ) = c("R2 of regression (%)", "Number of Estimations")
     }
-  }, include.rownames = FALSE)
+    return(summ)
+   }, include.rownames = FALSE)
   
   
   output$model_temporal = renderTable({
-    fixedEffect = input$fixedEffects
-    if (input$fixedEffects == T | input$fixedCountryEffects == T) {
+    
+    if (input$modelSpec == "fixedStudyEffects" | input$modelSpec =="fixedCountryEffects") {
       model = metaModelFixed()
-    } else {
+    }
+    
+    if (input$modelSpec == "randomPanelEffects") {
+      model = metaModelRandomPanel()
+    }
+    if (input$modelSpec == "fixedPanelEffects") {
+      model = metaModelFixedPanel()
+    }
+    if (input$modelSpec == "ols") {
       model = metaModelOLS()
     }
+    
     mod = as.data.frame(summary(model)$coefficients)
     temporal = mod[rownames(mod) %in% c("(Intercept)"),]
     temporal = data.frame(rownames(temporal), temporal)
@@ -2081,7 +2512,22 @@ shinyServer(function(input, output, session) {
   }, digits = 3)
   
   output$model_significant = renderTable({
-    if (input$fixedEffects == T | input$fixedCountryEffects == T) {
+    
+    if (input$modelSpec == "randomPanelEffects") {
+      model = metaModelRandomPanel()
+    }
+    if (input$modelSpec == "fixedPanelEffects") {
+      model = metaModelFixedPanel()
+    }
+    if (input$modelSpec == "ols") {
+      model = metaModelOLS()
+    }
+    
+    if(input$modelSpec %in% c("ols","randomPanelEffects", "fixedPanelEffects")){
+      mod = as.data.frame(summary(model)$coefficients)
+      sign = input$significance / 100
+      significant = round(mod[mod$`Pr(>|t|)` <= sign,], 3)
+    } else {
       model = metaModelFixed()
       mod = as.data.frame(summary(model)$coefficients)
       sign = input$significance / 100
@@ -2094,12 +2540,8 @@ shinyServer(function(input, output, session) {
       if (sign < 0.01)
         tTestValue = 2.326
       significant = round(mod[abs(mod$`t value`) >= tTestValue,], 3)
-    } else {
-      model = metaModelOLS()
-      mod = as.data.frame(summary(model)$coefficients)
-      sign = input$significance / 100
-      significant = round(mod[mod$`Pr(>|t|)` <= sign,], 3)
     }
+    
     significant = significant[!rownames(significant) %in% c("(Intercept)"),]
     significant = data.frame(rownames(significant), significant)
     colnames(significant)[1] = "Variable"
@@ -2107,29 +2549,41 @@ shinyServer(function(input, output, session) {
   }, digits = 3)
   
   output$model_non_significant = renderTable({
-    if (input$fixedEffects == T | input$fixedCountryEffects == T) {
-      model = metaModelFixed()
-      mod = as.data.frame(summary(model)$coefficients)
-      sign = input$significance / 100
-      if (sign <= 0.1)
-        tTestValue = 1.282
-      if (sign < 0.05)
-        tTestValue = 1.645
-      if (sign < 0.025)
-        tTestValue = 1.960
-      if (sign < 0.01)
-        tTestValue = 2.326
-      non_significant = mod[abs(mod$`t value`) < tTestValue,]
-    } else {
-      model = metaModelOLS()
-      mod = as.data.frame(summary(model)$coefficients)
-      sign = input$significance / 100
-      non_significant = mod[mod$`Pr(>|t|)` > sign,]
-    }
-    non_significant = data.frame(rownames(non_significant), non_significant)
-    colnames(non_significant)[1] = "Variable"
     
-    return(non_significant)
+      if (input$modelSpec == "randomPanelEffects") {
+        model = metaModelRandomPanel()
+      }
+      if (input$modelSpec == "fixedPanelEffects") {
+        model = metaModelFixedPanel()
+      }
+      if (input$modelSpec == "ols") {
+        model = metaModelOLS()
+      }
+      
+      if(input$modelSpec %in% c("ols","randomPanelEffects", "fixedPanelEffects")){
+        mod = as.data.frame(summary(model)$coefficients)
+        sign = input$significance / 100
+        non_significant = round(mod[mod$`Pr(>|t|)` > sign,], 3)
+      } else {
+        model = metaModelFixed()
+        mod = as.data.frame(summary(model)$coefficients)
+        sign = input$significance / 100
+        if (sign <= 0.1)
+          tTestValue = 1.282
+        if (sign < 0.05)
+          tTestValue = 1.645
+        if (sign < 0.025)
+          tTestValue = 1.960
+        if (sign < 0.01)
+          tTestValue = 2.326
+        non_significant = mod[abs(mod$`t value`) < tTestValue,]
+      }
+      
+      non_significant = non_significant[!rownames(non_significant) %in% c("(Intercept)"),]
+      non_significant = data.frame(rownames(non_significant), non_significant)
+      colnames(non_significant)[1] = "Variable"
+
+      return(non_significant)
   })
   
   output$REFS = renderUI({
@@ -2615,7 +3069,16 @@ shinyServer(function(input, output, session) {
     ))))
   })
   
-
+  observe({
+    inRefFile <- meta
+    if (is.null(inRefFile))
+      return(NULL)
+    updateSelectInput(session, "references", choices = c('All',sort(unique(
+      as.character(inRefFile$REFERENCE)
+    ))))
+  })
+  
+  
   observe({
     tab = metaArxiv()
     if (input$alpha == "Lotka")

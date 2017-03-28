@@ -126,16 +126,23 @@ shinyUI(
                                 ))
                                 ),
                    tags$hr(),
-                   fluidRow(column(
+                   "Select the references to include in the analysis...",
+                   fluidRow(
+                     column(
+                     6,
+                     selectizeInput("references", "References", "", multiple = T)
+                     )
+                  ,
+                   column(
                      6,
                      checkboxInput(
                        "Arxiv",
-                       "Reproduce the analyses of the arXiv paper (reference collection ends in June 2016)",
+                       "...Or reproduce the analyses of the arXiv paper (reference collection ends in June 2016)",
                        value = FALSE
                      )
                    ),
                    column(
-                     6,
+                     12,
                      HTML(
                        'Cottineau C. , 2016, « MetaZipf. (Re)producing knowledge about city size distributions », Arxiv.org, <a href="https://arxiv.org/abs/1606.06162">https://arxiv.org/abs/1606.06162</a>'
                      )
@@ -624,19 +631,29 @@ shinyUI(
                   inline = FALSE
                 )
               ),
+             
               
               column(
-                4,
-                checkboxInput("fixedEffects", "Fixed Study Effects", value = F)
+                7,
+                selectInput(
+                  "modelSpec",
+                  "Type of meta analysis model",
+                  c(
+                    "OLS" =  "ols",
+                    "Fixed Study Effects" = "fixedStudyEffects",
+                    "Fixed Country Effects" = "fixedCountryEffects",
+                    "Fixed Effects Panel Model" = "fixedPanelEffects",
+                    "Random Effects Panel Model" = "randomPanelEffects"
+                  ),
+                  selected = "ols",
+                  multiple = F
+                )
               ),
               column(
-                4,
-                checkboxInput("fixedCountryEffects", "Fixed Country Effects", value = F)
-              ),
-              column(
-                4,
+              5,
                 checkboxInput("sameSample", "Compare models with the same observations", value = F)
               ),
+              
               # column(
               #   6,
               #   checkboxInput("standardize", "Standardise variables: (x - mean(x)) / sd(x)", value = F)
@@ -784,6 +801,14 @@ shinyUI(
               br(),
               br(),
               tableOutput('modelparameters'),
+              
+              column(
+                12,
+                conditionalPanel(
+                  condition = 'input.modelSpec.indexOf("randomPanelEffects") != -1',
+                  textOutput('pFtest')
+                )
+              ),
               # tags$b("Are fixed study effects needed? (based on pFtest)"),
               #  textOutput('pFtest'),
               tags$hr(),
@@ -867,7 +892,7 @@ ep represents a fixed effect in the panel models,
                     "Initial GDP per capita" = "gdp",
                     "Initial Urbanization level" = "urb"
                   ),
-                  selected = c('alpha'),
+                  selected = NULL,
                   inline = FALSE
                 )
               ),

@@ -1,10 +1,16 @@
 name: MetaZipf
-title:
+title: MetaZipf
 account: clementinegeo
 server: shinyapps.io
 appId: 56260
+<<<<<<< HEAD
 bundleId: 740282
 url: https://clementinegeo.shinyapps.io/MetaZipf/
 when: 1489073564.41256
+=======
+bundleId: 743592
+url: https://clementinegeo.shinyapps.io/MetaZipf/
+when: 1489330189.13878
+>>>>>>> origin/master
 asMultiple: FALSE
 asStatic: FALSE
