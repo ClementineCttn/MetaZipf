@@ -385,7 +385,7 @@ shinyServer(function(input, output, session) {
       
       refList = input$references
       
-      if('All' %in% refList){
+      if('All' %in% refList | is.null(refList)){
         tab = tab
       } else {
       tab = subset(tab, REFERENCE %in% refList)
@@ -3073,9 +3073,7 @@ shinyServer(function(input, output, session) {
     inRefFile <- meta
     if (is.null(inRefFile))
       return(NULL)
-    updateSelectInput(session, "references", choices = c('All',sort(unique(
-      as.character(inRefFile$REFERENCE)
-    ))))
+    updateSelectInput(session, "references", choices = c('All',sort(unique(as.character(inRefFile$REFERENCE)))))
   })
   
   
