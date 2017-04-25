@@ -634,7 +634,7 @@ shinyUI(
              
               
               column(
-                7,
+                12,
                 selectInput(
                   "modelSpec",
                   "Type of meta analysis model",
@@ -649,11 +649,11 @@ shinyUI(
                   multiple = F
                 )
               ),
-              column(
-              5,
-                checkboxInput("sameSample", "Compare models with the same observations", value = F)
-              ),
-              
+              # column(
+              # 5,
+              #   checkboxInput("sameSample", "Compare models with the same observations", value = F)
+              # ),
+              # 
               # column(
               #   6,
               #   checkboxInput("standardize", "Standardise variables: (x - mean(x)) / sd(x)", value = F)

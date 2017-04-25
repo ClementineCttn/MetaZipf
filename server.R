@@ -33,7 +33,11 @@ refs = read.csv("data/zipf_refs.csv", sep = ",", dec = ".")
 metaToAdd = data.frame()
 refsToAdd = data.frame()
 
-meta = data.frame(meta, refs[match(meta$REFID, refs$REFID),])
+delga2 = refs[refs$REFID == "Del04Con",]
+delga2[,"REFID"] = "Del04Con2"
+
+refs2 = rbind(refs, delga2)
+meta = data.frame(meta, refs2[match(meta$REFID, refs2$REFID),])
 rownames(meta) = 1:dim(meta)[1]
 meta$REFID.1 = NULL
 meta$AUTHOR = NULL
@@ -230,6 +234,11 @@ meta$SAME_SPECIFICATIONS = ifelse(
     sep = "_"
   )
 )
+
+meta$URBANISATION = as.factor(ifelse(meta$URBANISATION == "", "MissingInfo", as.character(meta$URBANISATION)))
+
+meta[is.na(meta)] <- "MissingInfo"
+
 ##############################
 ######  Outputs functions
 ##############################
@@ -439,7 +448,8 @@ shinyServer(function(input, output, session) {
     return(tab)
   })
   
-  tableForTrajectoryMaps <- reactive({
+
+tableForTrajectoryMaps <- reactive({
     tab = metaArxiv()
     if (input$alpha == "Lotka")tab$ALPHA = tab$ALPHALOTKA
     if (input$alpha  == "Pareto") tab$ALPHA = tab$ALPHAPARETO
@@ -480,7 +490,10 @@ shinyServer(function(input, output, session) {
                                                   longitudinalAlphas$DATE),]
     n = dim(longitudinalAlphas)[1] - 1
     
+    
+    head(longitudinalAlphas)
     for (i in 1:n) {
+      
       if (longitudinalAlphas[i, "SAME_SPECIFICATIONS"] == longitudinalAlphas[i +
                                                                              1, "SAME_SPECIFICATIONS"]) {
         fv = longitudinalAlphas[i + 1, "ALPHA"]
@@ -493,7 +506,7 @@ shinyServer(function(input, output, session) {
                                                               nPeriods = ye)
         longitudinalAlphas[i, "GROWTH_DECADE"] = paste0(substr(as.character(median_date), 1, 3), '0s')
         
-        if (!is.na(longitudinalAlphas[i, "N"])) {
+        if (is.numeric(longitudinalAlphas[i, "N"])) {
           fvn = longitudinalAlphas[i + 1, "N"]
           ivn = longitudinalAlphas[i, "N"]
           longitudinalAlphas[i, "GN"] =  AAGR_pct(initVal = ivn,
@@ -715,24 +728,26 @@ shinyServer(function(input, output, session) {
     regressants = "ALPHA ~ 1"
     columnsToKeep = c("ALPHA", "DATE")
     if ('truncation4model' %in% TechnicalSpecs == "TRUE") {
-      tab$Population_Cutoff_ = as.factor(ifelse(
-        tab$TRUNCATION_POINT <= input$truncVal[[1]],
+      tab$Population_Cutoff_ = as.factor(
+        ifelse(tab$TRUNCATION_POINT == "MissingInfo", "MissingInfo",
+               ifelse(tab$TRUNCATION_POINT <= input$truncVal[[1]],
         "Low",
         ifelse(
           tab$TRUNCATION_POINT >= input$truncVal[[2]],
           "High",
           " Medium"
         )
-      ))
+      )))
       regressants = paste0(regressants, " + Population_Cutoff_")
       columnsToKeep = c(columnsToKeep, "Population_Cutoff_")
     }
     if ('N4model' %in% TechnicalSpecs == "TRUE")  {
       tab$Number_Of_Cities_ = as.factor(ifelse(
-        tab$N <= input$NVal[[1]],
+       tab$N == "MissingInfo", "MissingInfo",
+       ifelse(tab$N <= input$NVal[[1]],
         "Small",
         ifelse(tab$N >= input$NVal[[2]], "Large", " Medium")
-      ))
+      )))
       regressants = paste0(regressants, " + Number_Of_Cities_")
       columnsToKeep = c(columnsToKeep, "Number_Of_Cities_")
     }
@@ -762,40 +777,46 @@ shinyServer(function(input, output, session) {
       columnsToKeep = c(columnsToKeep, "City_Definition_")
     }
     if ('urbanisation4model' %in% TopicalSpecs == "TRUE") {
-      tab = subset(tab, URBANISATION != "")
+    #  tab = subset(tab, URBANISATION != "")
       tab$Urbanisation_Age_ = tab$URBANISATION
       regressants = paste0(regressants, " + Urbanisation_Age_")
       columnsToKeep = c(columnsToKeep, "Urbanisation_Age_")
     }
     if ('countrySize' %in% TopicalSpecs  == "TRUE") {
-      tab = subset(tab, TOTAL_POP > 0)
+   #   tab = subset(tab, TOTAL_POP > 0)
       tab$Country_Size_ = as.factor(ifelse(
+        tab$TOTAL_POP == "MissingInfo", "MissingInfo",
+        ifelse(
         tab$TOTAL_POP <= input$PopVal[[1]],
         "Small",
         ifelse(tab$TOTAL_POP >= input$PopVal[[2]], "Large", " Medium")
-      ))
+      )))
       regressants = paste0(regressants, " + Country_Size_")
       columnsToKeep = c(columnsToKeep, "Country_Size_")
     }
     if ('countryUrb' %in% TopicalSpecs  == "TRUE") {
-      tab = subset(tab, URBP > 0)
+    #  tab = subset(tab, URBP > 0)
       tab$Country_Urbanization_ = as.factor(ifelse(
+        tab$URBP == "MissingInfo", "MissingInfo",
+        ifelse(
         tab$URBP <= input$UrbVal[[1]],
         "Low",
         ifelse(tab$URBP >= input$UrbVal[[2]], "High", " Medium")
-      ))
+      )))
       regressants = paste0(regressants, " + Country_Urbanization_")
       columnsToKeep = c(columnsToKeep, "Country_Urbanization_")
     }
   
     
     if ('countryGDP' %in% TopicalSpecs  == "TRUE") {
-      tab = subset(tab, GDPPC > 0)
+    #  tab = subset(tab, GDPPC > 0)
       tab$Country_GDP_ = as.factor(ifelse(
+        tab$GDPPC == "MissingInfo", "MissingInfo",
+        ifelse(
         tab$GDPPC <= input$GDPVal[[1]],
         "Low",
         ifelse(tab$GDPPC >= input$GDPVal[[2]], "High", " Medium")
-      ))
+      )))
       regressants = paste0(regressants, " + Country_GDP_")
       columnsToKeep = c(columnsToKeep, "Country_GDP_")
     }
@@ -835,20 +856,20 @@ shinyServer(function(input, output, session) {
       regressants = paste0(regressants, " + Period_Analysed_")
       columnsToKeep = c(columnsToKeep, "Period_Analysed_")
     }
-    
-    
-    sameSample = input$sameSample
-    if (sameSample == T) {
-      tab = subset(tab, TRUNCATION_POINT >= 0)
-      tab = subset(tab, N >= 0)
-      tab = subset(tab, URBANISATION != "")
-      tab = subset(tab, URBP > 0)
-      tab = subset(tab, TOTAL_POP > 0)
-      tab = subset(tab, GDPPC > 0)
-      tab = tab[, columnsToKeep]
-      tab = tab[complete.cases(tab),]
-    }
-    
+    # 
+    # 
+    # sameSample = input$sameSample
+    # if (sameSample == T) {
+    #   tab = subset(tab, TRUNCATION_POINT >= 0)
+    #   tab = subset(tab, N >= 0)
+    #   tab = subset(tab, URBANISATION != "")
+    #   tab = subset(tab, URBP > 0)
+    #   tab = subset(tab, TOTAL_POP > 0)
+    #   tab = subset(tab, GDPPC > 0)
+    #   tab = tab[, columnsToKeep]
+    #   tab = tab[complete.cases(tab),]
+    # }
+    # 
 
 
     model = lm(regressants, data = tab, na.action = na.omit)
@@ -885,6 +906,7 @@ shinyServer(function(input, output, session) {
     columnsToKeep = c("REFID", "CNTR_ID", "ALPHA" )
     if ('truncation4model' %in% TechnicalSpecs == "TRUE") {
       tab$Population_Cutoff_ = as.factor(ifelse(
+        tab$TRUNCATION_POINT == "MissingInfo", "MissingInfo",ifelse(
         tab$TRUNCATION_POINT <= input$truncVal[[1]],
         "Low",
         ifelse(
@@ -892,16 +914,17 @@ shinyServer(function(input, output, session) {
           "High",
           " Medium"
         )
-      ))
+      )))
       regressants = paste0(regressants, " + Population_Cutoff_")
       columnsToKeep = c(columnsToKeep, "Population_Cutoff_")
     }
     if ('N4model' %in% TechnicalSpecs == "TRUE")  {
       tab$Number_Of_Cities_ = as.factor(ifelse(
+        tab$N == "MissingInfo", "MissingInfo",ifelse(
         tab$N <= input$NVal[[1]],
         "Small",
         ifelse(tab$N >= input$NVal[[2]], "Large", " Medium")
-      ))
+      )))
       regressants = paste0(regressants, " + Number_Of_Cities_")
       columnsToKeep = c(columnsToKeep, "Number_Of_Cities_")
     }
@@ -925,7 +948,7 @@ shinyServer(function(input, output, session) {
     }
     
     if ('urbanisation4model' %in% TopicalSpecs == "TRUE") {
-      tab = subset(tab, URBANISATION != "")
+    #  tab = subset(tab, URBANISATION != "")
       tab$Urbanisation_Age_ = tab$URBANISATION
       regressants = paste0(regressants, " + Urbanisation_Age_")
       columnsToKeep = c(columnsToKeep, "Urbanisation_Age_")
@@ -940,34 +963,37 @@ shinyServer(function(input, output, session) {
       columnsToKeep = c(columnsToKeep, "Date_of_Observation_")
     }
     if ('countrySize' %in% TopicalSpecs  == "TRUE") {
-      tab = subset(tab, TOTAL_POP > 0)
+     # tab = subset(tab, TOTAL_POP > 0)
       tab$Country_Size_ = as.factor(ifelse(
+        tab$TOTAL_POP == "MissingInfo", "MissingInfo",ifelse(
         tab$TOTAL_POP <= input$PopVal[[1]],
         "Small",
         ifelse(tab$TOTAL_POP >= input$PopVal[[2]], "Large", " Medium")
-      ))
+      )))
       regressants = paste0(regressants, " + Country_Size_")
       columnsToKeep = c(columnsToKeep, "Country_Size_")
     }
     
     if ('countryUrb' %in% TopicalSpecs  == "TRUE") {
-      tab = subset(tab, URBP > 0)
+   #   tab = subset(tab, URBP > 0)
       tab$Country_Urbanization_ = as.factor(ifelse(
+        tab$URBP == "MissingInfo", "MissingInfo",ifelse(
         tab$URBP <= input$UrbVal[[1]],
         "Low",
         ifelse(tab$URBP >= input$UrbVal[[2]], "High", " Medium")
-      ))
+      )))
       regressants = paste0(regressants, " + Country_Urbanization_")
       columnsToKeep = c(columnsToKeep, "Country_Urbanization_")
     }
     
     if ('countryGDP' %in% TopicalSpecs  == "TRUE") {
-      tab = subset(tab, GDPPC > 0)
+    #  tab = subset(tab, GDPPC > 0)
       tab$Country_GDP_ = as.factor(ifelse(
+        tab$GDPPC == "MissingInfo", "MissingInfo",ifelse(
         tab$GDPPC <= input$GDPVal[[1]],
         "Low",
         ifelse(tab$GDPPC >= input$GDPVal[[2]], "High", " Medium")
-      ))
+      )))
       regressants = paste0(regressants, " + Country_GDP_")
       columnsToKeep = c(columnsToKeep, "Country_GDP_")
     }
@@ -1013,18 +1039,18 @@ shinyServer(function(input, output, session) {
     }
     
     
-    sameSample = input$sameSample
-    if (sameSample == T) {
-      tab = subset(tab, TRUNCATION_POINT >= 0)
-      tab = subset(tab, N >= 0)
-      tab = subset(tab, URBANISATION != "")
-      tab = subset(tab, TOTAL_POP > 0)
-      tab = subset(tab, URBP > 0)
-      tab = subset(tab, GDPPC > 0)
-      tab = tab[, columnsToKeep]
-      tab = tab[complete.cases(tab),]
-    }
-    
+    # sameSample = input$sameSample
+    # if (sameSample == T) {
+    #   tab = subset(tab, TRUNCATION_POINT >= 0)
+    #   tab = subset(tab, N >= 0)
+    #   tab = subset(tab, URBANISATION != "")
+    #   tab = subset(tab, TOTAL_POP > 0)
+    #   tab = subset(tab, URBP > 0)
+    #   tab = subset(tab, GDPPC > 0)
+    #   tab = tab[, columnsToKeep]
+    #   tab = tab[complete.cases(tab),]
+    # }
+    # 
  
     if (input$modelSpec == "fixedStudyEffects") {
       formulaModel = paste0(regressants, " + ( 1 | REFID)")
@@ -1072,23 +1098,25 @@ shinyServer(function(input, output, session) {
     columnsToKeep = c("REFID", "CNTR_ID", "ALPHA", "SAME_SPECIFICATIONS", "DATE")
     if ('truncation4model' %in% TechnicalSpecs == "TRUE") {
       tab$Population_Cutoff_ = as.factor(ifelse(
+        tab$TRUNCATION_POINT == "MissingInfo", "MissingInfo",ifelse(
         tab$TRUNCATION_POINT <= input$truncVal[[1]],
         "Low",
         ifelse(
           tab$TRUNCATION_POINT >= input$truncVal[[2]],
           "High",
           " Medium"
-        )
+        ))
       ))
       regressants = paste0(regressants, " + Population_Cutoff_")
       columnsToKeep = c(columnsToKeep, "Population_Cutoff_")
     }
     if ('N4model' %in% TechnicalSpecs == "TRUE")  {
       tab$Number_Of_Cities_ = as.factor(ifelse(
+        tab$N == "MissingInfo", "MissingInfo",ifelse(
         tab$N <= input$NVal[[1]],
         "Small",
         ifelse(tab$N >= input$NVal[[2]], "Large", " Medium")
-      ))
+      )))
       regressants = paste0(regressants, " + Number_Of_Cities_")
       columnsToKeep = c(columnsToKeep, "Number_Of_Cities_")
     }
@@ -1112,7 +1140,7 @@ shinyServer(function(input, output, session) {
     }
     
     if ('urbanisation4model' %in% TopicalSpecs == "TRUE") {
-      tab = subset(tab, URBANISATION != "")
+    #  tab = subset(tab, URBANISATION != "")
       tab$Urbanisation_Age_ = tab$URBANISATION
       regressants = paste0(regressants, " + Urbanisation_Age_")
       columnsToKeep = c(columnsToKeep, "Urbanisation_Age_")
@@ -1127,34 +1155,37 @@ shinyServer(function(input, output, session) {
       columnsToKeep = c(columnsToKeep, "Date_of_Observation_")
     }
     if ('countrySize' %in% TopicalSpecs  == "TRUE") {
-      tab = subset(tab, TOTAL_POP > 0)
+   #   tab = subset(tab, TOTAL_POP > 0)
       tab$Country_Size_ = as.factor(ifelse(
+        tab$TOTAL_POP == "MissingInfo", "MissingInfo",ifelse(
         tab$TOTAL_POP <= input$PopVal[[1]],
         "Small",
         ifelse(tab$TOTAL_POP >= input$PopVal[[2]], "Large", " Medium")
-      ))
+      )))
       regressants = paste0(regressants, " + Country_Size_")
       columnsToKeep = c(columnsToKeep, "Country_Size_")
     }
     
     if ('countryUrb' %in% TopicalSpecs  == "TRUE") {
-      tab = subset(tab, URBP > 0)
+  #    tab = subset(tab, URBP > 0)
       tab$Country_Urbanization_ = as.factor(ifelse(
+        tab$URBP == "MissingInfo", "MissingInfo",ifelse(
         tab$URBP <= input$UrbVal[[1]],
         "Low",
         ifelse(tab$URBP >= input$UrbVal[[2]], "High", " Medium")
-      ))
+      )))
       regressants = paste0(regressants, " + Country_Urbanization_")
       columnsToKeep = c(columnsToKeep, "Country_Urbanization_")
     }
     
     if ('countryGDP' %in% TopicalSpecs  == "TRUE") {
-      tab = subset(tab, GDPPC > 0)
+  #    tab = subset(tab, GDPPC > 0)
       tab$Country_GDP_ = as.factor(ifelse(
+        tab$GDPPC == "MissingInfo", "MissingInfo",ifelse(
         tab$GDPPC <= input$GDPVal[[1]],
         "Low",
         ifelse(tab$GDPPC >= input$GDPVal[[2]], "High", " Medium")
-      ))
+      )))
       regressants = paste0(regressants, " + Country_GDP_")
       columnsToKeep = c(columnsToKeep, "Country_GDP_")
     }
@@ -1200,18 +1231,18 @@ shinyServer(function(input, output, session) {
     }
     
     
-    sameSample = input$sameSample
-    if (sameSample == T) {
-      tab = subset(tab, TRUNCATION_POINT >= 0)
-      tab = subset(tab, N >= 0)
-      tab = subset(tab, URBANISATION != "")
-      tab = subset(tab, TOTAL_POP > 0)
-      tab = subset(tab, URBP > 0)
-      tab = subset(tab, GDPPC > 0)
-      tab = tab[, columnsToKeep]
-      tab = tab[complete.cases(tab),]
-    }
-    
+    # sameSample = input$sameSample
+    # if (sameSample == T) {
+    #   tab = subset(tab, TRUNCATION_POINT >= 0)
+    #   tab = subset(tab, N >= 0)
+    #   tab = subset(tab, URBANISATION != "")
+    #   tab = subset(tab, TOTAL_POP > 0)
+    #   tab = subset(tab, URBP > 0)
+    #   tab = subset(tab, GDPPC > 0)
+    #   tab = tab[, columnsToKeep]
+    #   tab = tab[complete.cases(tab),]
+    # }
+    # 
     
     model = plm(as.formula(regressants), data=tab, index=c("SAME_SPECIFICATIONS", "DATE"), model="random")
     
@@ -1249,6 +1280,7 @@ shinyServer(function(input, output, session) {
     columnsToKeep = c("REFID", "CNTR_ID", "ALPHA", "SAME_SPECIFICATIONS", "DATE")
     if ('truncation4model' %in% TechnicalSpecs == "TRUE") {
       tab$Population_Cutoff_ = as.factor(ifelse(
+        tab$N == "MissingInfo", "MissingInfo",ifelse(
         tab$TRUNCATION_POINT <= input$truncVal[[1]],
         "Low",
         ifelse(
@@ -1256,16 +1288,17 @@ shinyServer(function(input, output, session) {
           "High",
           " Medium"
         )
-      ))
+      )))
       regressants = paste0(regressants, " + Population_Cutoff_")
       columnsToKeep = c(columnsToKeep, "Population_Cutoff_")
     }
     if ('N4model' %in% TechnicalSpecs == "TRUE")  {
       tab$Number_Of_Cities_ = as.factor(ifelse(
+        tab$N == "MissingInfo", "MissingInfo",ifelse(
         tab$N <= input$NVal[[1]],
         "Small",
         ifelse(tab$N >= input$NVal[[2]], "Large", " Medium")
-      ))
+      )))
       regressants = paste0(regressants, " + Number_Of_Cities_")
       columnsToKeep = c(columnsToKeep, "Number_Of_Cities_")
     }
@@ -1289,7 +1322,7 @@ shinyServer(function(input, output, session) {
     }
     
     if ('urbanisation4model' %in% TopicalSpecs == "TRUE") {
-      tab = subset(tab, URBANISATION != "")
+   #   tab = subset(tab, URBANISATION != "")
       tab$Urbanisation_Age_ = tab$URBANISATION
       regressants = paste0(regressants, " + Urbanisation_Age_")
       columnsToKeep = c(columnsToKeep, "Urbanisation_Age_")
@@ -1304,34 +1337,37 @@ shinyServer(function(input, output, session) {
       columnsToKeep = c(columnsToKeep, "Date_of_Observation_")
     }
     if ('countrySize' %in% TopicalSpecs  == "TRUE") {
-      tab = subset(tab, TOTAL_POP > 0)
+   #   tab = subset(tab, TOTAL_POP > 0)
       tab$Country_Size_ = as.factor(ifelse(
+        tab$TOTAL_POP == "MissingInfo", "MissingInfo",ifelse(
         tab$TOTAL_POP <= input$PopVal[[1]],
         "Small",
         ifelse(tab$TOTAL_POP >= input$PopVal[[2]], "Large", " Medium")
-      ))
+      )))
       regressants = paste0(regressants, " + Country_Size_")
       columnsToKeep = c(columnsToKeep, "Country_Size_")
     }
     
     if ('countryUrb' %in% TopicalSpecs  == "TRUE") {
-      tab = subset(tab, URBP > 0)
+  #    tab = subset(tab, URBP > 0)
       tab$Country_Urbanization_ = as.factor(ifelse(
+        tab$URBP == "MissingInfo", "MissingInfo",ifelse(
         tab$URBP <= input$UrbVal[[1]],
         "Low",
         ifelse(tab$URBP >= input$UrbVal[[2]], "High", " Medium")
-      ))
+      )))
       regressants = paste0(regressants, " + Country_Urbanization_")
       columnsToKeep = c(columnsToKeep, "Country_Urbanization_")
     }
     
     if ('countryGDP' %in% TopicalSpecs  == "TRUE") {
-      tab = subset(tab, GDPPC > 0)
+    #  tab = subset(tab, GDPPC > 0)
       tab$Country_GDP_ = as.factor(ifelse(
+        tab$GDPPC == "MissingInfo", "MissingInfo",ifelse(
         tab$GDPPC <= input$GDPVal[[1]],
         "Low",
         ifelse(tab$GDPPC >= input$GDPVal[[2]], "High", " Medium")
-      ))
+      )))
       regressants = paste0(regressants, " + Country_GDP_")
       columnsToKeep = c(columnsToKeep, "Country_GDP_")
     }
@@ -1377,18 +1413,18 @@ shinyServer(function(input, output, session) {
     }
     
     
-    sameSample = input$sameSample
-    if (sameSample == T) {
-      tab = subset(tab, TRUNCATION_POINT >= 0)
-      tab = subset(tab, N >= 0)
-      tab = subset(tab, URBANISATION != "")
-      tab = subset(tab, TOTAL_POP > 0)
-      tab = subset(tab, URBP > 0)
-      tab = subset(tab, GDPPC > 0)
-      tab = tab[, columnsToKeep]
-      tab = tab[complete.cases(tab),]
-    }
-    
+    # sameSample = input$sameSample
+    # if (sameSample == T) {
+    #   tab = subset(tab, TRUNCATION_POINT >= 0)
+    #   tab = subset(tab, N >= 0)
+    #   tab = subset(tab, URBANISATION != "")
+    #   tab = subset(tab, TOTAL_POP > 0)
+    #   tab = subset(tab, URBP > 0)
+    #   tab = subset(tab, GDPPC > 0)
+    #   tab = tab[, columnsToKeep]
+    #   tab = tab[complete.cases(tab),]
+    # }
+    # 
     
     model = plm(as.formula(regressants), data=tab, index=c("SAME_SPECIFICATIONS", "DATE"), model="within")
     
@@ -1565,30 +1601,33 @@ shinyServer(function(input, output, session) {
     }
     if ('pop' %in% static_vars == "TRUE") {
       tab$Initial_Population_ =  as.factor(ifelse(
+        tab$TOTAL_POP == "MissingInfo", "MissingInfo",ifelse(
         tab$TOTAL_POP <= input$PopVal2[[1]],
         "Small",
         ifelse(tab$TOTAL_POP >= input$PopVal2[[2]], "Large", " Medium")
-      ))
+      )))
       tab = tab[!is.na(tab$Initial_Population_), ]
       columnsToKeep = c(columnsToKeep, "Initial_Population_")
     }
     
     if ('gdp' %in% static_vars == "TRUE") {
       tab$Initial_GDP_Per_Capita_ = as.factor(ifelse(
+        tab$GDPPC == "MissingInfo", "MissingInfo",ifelse(
         tab$GDPPC <= input$GDPVal2[[1]],
         "Low",
         ifelse(tab$GDPPC >= input$GDPVal2[[2]], "High", " Medium")
-      ))
+      )))
       tab = tab[!is.na(tab$Initial_GDP_Per_Capita_), ]
       columnsToKeep = c(columnsToKeep, "Initial_GDP_Per_Capita_")
     }
     
     if ('urb' %in% static_vars == "TRUE") {
       tab$Initial_Urbanization_Level_ = as.factor(ifelse(
+        tab$URBP == "MissingInfo", "MissingInfo",ifelse(
         tab$URBP <= input$UrbVal2[[1]],
         "Low",
         ifelse(tab$URBP >= input$UrbVal2[[2]], "High", " Medium")
-      ))
+      )))
       tab = tab[!is.na(tab$Initial_Urbanization_Level_), ]
       columnsToKeep = c(columnsToKeep, "Initial_Urbanization_Level_")
       
@@ -1664,15 +1703,16 @@ shinyServer(function(input, output, session) {
                 ifelse(
                   tab$GROWTH_DECADE == "2000s",
                   tab$Pct_POP_2000s,
-                  ifelse(tab$GROWTH_DECADE == "2010s", tab$Pct_POP_2010s, NA)
+                  ifelse(
+                    tab$GROWTH_DECADE == "2010s", tab$Pct_POP_2010s, NA)
                 )
               )
             )
           )
         )
       )
-      tab$Population_Growth_ =  as.factor(ifelse(
-        tab$Population_Growth <= input$ratespop[[1]],
+      tab$Population_Growth_ =  as.factor(
+        ifelse(tab$Population_Growth <= input$ratespop[[1]],
         "Slow",
         ifelse(
           tab$Population_Growth >= input$ratespop[[2]],
@@ -1791,30 +1831,33 @@ shinyServer(function(input, output, session) {
     
     if ('pop' %in% static_vars == "TRUE") {
       tab$Initial_Population_ =  as.factor(ifelse(
+        tab$TOTAL_POP == "MissingInfo", "MissingInfo",ifelse(
         tab$TOTAL_POP <= input$PopVal2[[1]],
         "Small",
         ifelse(tab$TOTAL_POP >= input$PopVal2[[2]], "Large", " Medium")
-      ))
+      )))
       regressants = paste0(regressants, " + Initial_Population_")
       columnsToKeep = c(columnsToKeep, "Initial_Population_")
     }
     
     if ('gdp' %in% static_vars == "TRUE") {
       tab$Initial_GDP_Per_Capita_ = as.factor(ifelse(
+        tab$GDPPC == "MissingInfo", "MissingInfo",ifelse(
         tab$GDPPC <= input$GDPVal2[[1]],
         "Low",
         ifelse(tab$GDPPC >= input$GDPVal2[[2]], "High", " Medium")
-      ))
+      )))
       regressants = paste0(regressants, " + Initial_GDP_Per_Capita_")
       columnsToKeep = c(columnsToKeep, "Initial_GDP_Per_Capita_")
     }
     
     if ('urb' %in% static_vars == "TRUE") {
       tab$Initial_Urbanization_Level_ = as.factor(ifelse(
+        tab$URBP == "MissingInfo", "MissingInfo",ifelse(
         tab$URBP <= input$UrbVal2[[1]],
         "Low",
         ifelse(tab$URBP >= input$UrbVal2[[2]], "High", " Medium")
-      ))
+      )))
       regressants = paste0(regressants, " + Initial_Urbanization_Level_")
       columnsToKeep = c(columnsToKeep, "Initial_Urbanization_Level_")
       
@@ -2020,30 +2063,33 @@ shinyServer(function(input, output, session) {
     
     if ('pop' %in% static_vars == "TRUE") {
       tab$Initial_Population_ =  as.factor(ifelse(
+        tab$TOTAL_POP == "MissingInfo", "MissingInfo",ifelse(
         tab$TOTAL_POP <= input$PopVal2[[1]],
         "Small",
         ifelse(tab$TOTAL_POP >= input$PopVal2[[2]], "Large", " Medium")
-      ))
+      )))
       regressants = paste0(regressants, " + Initial_Population_")
       columnsToKeep = c(columnsToKeep, "Initial_Population_")
     }
     
     if ('gdp' %in% static_vars == "TRUE") {
       tab$Initial_GDP_Per_Capita_ = as.factor(ifelse(
+        tab$GDPPC == "MissingInfo", "MissingInfo",ifelse(
         tab$GDPPC <= input$GDPVal2[[1]],
         "Low",
         ifelse(tab$GDPPC >= input$GDPVal2[[2]], "High", " Medium")
-      ))
+      )))
       regressants = paste0(regressants, " + Initial_GDP_Per_Capita_")
       columnsToKeep = c(columnsToKeep, "Initial_GDP_Per_Capita_")
     }
     
     if ('urb' %in% static_vars == "TRUE") {
       tab$Initial_Urbanization_Level_ = as.factor(ifelse(
+        tab$URBP == "MissingInfo", "MissingInfo",ifelse(
         tab$URBP <= input$UrbVal2[[1]],
         "Low",
         ifelse(tab$URBP >= input$UrbVal2[[2]], "High", " Medium")
-      ))
+      )))
       regressants = paste0(regressants, " + Initial_Urbanization_Level_")
       columnsToKeep = c(columnsToKeep, "Initial_Urbanization_Level_")
       
@@ -3073,7 +3119,9 @@ shinyServer(function(input, output, session) {
     inRefFile <- meta
     if (is.null(inRefFile))
       return(NULL)
-    updateSelectInput(session, "references", choices = c('All',sort(unique(as.character(inRefFile$REFERENCE)))))
+    updateSelectInput(session, "references", choices = c('All',sort(unique(
+      as.character(inRefFile$REFERENCE)
+    ))))
   })
   
   
