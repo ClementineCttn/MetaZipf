@@ -491,7 +491,6 @@ tableForTrajectoryMaps <- reactive({
     n = dim(longitudinalAlphas)[1] - 1
     
     
-    head(longitudinalAlphas)
     for (i in 1:n) {
       
       if (longitudinalAlphas[i, "SAME_SPECIFICATIONS"] == longitudinalAlphas[i +
@@ -506,9 +505,9 @@ tableForTrajectoryMaps <- reactive({
                                                               nPeriods = ye)
         longitudinalAlphas[i, "GROWTH_DECADE"] = paste0(substr(as.character(median_date), 1, 3), '0s')
         
-        if (is.numeric(longitudinalAlphas[i, "N"])) {
-          fvn = longitudinalAlphas[i + 1, "N"]
-          ivn = longitudinalAlphas[i, "N"]
+        if (!is.na(as.numeric(longitudinalAlphas[i, "N"]))) {
+          fvn = as.numeric(longitudinalAlphas[i + 1, "N"])
+          ivn = as.numeric(longitudinalAlphas[i, "N"])
           longitudinalAlphas[i, "GN"] =  AAGR_pct(initVal = ivn,
                                                   finalVal = fvn,
                                                   nPeriods = ye)
@@ -522,6 +521,7 @@ tableForTrajectoryMaps <- reactive({
         longitudinalAlphas[i, "GN"] = NA
       }
     }
+    
     
     longitudinalAlphas = longitudinalAlphas[is.finite(longitudinalAlphas$PCT_GROWTH_ALPHA),]
     return(longitudinalAlphas)
