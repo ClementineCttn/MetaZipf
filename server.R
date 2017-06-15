@@ -702,6 +702,19 @@ tableForTrajectoryMaps <- reactive({
   
   metaModelOLS <- reactive({
     tab = metaArxiv()
+    
+    if (input$subsetData == T){
+      terr = input$territory
+      dec = input$decade
+      def = input$scale
+      if (length(terr) >= 1)
+        tab = tab[tab$TERRITORY %in% terr,]
+      if (length(dec) >= 1)
+        tab = tab[tab$DECADE %in% dec,]
+      if (length(def) >= 1)
+        tab = tab[tab$URBANSCALE %in% def,]
+    }
+    
     if (input$alpha == "Lotka")
       tab$ALPHA = tab$ALPHALOTKA
     if (input$alpha == "Pareto")
@@ -879,6 +892,19 @@ tableForTrajectoryMaps <- reactive({
   
   metaModelFixed <- reactive({
     tab = metaArxiv()
+    
+    if (input$subsetData == T){
+      terr = input$territory
+      dec = input$decade
+      def = input$scale
+      if (length(terr) >= 1)
+        tab = tab[tab$TERRITORY %in% terr,]
+      if (length(dec) >= 1)
+        tab = tab[tab$DECADE %in% dec,]
+      if (length(def) >= 1)
+        tab = tab[tab$URBANSCALE %in% def,]
+    }
+    
     if (input$alpha == "Lotka")
       tab$ALPHA = tab$ALPHALOTKA
     if (input$alpha == "Pareto")
@@ -1071,6 +1097,19 @@ tableForTrajectoryMaps <- reactive({
   
   metaModelRandomPanel <- reactive({
     tab = metaArxiv()
+    
+    if (input$subsetData == T){
+      terr = input$territory
+      dec = input$decade
+      def = input$scale
+      if (length(terr) >= 1)
+        tab = tab[tab$TERRITORY %in% terr,]
+      if (length(dec) >= 1)
+        tab = tab[tab$DECADE %in% dec,]
+      if (length(def) >= 1)
+        tab = tab[tab$URBANSCALE %in% def,]
+    }
+    
     if (input$alpha == "Lotka")
       tab$ALPHA = tab$ALPHALOTKA
     if (input$alpha == "Pareto")
@@ -1253,6 +1292,19 @@ tableForTrajectoryMaps <- reactive({
   
   metaModelFixedPanel <- reactive({
     tab = metaArxiv()
+    
+    if (input$subsetData == T){
+      terr = input$territory
+      dec = input$decade
+      def = input$scale
+      if (length(terr) >= 1)
+        tab = tab[tab$TERRITORY %in% terr,]
+      if (length(dec) >= 1)
+        tab = tab[tab$DECADE %in% dec,]
+      if (length(def) >= 1)
+        tab = tab[tab$URBANSCALE %in% def,]
+    }
+    
     if (input$alpha == "Lotka")
       tab$ALPHA = tab$ALPHALOTKA
     if (input$alpha == "Pareto")

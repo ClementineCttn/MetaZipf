@@ -634,7 +634,7 @@ shinyUI(
              
               
               column(
-                12,
+                6,
                 selectInput(
                   "modelSpec",
                   "Type of meta analysis model",
@@ -647,6 +647,13 @@ shinyUI(
                   ),
                   selected = "ols",
                   multiple = F
+                )
+              ),
+              column(
+                6,
+                checkboxInput(
+                  "subsetData",
+                  "Use the data subset defined in tab [2.Data]"
                 )
               ),
               # column(
