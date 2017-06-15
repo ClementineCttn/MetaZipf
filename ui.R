@@ -1165,8 +1165,7 @@ ep represents a fixed effect in the panel models,
                     "International Wars" = "iw",
                     "Civil Wars" = "cw",
                     "Revolutions" = "rv",
-                    "Wars of Independence" = "wi",
-                    " "=""
+                    "Wars of Independence" = "wi"
                   ),
                   inline = F
                 )

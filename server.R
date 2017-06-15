@@ -2866,7 +2866,7 @@ tableForTrajectoryMaps <- reactive({
   
   output$trajectories = renderPlot({
     tab = tableForTrajectories()
-    if (length(unique(tab$SAME_SPECIFICATIONS)) <= 20)  {
+    if (length(unique(tab$SAME_SPECIFICATIONS)) <= 100)  {
       gp = ggplot() + geom_point(
         data = tab,
         aes(
@@ -2903,8 +2903,8 @@ tableForTrajectoryMaps <- reactive({
             group = SAME_SPECIFICATIONS,
             col = SAME_SPECIFICATIONS
           )
-        ) +
-        guides(colour = FALSE)
+         )# +
+        # guides(colour = FALSE)
     }
     events = input$eventsToPlot
     
