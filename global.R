@@ -45,8 +45,11 @@ SummaryMetaMeta = function(table, regression = "Lotka"){
   estimations = dim(tab)[[1]]
   pct_Agglo = round(dim(subset(tab, URBANSCALE == "MorphoCity"))[[1]] / estimations * 100,1)
   pct_Metro = round(dim(subset(tab, URBANSCALE == "MetroArea"))[[1]] / estimations * 100,1)
-  t1 = subset(tab, !is.na(N) & is.numeric(N))
-  t2 = subset(tab, !is.na(TRUNCATION_POINT) & is.numeric(TRUNCATION_POINT))
+  t1 = subset(tab, N != "MissingInfo")
+  t1 = subset(t1, N != "")
+  t1 = subset(t1, !is.na(N))
+  t1$N = as.numeric(t1$N)
+  t2 = subset(tab, TRUNCATION_POINT != "MissingInfo")
   medianN = median(t1$N)
   medianTruncation = median(t2$TRUNCATION_POINT)
   

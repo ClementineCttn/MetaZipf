@@ -774,7 +774,7 @@ tableForTrajectoryMaps <- reactive({
     }
     
     if ('regForm' %in%  TechnicalSpecs == "TRUE")  {
-      tab$Regression_Form_ = tab$REGRESSIONFORM
+      tab$Regression_Form_ = tab$REGRESSION
       regressants = paste0(regressants, " + Regression_Form_")
       columnsToKeep = c(columnsToKeep, "Regression_Form_")
     }
@@ -955,7 +955,7 @@ tableForTrajectoryMaps <- reactive({
     }
     
     if ('regForm' %in%  TechnicalSpecs == "TRUE")  {
-      tab$Regression_Form_ = tab$REGRESSIONFORM
+      tab$Regression_Form_ = tab$REGRESSION
       regressants = paste0(regressants, " + Regression_Form_")
       columnsToKeep = c(columnsToKeep, "Regression_Form_")
     }
@@ -1160,7 +1160,7 @@ tableForTrajectoryMaps <- reactive({
     }
     
     if ('regForm' %in%  TechnicalSpecs == "TRUE")  {
-      tab$Regression_Form_ = tab$REGRESSIONFORM
+      tab$Regression_Form_ = tab$REGRESSION
       regressants = paste0(regressants, " + Regression_Form_")
       columnsToKeep = c(columnsToKeep, "Regression_Form_")
     }
@@ -1355,7 +1355,7 @@ tableForTrajectoryMaps <- reactive({
     }
     
     if ('regForm' %in%  TechnicalSpecs == "TRUE")  {
-      tab$Regression_Form_ = tab$REGRESSIONFORM
+      tab$Regression_Form_ = tab$REGRESSION
       regressants = paste0(regressants, " + Regression_Form_")
       columnsToKeep = c(columnsToKeep, "Regression_Form_")
     }
@@ -2466,14 +2466,13 @@ tableForTrajectoryMaps <- reactive({
                                   "YEAR",
                                   "JOURNAL",
                                   "PAGE",
-                                  "N_ESTIM",
-                                  "REGRESSIONFORM")]
+                                  "N_ESTIM")]
     colnames(d) = c("Author",
                     "Year",
                     "Journal",
                     "Page",
-                    "Estimations",
-                    "Regression")
+                    "Estimations")
+    d$Page = as.factor(d$Page)
     return(d)
   }, options = list(pageLength = 10, paging = FALSE))
   
