@@ -135,10 +135,16 @@ shinyUI(
                   ,
                    column(
                      6,
-                     checkboxInput(
-                       "Arxiv",
-                       "...Or reproduce the analyses of the arXiv paper (reference collection ends in June 2016)",
-                       value = FALSE
+                     selectInput(
+                       "reproducePaperSelection",
+                       "Select the set of references used",
+                       c(
+                         "Custom Selection" = "current",
+                         "PLoS-ONE submission (collection ends 03/2017)" = "plosone",
+                         "ArXiv preprint (collection ends 06/2016)" = "arxiv"
+                         ),
+                       selected = "current",
+                       multiple = F
                      )
                    ),
                    column(

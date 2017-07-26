@@ -321,7 +321,7 @@ shinyServer(function(input, output, session) {
   })
   
   alphaSummaryByCountryForTable = reactive({
-    meta = metaArxiv()
+    meta = metaPaperSelection()
     m = meta[meta$TERRITORY_TYPE == "Country",]
     if (input$alpha == "Lotka")
       m$ALPHA = m$ALPHALOTKA
@@ -386,14 +386,12 @@ shinyServer(function(input, output, session) {
     return(summary)
   })
   
-  metaArxiv = reactive({
+    metaPaperSelection = reactive({
     tab = meta
-    if (input$Arxiv == TRUE){
-      tab = subset(tab, ARXIV == 1)
-    } else {
-      
+    if (input$reproducePaperSelection == "arxiv") tab = subset(tab, ARXIV == 1)
+   if (input$reproducePaperSelection == "plosone") tab = subset(tab, PLOSONE == 1)
+   if (input$reproducePaperSelection == "current"){
       refList = input$references
-      
       if('All' %in% refList | is.null(refList)){
         tab = tab
       } else {
@@ -403,15 +401,16 @@ shinyServer(function(input, output, session) {
     return(tab)
   })
   
-  refsArxiv = reactive({
+  refsPaperSelection = reactive({
     tab = refs
-    if (input$Arxiv == TRUE)
-      tab = subset(tab, ARXIV == 1)
+    if (input$reproducePaperSelection == "arxiv"){tab = subset(tab, ARXIV == 1)}
+    if (input$reproducePaperSelection == "plosone"){tab = subset(tab, PLOSONE == 1)}
+   
     return(tab)
   })
   
   metaTableSelected <- reactive({
-    tab = metaArxiv()
+    tab = metaPaperSelection()
     if (input$alpha == "Lotka")
       tab$ALPHA = tab$ALPHALOTKA
     if (input$alpha  == "Pareto")
@@ -431,7 +430,7 @@ shinyServer(function(input, output, session) {
   })
   
   metaTableSummary <- reactive({
-    tab = metaArxiv()
+    tab = metaPaperSelection()
     if (input$alpha == "Lotka")
       tab$ALPHA = tab$ALPHALOTKA
     if (input$alpha  == "Pareto")
@@ -450,7 +449,7 @@ shinyServer(function(input, output, session) {
   
 
 tableForTrajectoryMaps <- reactive({
-    tab = metaArxiv()
+    tab = metaPaperSelection()
     if (input$alpha == "Lotka")tab$ALPHA = tab$ALPHALOTKA
     if (input$alpha  == "Pareto") tab$ALPHA = tab$ALPHAPARETO
     terr = unique(as.character(tab$TERRITORY))
@@ -529,7 +528,7 @@ tableForTrajectoryMaps <- reactive({
  
 
   tableForTrajectories <- reactive({
-    tab = metaArxiv()
+    tab = metaPaperSelection()
     if (input$alpha == "Lotka")  tab$ALPHA = tab$ALPHALOTKA
     if (input$alpha  == "Pareto") tab$ALPHA = tab$ALPHAPARETO
     terr = input$territory_3
@@ -701,7 +700,7 @@ tableForTrajectoryMaps <- reactive({
   })
   
   metaModelOLS <- reactive({
-    tab = metaArxiv()
+    tab = metaPaperSelection()
     
     if (input$subsetData == T){
       terr = input$territory
@@ -891,7 +890,7 @@ tableForTrajectoryMaps <- reactive({
   
   
   metaModelFixed <- reactive({
-    tab = metaArxiv()
+    tab = metaPaperSelection()
     
     if (input$subsetData == T){
       terr = input$territory
@@ -1096,7 +1095,7 @@ tableForTrajectoryMaps <- reactive({
   
   
   metaModelRandomPanel <- reactive({
-    tab = metaArxiv()
+    tab = metaPaperSelection()
     
     if (input$subsetData == T){
       terr = input$territory
@@ -1291,7 +1290,7 @@ tableForTrajectoryMaps <- reactive({
   
   
   metaModelFixedPanel <- reactive({
-    tab = metaArxiv()
+    tab = metaPaperSelection()
     
     if (input$subsetData == T){
       terr = input$territory
@@ -2272,7 +2271,7 @@ tableForTrajectoryMaps <- reactive({
   ######  Tab B.1
 
   output$continent = renderDataTable({
-    m = metaArxiv()
+    m = metaPaperSelection()
     if (input$alpha == "Lotka")
       m$ALPHA = m$ALPHALOTKA
     if (input$alpha == "Pareto")
@@ -2300,7 +2299,7 @@ tableForTrajectoryMaps <- reactive({
   }, options = list(paging = FALSE, searching = FALSE))
   
   output$topjournals = renderDataTable({
-    refs = refsArxiv()
+    refs = refsPaperSelection()
     d = refs[refs$JOURNAL != "Dissertation",]
     d$count = 1
     ds = aggregate(d[, "count"], unique(list(d$JOURNAL)), FUN = sumNum)
@@ -2312,7 +2311,7 @@ tableForTrajectoryMaps <- reactive({
   }, options = list(pageLength = 10, searching = FALSE))
   
   output$topauthors = renderDataTable({
-    refs = refsArxiv()
+    refs = refsPaperSelection()
     
     d1 = refs[refs$IN_HERE == 1,]
     
@@ -2334,7 +2333,7 @@ tableForTrajectoryMaps <- reactive({
   ######  Tab B.2
   
   output$worldmap <- renderLeaflet({
-    tab = metaArxiv()
+    tab = metaPaperSelection()
     if (input$alpha == "Lotka")
       tab$ALPHA = tab$ALPHALOTKA
     if (input$alpha == "Pareto")
@@ -2409,7 +2408,7 @@ tableForTrajectoryMaps <- reactive({
   })
   
   output$temporal = renderPlot({
-    m = metaArxiv()
+    m = metaPaperSelection()
     
     ggplot(m, aes(x = DATE)) +
       geom_histogram(binwidth = 10,
@@ -2462,7 +2461,7 @@ tableForTrajectoryMaps <- reactive({
   ######  Tab B.4
 
   output$references = renderDataTable({
-    refs = refsArxiv()
+    refs = refsPaperSelection()
     d = refs[refs$IN_HERE == 1, c("AUTHOR",
                                   "YEAR",
                                   "JOURNAL",
@@ -3178,7 +3177,7 @@ tableForTrajectoryMaps <- reactive({
   
   
   observe({
-    tab = metaArxiv()
+    tab = metaPaperSelection()
     if (input$alpha == "Lotka")
       tab$ALPHA = tab$ALPHALOTKA
     if (input$alpha  == "Pareto")
