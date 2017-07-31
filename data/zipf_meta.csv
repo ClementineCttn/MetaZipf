@@ -2126,3 +2126,10 @@ Fang_al_2017,LOTKA,_OLS,0.93,1.075268817,,2014,Urban settlements_cities_urban ar
 Jiang_jia_2011,LOTKA,ML,0.91,1.098901099,,2000,Urban Areas,MorphoCity,150,,United States of America,Country,RECENT,US,NORTH AMERICA,AMERICA,sample size,,Jia11Int
 Jiang_jia_2011,LOTKA,ML,0.74,1.351351351,,2000,Urban Areas,MorphoCity,1500,,United States of America,Country,RECENT,US,NORTH AMERICA,AMERICA,sample size,,Jia11Int
 Jiang_jia_2011,LOTKA,ML,0.74,1.351351351,,2000,Urban Areas,MorphoCity,3638,,United States of America,Country,RECENT,US,NORTH AMERICA,AMERICA,sample size,,Jia11Int
+Kuninaka_Matsushita_2008,PARETO,_OLS,0.747384155,1.338,,2002,city,LocalUnit,300,2500,United States of America,Country,RECENT,US,NORTH AMERICA,AMERICA,2500,,Kun08Jou
+Kuninaka_Matsushita_2008,PARETO,_OLS,0.81300813,1.23,,2006,city,LocalUnit,267,,Brazil,Country,RECENT,BR,SOUTH AMERICA,AMERICA,,,Kun08Jou
+Kuninaka_Matsushita_2008,PARETO,_OLS,0.806451613,1.24,,1950,city,LocalUnit,254,50000,Japan,Country,RECENT,JP,SOUTH EAST ASIA,ASIA,50000,,Kun08Jou
+Kuninaka_Matsushita_2008,PARETO,_OLS,0.751879699,1.33,,1960,city,LocalUnit,561,50000,Japan,Country,RECENT,JP,SOUTH EAST ASIA,ASIA,50000,,Kun08Jou
+Kuninaka_Matsushita_2008,PARETO,_OLS,0.980392157,1.02,,1970,city,LocalUnit,588,50000,Japan,Country,RECENT,JP,SOUTH EAST ASIA,ASIA,50000,,Kun08Jou
+Kuninaka_Matsushita_2008,PARETO,_OLS,1.052631579,0.95,,1980,city,LocalUnit,647,50000,Japan,Country,RECENT,JP,SOUTH EAST ASIA,ASIA,50000,,Kun08Jou
+Kuninaka_Matsushita_2008,PARETO,_OLS,0.952380952,1.05,,1990,city,LocalUnit,656,50000,Japan,Country,RECENT,JP,SOUTH EAST ASIA,ASIA,50000,,Kun08Jou
