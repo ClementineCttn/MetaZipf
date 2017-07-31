@@ -104,7 +104,7 @@ gdps$Pct_GDP_2010s = AAGR_pct(gdps$GDP2010, gdps$GDP2015, 5)
 meta = data.frame(meta, pops[match(meta$CNTR_ID, pops$CNTR_ID),])
 meta = data.frame(meta, gdps[match(meta$CNTR_ID, gdps$CNTR_ID),])
 meta = data.frame(meta, urbs[match(meta$CNTR_ID, urbs$CNTR_ID),])
-head(meta)
+
 meta$TOTAL_POP = NA
 meta$URBP = NA
 meta$GDPPC = NA
