@@ -84,7 +84,7 @@ shinyUI(
                      br(),
                      br(),
                      HTML(
-                       'The current database covers 1692 estimations from 81 studies, spanning over more than 80 countries over 400 years.
+                       'The current database covers 2124 estimations from 87 studies, spanning over more than 100 countries over 400 years.
                        It is open for download (<a href="https://github.com/ClementineCttn/MetaZipf">https://github.com/ClementineCttn/MetaZipf</a>) and you are
                        strongly invited to contribute by submitting your own empirical estimates using the \'Contribute !\' form.'
                      ),
