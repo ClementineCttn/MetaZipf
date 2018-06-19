@@ -150,7 +150,7 @@ shinyUI(
                    column(
                      12,
                      HTML(
-                       'Cottineau C. , 2016, « MetaZipf. (Re)producing knowledge about city size distributions », Arxiv.org, <a href="https://arxiv.org/abs/1606.06162">https://arxiv.org/abs/1606.06162</a>'
+                       'Cottineau C. , 2017, « MetaZipf. A dynamic meta-analysis of city size distributions »,  PLoS ONE 12(8): e0183919, <a href="https://doi.org/10.1371/journal.pone.0183919">https://doi.org/10.1371/journal.pone.0183919</a>'
                      )
                    )),
                    
