@@ -1,7 +1,7 @@
 REFID;AUTHOR;YEAR;PAGE;JOURNAL;N_ESTIM;IN_HERE;IN_NITSCH;REGRESSIONFORM;SOURCE;ECO;SOC;PHYS;CROWDSOURCED;ADDED;ARXIV;FULLTEXT;AFFILIATION_COUNTRY
 All54Bul;Allen G. R.;1954;;Bulletin of the Oxford University Institute of Statistics;69;0;1;PARETO;;0;0;0;0;;0;0;
 Alp89Jou;Alperovich G.;1989;97;Journal of Urban Economics;22;1;1;PARETO;https://www.sciencedirect.com/science/article/pii/0094119089900466;1;1;0;0;Dec-15;1;1;IL
-Ama14Int;Amalraj V. C. & Subbarayan A.;2014;381;International Journal of Pure and Applied Mathematics ;6;1;0;LOTKA;http://ijpam.eu/contents/2014-95-3/5/;0;0;0;0;juin-16;1;;
+Ama14Int;Amalraj V. C. & Subbarayan A.;2014;381;International Journal of Pure and Applied Mathematics ;6;1;0;LOTKA;http://ijpam.eu/contents/2014-95-3/5/;0;0;0;0;juin-16;1;1;IN
 And05Reg;Anderson G. & Ge Y.;2005;768;Regional Science and Urban Economics;16;1;0;LOTKA;http://www.sciencedirect.com/science/article/pii/S0166046205000062;1;1;0;0;Dec-15;1;;
 Ara14Eco;Aragon J. A. O. & Queiroz V.;2014;90;EconomiA;36;1;0;PARETO;http://www.sciencedirect.com/science/article/pii/S1517758014000083?np=y;0;0;0;0;juin-16;1;;
 Arr12Reg;Arribas-Bel D. et al.;2012;170;Region et Developpement ;2;1;0;PARETO;http://region-developpement.univ-tln.fr/en/pdf/R36/9-Arribas.pdf;0;0;0;0;juin-16;1;;
