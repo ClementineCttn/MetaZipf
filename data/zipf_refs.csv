@@ -15,8 +15,8 @@ Bre00Cyb;Bretagnolle A. et al. ;2000;21;Cybergeo;8;1;0;LOTKA;https://cybergeo.re
 Bre08Cyb;Bretagnolle A. et al.;2008;59;Cybergeo;12;1;0;LOTKA;http://cybergeo.revues.org/19683;0;1;0;0;Dec-15;0;0;;
 Bre15Int;Bretagnolle A. & Delisle F.;2015;864;International Journal of Geographical Information Science;6;1;0;LOTKA;http://www.tandfonline.com/doi/pdf/10.1080/13658816.2014.999681;0;1;0;0;Dec-15;1;1;FR;urban area_harmonized database_time–space reference frame_Reilly model_GIS 
 Cam90Jou;Cameron T. A.;1990;201;Journal of Urban Economics;1;1;0;PARETO;https://www.sciencedirect.com/science/article/pii/0094119090900036;1;1;0;0;Dec-15;1;1;US;
-Cat08Reg;Catin M. et al;2008;217;Region et Developpement ;11;1;0;LOTKA;http://region-developpement.univ-tln.fr/fr/pdf/R27/Catin-Cuenca-Kamal.pdf;0;0;0;0;Dec-15;1;;;
-Cie16Mis;Cieslik A. & Teresnski J.;2016;8;Miscellanea Geographica;6;1;0;LOTKA;https://www.degruyter.com/view/j/mgrsd.2016.20.issue-4/mgrsd-2016-0020/mgrsd-2016-0020.xml;1;1;0;0;Feb-17;0;;;
+Cat08Reg;Catin M. et al;2008;217;Region et Developpement ;11;1;0;LOTKA;http://region-developpement.univ-tln.fr/fr/pdf/R27/Catin-Cuenca-Kamal.pdf;0;0;0;0;Dec-15;1;0;;
+Cie16Mis;Cieslik A. & Teresnski J.;2016;8;Miscellanea Geographica;6;1;0;LOTKA;https://www.degruyter.com/view/j/mgrsd.2016.20.issue-4/mgrsd-2016-0020/mgrsd-2016-0020.xml;1;1;0;0;Feb-17;0;1;PL;Zipf’s law_rank-size rule_city size distribution_poland
 Cot14Dis;Cottineau C.;2014;131;Dissertation;33;1;0;LOTKA;https://halshs.archives-ouvertes.fr/tel-01167818;0;0;0;0;Dec-15;1;0;;
 Cra05Con;Crampton G.;2005;4;Congress of the European Regional Science Association;14;1;0;PARETO;https://www.econstor.eu/handle/10419/117499;0;0;0;0;juin-16;1;;;
 Dav02Ame;Davis D.R. & Weinstein D. E.;2002;;American Economic Review;12;0;1;PARETO;http://www.nber.org/papers/w8517.pdf;1;0;0;0;;0;0;;
@@ -101,4 +101,4 @@ Ziq16Asi;Ziqin W.;2016;55;Asian Journal of Social Science Studies ;30;1;0;PARETO
 ;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;
 ;;;;;;;;;;;;;;;;;;
-;;;;;;;;;;;;;;;;14;;
+;;;;;;;;;;;;;;;;15;;
