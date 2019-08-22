@@ -141,7 +141,7 @@ mean(samplesummary$YEAR)
 mean(samplesummary[samplesummary$in_citations > 10, "YEAR"])
 
 
-########### bipartite network between disciplines
+########### network between disciplines
 
 cites_long <- melt(cmat)
 head(cites_long)
@@ -154,3 +154,30 @@ j_cited <- j
 colnames(j_cited) <- paste("cited", colnames(j), sep="_")
 clpd <- data.frame(clpd, j_cited[match(clpd$Var2, j_cited$cited_REFID),])
 head(clpd)
+
+dmat <- dcast(clpd, citing_DISCIPLINE ~ cited_DISCIPLINE, sum)
+dmatm <- melt(dmat)
+
+library(igraph)
+gd <- graph_from_data_frame(dmatm, directed = T)
+plot(gd,edge.width = dmatm$value * 0.5, vertex.label.cex = 0.7,  edge.curved=.4)
+
+########### network between disciplines
+
+dmat <- dcast(clpd, citing_JOURNAL ~ cited_JOURNAL, sum)
+dmatm <- melt(dmat)
+dmatmp <- dmatm[dmatm$value>1,]
+
+gj <- graph_from_data_frame(dmatmp, directed = T)
+
+v <- as.data.frame(names(V(gj)))
+colnames(v) <- "journal"
+
+size.nodes <- data.frame(v, journals[match(v$journal, journals$Group.1),])
+size.nodes.l <- size.nodes$x
+
+
+plot(gj,edge.width = dmatmp$value, vertex.label.cex = 0.7,  edge.curved=.4,
+     vertex.size = size.nodes.l * 3)
+
+
