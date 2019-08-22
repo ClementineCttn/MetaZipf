@@ -5,6 +5,8 @@ library(wesanderson)
 library(ggplot2)
 library(ggrepel)
 library(ggalt)
+library(gridExtra)
+library(data.table)
 
 '%!in%' <- function(x,y)!('%in%'(x,y))
 
@@ -115,5 +117,40 @@ q <- ggplot(cope, aes(x=ref, y = cop))
 q + geom_lollipop(aes(reorder(ref, -cop)),color = "seagreen3", cex=1) +
   coord_flip() +
   labs(x="Reference", y="Number of in-citations from the sample")
-
   
+################## intro
+
+refs <- read.csv2("data/zipf_refs.csv", sep=';')
+dim(refs[refs$IN_HERE == 1,])
+head(cites[1:66,])
+
+cites[1:66,1:5]
+
+j <- cites[1:66,1:5]
+j$n <- 1
+journals <- aggregate(j[,"n"], by=list(j[,"JOURNAL"]), FUN = sum)
+q <- ggplot(journals, aes(x= Group.1, y = x))
+ q + geom_lollipop(aes(reorder( Group.1, -x)),color = "orangered", cex=1) +
+  coord_flip() +
+  labs(x="Journal", y="Number of articles in the sample")
+
+
+ samplesummary <- data.frame(j, cope[match(j$REFID, cope$ref),])
+colnames(samplesummary)[8] <- "in_citations"
+mean(samplesummary$YEAR)
+mean(samplesummary[samplesummary$in_citations > 10, "YEAR"])
+
+
+########### bipartite network between disciplines
+
+cites_long <- melt(cmat)
+head(cites_long)
+cites_long_pos <- cites_long[cites_long$value > 0,]
+head(cites_long_pos)
+j_citing <- j
+colnames(j_citing) <- paste("citing", colnames(j), sep="_")
+clpd <- data.frame(cites_long_pos, j_citing[match(cites_long_pos$Var1, j_citing$citing_REFID),])
+j_cited <- j
+colnames(j_cited) <- paste("cited", colnames(j), sep="_")
+clpd <- data.frame(clpd, j_cited[match(clpd$Var2, j_cited$cited_REFID),])
+head(clpd)
