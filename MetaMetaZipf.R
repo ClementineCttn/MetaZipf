@@ -1,4 +1,4 @@
-setwd("~/GitHub/MetaZipf")
+setwd("~/Documents/MetaZipf")
 library(igraph)
 library(scales)
 library(wesanderson)
@@ -175,7 +175,7 @@ colnames(v) <- "journal"
 
 size.nodes <- data.frame(v, journals[match(v$journal, journals$Group.1),])
 size.nodes.l <- size.nodes$x
-
+size.nodes
 
 plot(gj,edge.width = dmatmp$value, vertex.label.cex = 0.7,  edge.curved=.4,
      vertex.size = size.nodes.l * 3)
