@@ -159,10 +159,21 @@ dmat <- dcast(clpd, citing_DISCIPLINE ~ cited_DISCIPLINE, sum)
 dmatm <- melt(dmat)
 
 library(igraph)
-gd <- graph_from_data_frame(dmatm, directed = T)
-plot(gd,edge.width = dmatm$value * 0.5, vertex.label.cex = 0.7,  edge.curved=.4)
 
-########### network between disciplines
+
+gd <- graph_from_data_frame(dmatm, directed = T)
+vd <- as.data.frame(names(V(gd)))
+colnames(vd) <- "discipline"
+disciplines <- aggregate(j[,"n"], by=list(j[,"DISCIPLINE"]), FUN = sum)
+
+size.nodes <- data.frame(vd, disciplines[match(vd$discipline, disciplines$Group.1),])
+size.nodes.d <- size.nodes$x
+
+plot(gd,edge.width = dmatm$value * 0.5, vertex.size = size.nodes.d * 3,
+     vertex.label.cex = 0.7,  edge.curved=.8)
+
+
+########### network between journals
 
 dmat <- dcast(clpd, citing_JOURNAL ~ cited_JOURNAL, sum)
 dmatm <- melt(dmat)
@@ -181,3 +192,25 @@ plot(gj,edge.width = dmatmp$value, vertex.label.cex = 0.7,  edge.curved=.4,
      vertex.size = size.nodes.l * 3)
 
 
+
+############## Age of publication by journal and disciplines
+
+age_journals <- data.frame(aggregate(j[,"YEAR"], by=list(j[,"JOURNAL"]), FUN = mean), journals$x)
+age_disciplines <- data.frame(aggregate(j[,"YEAR"], by=list(j[,"DISCIPLINE"]), FUN = mean), disciplines$x)
+rownames(age_disciplines) = age_disciplines$Group.1
+rownames(age_journals) = age_journals$Group.1
+age_disciplines$Group.1 <- NULL
+age_journals$Group.1 <- NULL
+colnames(age_disciplines) <- c("mean age", "n articles")
+colnames(age_journals) <- c("mean age", "n articles")
+yearIntra <- round(mean(j$YEAR), digit=0)
+yearIntraPerDisc <- round(age_disciplines, digit=0)
+yearIntraJour <- round(age_journals, digit=0)
+
+write.csv(yearIntra, "average_year_publi_internal_all.csv")
+write.csv(yearIntraPerDisc, "average_year_publi_internal_per_discipline.csv")
+write.csv(yearIntraJour, "average_year_publi_internal_all_per_journal.csv")
+
+
+  
+  
