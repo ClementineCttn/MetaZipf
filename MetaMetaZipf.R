@@ -228,4 +228,16 @@ cites_out$JOURNAL <- gsub("[[:punct:]]", " ", cites_out$JOURNAL)
 cites_out$AUTHOR <- gsub("[[:punct:]]", " ", cites_out$AUTHOR)
 
 head(cites_out)
-summary(as.factor(cites_out$JOURNAL))
+summary(as.factor(cites_out$JOURNAL))/dim(cites_out)[1]
+# Diverse pool of citations. MAx % of journals cited = 2.5% (Journal Regional Science) and 2.3 (Urban Studies)
+
+jou <- as.data.frame(summary(as.factor(cites_out$JOURNAL)))
+jou$ref = rownames(jou)
+colnames(jou)[1] <- "n"
+dim(jou)
+jou <- subset(jou[-100,], n>3)
+q <- ggplot(jou, aes(x=ref, y = n))
+q + geom_lollipop(aes(reorder(ref, -n)),color = "goldenrod3", cex=1) +
+  coord_flip() +
+  labs(x="Journal", y="Number of citations from the sample (>3)")
+
