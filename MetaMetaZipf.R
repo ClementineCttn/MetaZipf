@@ -213,4 +213,19 @@ write.csv(yearIntraJour, "average_year_publi_internal_all_per_journal.csv")
 
 
   
-  
+  ############## external citations
+
+library(stringr)
+head(cites)
+dim(cites)
+cites_out <- cites[67:1221,]
+tail(cites_out)
+
+cites_out$YEAR <- gsub("\\D+", "", cites_out$REFID)
+cites_out$JOURNAL <- gsub(".*\\d.", "", cites_out$REFID)
+cites_out$AUTHOR <- gsub(".*\\d.", "", cites_out$REFID)
+cites_out$JOURNAL <- gsub("[[:punct:]]", " ", cites_out$JOURNAL)
+cites_out$AUTHOR <- gsub("[[:punct:]]", " ", cites_out$AUTHOR)
+
+head(cites_out)
+summary(as.factor(cites_out$JOURNAL))
