@@ -223,7 +223,7 @@ tail(cites_out)
 
 cites_out$YEAR <- gsub("\\D+", "", cites_out$REFID)
 cites_out$JOURNAL <- gsub(".*\\d.", "", cites_out$REFID)
-cites_out$AUTHOR <- gsub(".*\\d.", "", cites_out$REFID)
+cites_out$AUTHOR <- gsub("\\d.*", "", cites_out$REFID)
 cites_out$JOURNAL <- gsub("[[:punct:]]", " ", cites_out$JOURNAL)
 cites_out$AUTHOR <- gsub("[[:punct:]]", " ", cites_out$AUTHOR)
 
@@ -262,6 +262,24 @@ cmat <- t(as.matrix(cites_out[,6:71]))
 
 node.size <- colSums(cmat) +1
 
+cmat[1:5,1:5]
+
+
+cited_inter <- as.data.frame(colSums(cmat))
+cited_inter$REFID <- rownames(cited_inter)
+cited_out <- as.data.frame(sort(colSums(cmat), decreasing=T))
+colnames(cited_out) <- "n_cites"
+cited_out$ID <- rownames(cited_out)
+cites_out$ID <- rownames(cites_out)
+cited_out <- data.frame(cited_out, cites_out[match(cited_out$ID,cites_out$ID), ])
+
+
+###@ ref we have probably overlooked or missed
+write.csv(cited_out[cited_out$n_cites > 5, c("REFID","n_cites")], "most_out_cites.csv")
+
+
+
+
 ########### Network of inter citations
 g <- graph_from_incidence_matrix(cmat, directed = T)
 
@@ -277,4 +295,6 @@ plot(g, vertex.size=node.size*0.5,
      vertex.label.cex = 0.7,  vertex.label.color = alpha("grey",0.6),
      vertex.label.font = 2,  
      edge.arrow.size=0.2)
-knljnmnmj
+
+
+
