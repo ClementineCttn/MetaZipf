@@ -241,3 +241,40 @@ q + geom_lollipop(aes(reorder(ref, -n)),color = "goldenrod3", cex=1) +
   coord_flip() +
   labs(x="Journal", y="Number of citations from the sample (>3)")
 
+#######
+
+sumNum = function(x) { 
+  s = sum(x, na.rm = T)
+  return(s)
+}
+meanNum = function(x) { 
+  s = mean(x, na.rm = T)
+  return(s)
+}
+
+head(cites_out)
+rownames(cites_out) <- paste0(substr(cites_out$AUTHOR,1,3), substr(cites_out$YEAR,1,4),
+                              substr(cites_out$JOURNAL,1,3),rownames(cites_out))
+total_cite_out <- apply(cites_out[,6:71], 2, FUN = sumNum)
+head(cites_out)
+
+cmat <- t(as.matrix(cites_out[,6:71]))
+
+node.size <- colSums(cmat) +1
+
+########### Network of inter citations
+g <- graph_from_incidence_matrix(cmat, directed = T)
+
+layout <- layout_nicely(g,2)
+g$layout <- layout
+fine = 500 # this will adjust the resolving power.
+
+par(mar = c(0.5, 0.3, 0.5, 0.5))
+
+plot(g, vertex.size=node.size*0.5,
+     vertex.label.dist=0.5, 
+     vertex.color= alpha("grey",0.6), edge.color = "black", 
+     vertex.label.cex = 0.7,  vertex.label.color = alpha("grey",0.6),
+     vertex.label.font = 2,  
+     edge.arrow.size=0.2)
+knljnmnmj
