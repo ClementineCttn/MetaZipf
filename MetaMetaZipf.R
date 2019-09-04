@@ -370,12 +370,13 @@ docs <- tm_map(docs, toSpace, "'")
 docs <- tm_map(docs, toSpace, "`")
 docs <- tm_map(docs, toSpace, "‘")
 docs <- tm_map(docs, toSpace, "_")
+docs <- tm_map(docs, toSpace, "–")
+docs <- tm_map(docs, toSpace, "/")
 docs <- tm_map(docs, removePunctuation)
 docs <- tm_map(docs, tolower)   
 docs <- tm_map(docs, removeNumbers)   
 docs <- tm_map(docs, removeWords, stopwords("english"))   
-docs <- tm_map(docs, stemDocument)   
-docs <- tm_map(docs, stripWhitespace)   
+#docs <- tm_map(docs, stemDocument)    
 
 
 dtm <- DocumentTermMatrix(docs)   
@@ -387,10 +388,54 @@ tdm.m = as.matrix(tdm)
 n = as.data.frame(rownames(tdm))
 colnames(n) = c("n")
 n$l = nchar(as.character(n$n))
-# head(n[order(-n$l),], 20)
-# tdm.df = as.data.frame(tdm.m)
-# write.csv(as.data.frame(tdm.df),"frequencyUseTermsByDoc.csv")
-# 
+head(n[order(-n$l),], 20)
+
+ tdm.df = as.data.frame(tdm.m)
+ write.csv(as.data.frame(tdm.df),"frequencyUseTermsByDoc.csv")
+
+ 
+ ########## intro stats
+ 
+ ########## network of term similarity
+ 
+ termmat <- t(tdm.m)
+ 
+refSimTerm <- rownames(termmat)
+ cosSimTerm <- data.frame()
+ k=0
+ ilist <- c()
+ for(i in refSimTerm){
+   ilist <- c(ilist, i)
+   for(j in refSimTerm){
+     if (j %!in% ilist){
+       k <- k + 1
+       cosSimTerm[k,1] <- i
+       cosSimTerm[k,2] <- j
+       vi <- termmat[i,]
+       vj <- termmat[j,]
+       cosSimTerm[k,3] <- (sumNum(vi * vj)) / (norm_vec(vi) *  norm_vec(vj)) 
+     }
+   }
+ }
+ colnames(cosSimTerm) <- c('i', 'j', 'cosSimTerm')
+ summary(cosSimTerm)
+ head(cosSimTerm)
+ 
+totalTerms <- apply(termmat,1, FUN = norm_vec)
+ 
+ #cs <- cosSim[cosSim$cosSim >= 0.3,]
+ cs <- cosSimTerm[cosSimTerm$cosSimTerm >= 0.75,]
+ g2 <- graph_from_data_frame(cs, directed=F)
+ clln2 <- cluster_louvain(g2)
+ layout <- layout_nicely(g2,2)
+ g2$layout <- layout
+ plot(g2, edge.width = sqrt(cs$cosSimTerm) * 2, vertex.size = totalTerms /50,
+      vertex.label.cex = 0.7,  edge.curved=.2, vertex.color = membership(clln2))
+ 
+ 
+ write.csv(cosSimTerm[order(-cosSimTerm$cosSimTerm),], "SimilarWording.csv")
+ 
+ # 
 # my.df <- as.data.frame(tdm.df)
 # my.df.scale <- scale(my.df)
 # write.csv(as.data.frame(my.df.scale),"scaledFrequencyUseTermsByDoc.csv")
