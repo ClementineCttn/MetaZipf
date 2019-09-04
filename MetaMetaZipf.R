@@ -301,9 +301,11 @@ norm_vec <- function(x) sqrt(sumNum(x^2))
 refSim <- rownames(toutcitemat)
 cosSim <- data.frame()
 k=0
+ilist <- c()
 for(i in refSim){
+  ilist <- c(ilist, i)
   for(j in refSim){
-    if (i!=j){
+    if (j %!in% ilist){
     k <- k + 1
     cosSim[k,1] <- i
     cosSim[k,2] <- j
@@ -314,37 +316,196 @@ for(i in refSim){
   }
 }
 colnames(cosSim) <- c('i', 'j', 'cosSim')
-summary(cosSim)
+dim(cosSim)
+head(cosSim)
 
-g1 <- graph_from_data_frame(cosSim, directed=F)
-clln1 <- cluster_louvain(g1, weights = NA)
+citingN <- apply(toutcitemat,1, FUN = norm_vec)
 
-
-cs <- cosSim[cosSim$cosSim >= 0.05,]
+cs <- cosSim[cosSim$cosSim >= 0.3,]
 g2 <- graph_from_data_frame(cs, directed=F)
 clln2 <- cluster_louvain(g2)
 layout <- layout_nicely(g2,2)
 g2$layout <- layout
-plot(g2, edge.width = sqrt(cs$cosSim) * 2, vertex.size = 3,
+plot(g2, edge.width = sqrt(cs$cosSim) * 2, vertex.size = citingN,
      vertex.label.cex = 0.7,  edge.curved=.2, vertex.color = membership(clln2))
 
 
-
-########### Network of inter citations
-g <- graph_from_incidence_matrix(cmat, directed = T)
-
-layout <- layout_nicely(g,2)
-g$layout <- layout
-fine = 500 # this will adjust the resolving power.
-
-par(mar = c(0.5, 0.3, 0.5, 0.5))
-
-plot(g, vertex.size=node.size*0.5,
-     vertex.label.dist=0.5, 
-     vertex.color= alpha("grey",0.6), edge.color = "black", 
-     vertex.label.cex = 0.7,  vertex.label.color = alpha("grey",0.6),
-     vertex.label.font = 2,  
-     edge.arrow.size=0.2)
+write.csv(cosSim[order(-cosSim$cosSim),], "SimilarCitations.csv")
 
 
+####### import full texts
 
+cname <- "data/FullText/"
+stat.comp<-  function( x,y){
+  K <-length(unique(y))
+  n <-length(x)
+  m <-mean(x)
+  TSS <-sum((x-m)^2)
+  nk<-table(y)
+  mk<-tapply(x,y,mean)
+  BSS <-sum(nk* (mk-m)^2)
+  result<-c(mk,100.0*BSS/TSS)
+  names(result) <-c( paste("G",1:K),"% epl.")
+  return(result)
+}
+
+dir(cname)
+
+library(tm)
+library(cluster)
+library(SnowballC)
+
+docs <- Corpus(DirSource(cname))   
+
+summary(docs)   
+docs
+inspect(docs[2])
+#docs = tm_map(docs, function(x) iconv(x, to='UTF-8-MAC', sub='byte'))
+toSpace <- content_transformer(function(x, pattern) {
+  return (gsub(pattern, " ", x))
+})
+docs <- tm_map(docs, toSpace, "-")
+docs <- tm_map(docs, toSpace, ":")
+docs <- tm_map(docs, toSpace, "'")
+docs <- tm_map(docs, toSpace, "`")
+docs <- tm_map(docs, toSpace, "‘")
+docs <- tm_map(docs, toSpace, "_")
+docs <- tm_map(docs, removePunctuation)
+docs <- tm_map(docs, tolower)   
+docs <- tm_map(docs, removeNumbers)   
+docs <- tm_map(docs, removeWords, stopwords("english"))   
+docs <- tm_map(docs, stemDocument)   
+docs <- tm_map(docs, stripWhitespace)   
+
+
+dtm <- DocumentTermMatrix(docs)   
+dtm 
+dtm.m = as.matrix(dtm)
+tdm <- TermDocumentMatrix(docs)   
+tdm  
+tdm.m = as.matrix(tdm)
+n = as.data.frame(rownames(tdm))
+colnames(n) = c("n")
+n$l = nchar(as.character(n$n))
+# head(n[order(-n$l),], 20)
+# tdm.df = as.data.frame(tdm.m)
+# write.csv(as.data.frame(tdm.df),"frequencyUseTermsByDoc.csv")
+# 
+# my.df <- as.data.frame(tdm.df)
+# my.df.scale <- scale(my.df)
+# write.csv(as.data.frame(my.df.scale),"scaledFrequencyUseTermsByDoc.csv")
+# d <- dist(my.df.scale,method="euclidean")
+# fit <- hclust(d, method="ward")
+# plot(fit)
+# numberOfGroups = 4
+# group_terms = cutree(fit, k=numberOfGroups)
+# groups = data.frame("ID" = rownames(my.df.scale), "group" = group_terms)
+# write.csv(groups, paste0(numberOfGroups, "_groups_cah_terms.csv"))
+# relative.df = sweep(my.df,2,colSums(my.df),`/`)
+# leg = sapply(relative.df, stat.comp,y=group_terms)
+# write.csv(leg, "termsGroupDesc.csv")
+# 
+# 
+# dtm.df = as.data.frame(dtm.m)
+# my.df <- as.data.frame(dtm.df)
+# my.df.scale <- scale(my.df)
+# d <- dist(my.df.scale,method="euclidean")
+# fit <- hclust(d, method="ward")
+# plot(fit)
+# head(my.df)
+# numberOfGroups = 3
+# group_terms = cutree(fit, k=numberOfGroups)
+# groups = data.frame("ID" = rownames(my.df.scale), "group" = group_terms)
+# write.csv(groups, paste0(numberOfGroups, "_groups_cah_docs.csv"))
+# 
+# 
+# my.df <- as.data.frame(tdm.df)
+# my.df.scale <- scale(my.df)
+# 
+# findAssocs(tdm, 'growth', 0.9)
+# findAssocs(as.TermDocumentMatrix(relative.df), "growth", 0.9)
+# freq <- colSums(as.matrix(dtm))   
+# length(freq)   
+# ord <- order(freq)   
+# m <- as.matrix(dtm)   
+# dim(m) 
+# #head(m)
+# 
+# 
+# 
+# 
+# dtms <- removeSparseTerms(dtm, 0.1) # This makes a matrix that is 10% empty space, maximum.   
+# findAssocs(dtms, 'product', 0.9)
+# 
+# 
+# freq <- sort(colSums(as.matrix(dtm)), decreasing=TRUE)   
+# wf <- data.frame(word=names(freq), freq=freq)   
+# write.csv(wf, "frequencyUseTerms.csv")   
+# 
+# listWords = c()
+# library(igraph)
+# par(mfrow = c(2,2), mar = c(2,2,3,2))
+# for (word in listWords){
+#   as = findAssocs(dtms, word, 0.9)
+#   #as = findAssocs(dtms, word, 0.9)
+#   
+#   if (length(as[1][[1]]) > 0){
+#     graph = data.frame()
+#     k=0
+#     for (i in seq(length(as))){
+#       a = as[i]
+#       n = names(a)
+#       l = length(as[i][[1]])
+#       if (l > 0){
+#         for ( j in seq(l)){
+#           k = k+1
+#           graph[k,1] = n
+#           graph[k,2] = names(as[i][[1]][j])
+#           graph[k,3] = as[i][[1]][j]
+#         }
+#       }
+#     }
+#     graph
+#     g <- graph.data.frame(graph, directed = T)
+#     plot(g, vertex.label.dist = 1)
+#     title(word)
+#   }}
+# 
+# 
+# 
+# for (word in listWords){
+#   as = findAssocs(dtms, word, 0.9)
+#   if (length(as[1][[1]]) > 0){
+#     graph = data.frame()
+#     k=0
+#     for (i in seq(length(as))){
+#       a = as[i]
+#       n = names(a)
+#       l = length(as[i][[1]])
+#       if (l > 0){
+#         for ( j in seq(l)){
+#           k = k+1
+#           graph[k,1] = n
+#           graph[k,2] = names(as[i][[1]][j])
+#           graph[k,3] = as[i][[1]][j]
+#         }
+#       }
+#     }
+#     graph
+#     g <- graph.data.frame(graph, directed = T)
+#     plot(g, vertex.label.dist = 1)
+#     title(word)
+#   }}
+# 
+# 
+# wf[wf$word %in% listWords,]
+# sum(wf$freq)
+# head(wf)
+# 
+# p <- ggplot(subset(wf, freq>50), aes(word, freq))    
+# p <- p + geom_bar(stat="identity")   
+# p <- p + theme(axis.text.x=element_text(angle=45, hjust=1))   
+# p   
+# 
+# 
+# findAssocs(dtm, listWords, corlimit=0.9) 
