@@ -287,6 +287,47 @@ cited_out <- data.frame(cited_out, cites_out[match(cited_out$ID,cites_out$ID), ]
 write.csv(cited_out[cited_out$n_cites > 5, c("REFID","n_cites")], "most_out_cites.csv")
 
 
+######### network of disciplines
+######### network of journals
+
+
+######### Bipartite Network of similarity between in papers based on out papers they cite
+dim(cites_out)
+outcitemat <- as.matrix(cites_out[,6:71])
+toutcitemat <- t(outcitemat)
+
+norm_vec <- function(x) sqrt(sumNum(x^2))
+
+refSim <- rownames(toutcitemat)
+cosSim <- data.frame()
+k=0
+for(i in refSim){
+  for(j in refSim){
+    if (i!=j){
+    k <- k + 1
+    cosSim[k,1] <- i
+    cosSim[k,2] <- j
+    vi <- toutcitemat[i,]
+    vj <- toutcitemat[j,]
+    cosSim[k,3] <- (sumNum(vi * vj)) / (norm_vec(vi) *  norm_vec(vj)) 
+    }
+  }
+}
+colnames(cosSim) <- c('i', 'j', 'cosSim')
+summary(cosSim)
+
+g1 <- graph_from_data_frame(cosSim, directed=F)
+clln1 <- cluster_louvain(g1, weights = NA)
+
+
+cs <- cosSim[cosSim$cosSim >= 0.05,]
+g2 <- graph_from_data_frame(cs, directed=F)
+clln2 <- cluster_louvain(g2)
+layout <- layout_nicely(g2,2)
+g2$layout <- layout
+plot(g2, edge.width = sqrt(cs$cosSim) * 2, vertex.size = 3,
+     vertex.label.cex = 0.7,  edge.curved=.2, vertex.color = membership(clln2))
+
 
 
 ########### Network of inter citations
