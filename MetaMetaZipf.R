@@ -422,8 +422,8 @@ refSimTerm <- rownames(termmat)
  head(cosSimTerm)
  
 totalTerms <- apply(termmat,1, FUN = norm_vec)
- 
- #cs <- cosSim[cosSim$cosSim >= 0.3,]
+
+
  cs <- cosSimTerm[cosSimTerm$cosSimTerm >= 0.55,]
  g2 <- graph_from_data_frame(cs, directed=F)
  clln2 <- cluster_louvain(g2)
@@ -436,4 +436,24 @@ totalTerms <- apply(termmat,1, FUN = norm_vec)
  write.csv(cosSimTerm[order(-cosSimTerm$cosSimTerm),], "SimilarWording.csv")
  
  
- refSimTerm
+ cosSimTerm$ij <- paste0(cosSimTerm$i, "_", cosSimTerm$j)
+ cosSimTerm <- cosSimTerm[,c("ij","cosSimTerm")]
+ PairCompa <- cosSim
+ PairCompa$ij <- paste0(PairCompa$i, ".txt_", PairCompa$j, ".txt")
+ PairCompa$ji <- paste0(PairCompa$j, ".txt_", PairCompa$i, ".txt")
+ PairCompa$CitationSimilarity <- PairCompa$cosSim
+ PairCompa <- PairCompa[,c("ij", "ji", "CitationSimilarity")]
+ PairCompa <- data.frame(PairCompa, cosSimTerm[match(PairCompa$ij, cosSimTerm$ij),])
+ PairCompa <- data.frame(PairCompa, cosSimTerm[match(PairCompa$ji, cosSimTerm$ij),])
+ PairCompa$TermSimilarity <- ifelse(!is.na(PairCompa$cosSimTerm), PairCompa$cosSimTerm, PairCompa$cosSimTerm.1)
+ 
+ PairCompaTable <- PairCompa[,c("ij", "CitationSimilarity", "TermSimilarity")]
+ summary(PairCompaTable)
+ 
+ q <- ggplot(PairCompaTable, aes(x=CitationSimilarity, y = TermSimilarity))
+ q + geom_point(color = "seagreen3", cex=1) +
+   labs(x="Citation Similarity", y="Wording Similarity")
+ 
+ # PairCompaTable[order(PairCompaTable$TermSimilarity, -PairCompaTable$CitationSimilarity),]
+ # PairCompaTable[order(-PairCompaTable$CitationSimilarity, -PairCompaTable$TermSimilarity),]
+ 
