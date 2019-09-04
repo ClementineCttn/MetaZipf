@@ -424,7 +424,7 @@ refSimTerm <- rownames(termmat)
 totalTerms <- apply(termmat,1, FUN = norm_vec)
  
  #cs <- cosSim[cosSim$cosSim >= 0.3,]
- cs <- cosSimTerm[cosSimTerm$cosSimTerm >= 0.75,]
+ cs <- cosSimTerm[cosSimTerm$cosSimTerm >= 0.55,]
  g2 <- graph_from_data_frame(cs, directed=F)
  clln2 <- cluster_louvain(g2)
  layout <- layout_nicely(g2,2)
@@ -435,122 +435,5 @@ totalTerms <- apply(termmat,1, FUN = norm_vec)
  
  write.csv(cosSimTerm[order(-cosSimTerm$cosSimTerm),], "SimilarWording.csv")
  
- # 
-# my.df <- as.data.frame(tdm.df)
-# my.df.scale <- scale(my.df)
-# write.csv(as.data.frame(my.df.scale),"scaledFrequencyUseTermsByDoc.csv")
-# d <- dist(my.df.scale,method="euclidean")
-# fit <- hclust(d, method="ward")
-# plot(fit)
-# numberOfGroups = 4
-# group_terms = cutree(fit, k=numberOfGroups)
-# groups = data.frame("ID" = rownames(my.df.scale), "group" = group_terms)
-# write.csv(groups, paste0(numberOfGroups, "_groups_cah_terms.csv"))
-# relative.df = sweep(my.df,2,colSums(my.df),`/`)
-# leg = sapply(relative.df, stat.comp,y=group_terms)
-# write.csv(leg, "termsGroupDesc.csv")
-# 
-# 
-# dtm.df = as.data.frame(dtm.m)
-# my.df <- as.data.frame(dtm.df)
-# my.df.scale <- scale(my.df)
-# d <- dist(my.df.scale,method="euclidean")
-# fit <- hclust(d, method="ward")
-# plot(fit)
-# head(my.df)
-# numberOfGroups = 3
-# group_terms = cutree(fit, k=numberOfGroups)
-# groups = data.frame("ID" = rownames(my.df.scale), "group" = group_terms)
-# write.csv(groups, paste0(numberOfGroups, "_groups_cah_docs.csv"))
-# 
-# 
-# my.df <- as.data.frame(tdm.df)
-# my.df.scale <- scale(my.df)
-# 
-# findAssocs(tdm, 'growth', 0.9)
-# findAssocs(as.TermDocumentMatrix(relative.df), "growth", 0.9)
-# freq <- colSums(as.matrix(dtm))   
-# length(freq)   
-# ord <- order(freq)   
-# m <- as.matrix(dtm)   
-# dim(m) 
-# #head(m)
-# 
-# 
-# 
-# 
-# dtms <- removeSparseTerms(dtm, 0.1) # This makes a matrix that is 10% empty space, maximum.   
-# findAssocs(dtms, 'product', 0.9)
-# 
-# 
-# freq <- sort(colSums(as.matrix(dtm)), decreasing=TRUE)   
-# wf <- data.frame(word=names(freq), freq=freq)   
-# write.csv(wf, "frequencyUseTerms.csv")   
-# 
-# listWords = c()
-# library(igraph)
-# par(mfrow = c(2,2), mar = c(2,2,3,2))
-# for (word in listWords){
-#   as = findAssocs(dtms, word, 0.9)
-#   #as = findAssocs(dtms, word, 0.9)
-#   
-#   if (length(as[1][[1]]) > 0){
-#     graph = data.frame()
-#     k=0
-#     for (i in seq(length(as))){
-#       a = as[i]
-#       n = names(a)
-#       l = length(as[i][[1]])
-#       if (l > 0){
-#         for ( j in seq(l)){
-#           k = k+1
-#           graph[k,1] = n
-#           graph[k,2] = names(as[i][[1]][j])
-#           graph[k,3] = as[i][[1]][j]
-#         }
-#       }
-#     }
-#     graph
-#     g <- graph.data.frame(graph, directed = T)
-#     plot(g, vertex.label.dist = 1)
-#     title(word)
-#   }}
-# 
-# 
-# 
-# for (word in listWords){
-#   as = findAssocs(dtms, word, 0.9)
-#   if (length(as[1][[1]]) > 0){
-#     graph = data.frame()
-#     k=0
-#     for (i in seq(length(as))){
-#       a = as[i]
-#       n = names(a)
-#       l = length(as[i][[1]])
-#       if (l > 0){
-#         for ( j in seq(l)){
-#           k = k+1
-#           graph[k,1] = n
-#           graph[k,2] = names(as[i][[1]][j])
-#           graph[k,3] = as[i][[1]][j]
-#         }
-#       }
-#     }
-#     graph
-#     g <- graph.data.frame(graph, directed = T)
-#     plot(g, vertex.label.dist = 1)
-#     title(word)
-#   }}
-# 
-# 
-# wf[wf$word %in% listWords,]
-# sum(wf$freq)
-# head(wf)
-# 
-# p <- ggplot(subset(wf, freq>50), aes(word, freq))    
-# p <- p + geom_bar(stat="identity")   
-# p <- p + theme(axis.text.x=element_text(angle=45, hjust=1))   
-# p   
-# 
-# 
-# findAssocs(dtm, listWords, corlimit=0.9) 
+ 
+ refSimTerm
