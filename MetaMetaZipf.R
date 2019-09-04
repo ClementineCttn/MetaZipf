@@ -11,15 +11,24 @@ library(data.table)
 '%!in%' <- function(x,y)!('%in%'(x,y))
 
 cites <- read.csv2("data/zipf_cites.csv", sep=';')
+J2D <- read.csv2('journals2Disciplines.csv', sep=';')
 head(cites)
+head(J2D)
+
+cites <- data.frame(cites,J2D[match(cites$JOURNAL, J2D$JOURNAL),])
+cites$DISCIPLINE <- ifelse(!is.na(cites$DISCPLINE), as.character(cites$DISCPLINE), as.character(cites$DISCIPLINE))
+cites$DISCPLINE <- NULL
+cites$JOURNAL.1<- NULL
 
 cites[is.na(cites)] <- 0
-dim(cites)
+head(cites)
 
 cites_within <- cites[1:66,c(1,6:71)]
 tail(cites_within)
 rownames(cites_within) <- cites_within$REFID
 cites_within$REFID <- NULL
+
+
 cmat <- t(as.matrix(cites_within))
 dim(cmat)
 
