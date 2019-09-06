@@ -319,10 +319,19 @@ colnames(cosSim) <- c('i', 'j', 'cosSim')
 dim(cosSim)
 head(cosSim)
 
-citingN <- apply(toutcitemat,1, FUN = norm_vec)
+#citingN <- apply(toutcitemat,1, FUN = norm_vec)
 
 cs.cit <- cosSim[cosSim$cosSim >= 0.3,]
 g.cit <- graph_from_data_frame(cs.cit, directed=F)
+
+citingNs <- as.data.frame(apply(toutcitemat[rownames(toutcitemat) %in% V(g.cit)$name,],1, FUN = norm_vec))
+colnames(citingNs) <- "citingN"
+citingNs$ref <- rownames(citingNs)
+orderedName <- data.frame(V(g.cit)$name)
+citingN <- data.frame(orderedName, citingNs[match(orderedName$g.cit..name, citingNs$ref),])[,"citingN"]
+citingN <- totalTerms[!is.na(citingN)] 
+
+
 clln.cit <- cluster_louvain(g.cit)
 layout <- layout_nicely(g.cit,2)
 g.cit$layout <- layout
@@ -427,11 +436,17 @@ refSimTerm <- rownames(termmat)
  summary(cosSimTerm)
  head(cosSimTerm)
  
-totalTerms <- apply(termmat,1, FUN = norm_vec)
+#totalTerm <- apply(termmat,1, FUN = norm_vec)
 
 summary(cosSimTerm)
  cs <- cosSimTerm[cosSimTerm$cosSimTerm > 0.7,]
  g.term <- graph_from_data_frame(cs, directed=F)
+ totalTerm <- as.data.frame(apply(termmat[rownames(termmat) %in% V(g.term)$name,],1, FUN = norm_vec))
+ colnames(totalTerm) <- "totalTerms"
+ totalTerm$ref <- rownames(totalTerm)
+ orderedName <- data.frame(V(g.term)$name)
+ totalTerms <- data.frame(orderedName, totalTerm[match(orderedName$V.g.term..name, totalTerm$ref),])[,"totalTerms"]
+ totalTerms <- totalTerms[!is.na(totalTerms)] 
  clln.term <- cluster_louvain(g.term)
  layout <- layout_nicely(g.term,2)
  g.term$layout <- layout
