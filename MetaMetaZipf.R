@@ -321,13 +321,13 @@ head(cosSim)
 
 citingN <- apply(toutcitemat,1, FUN = norm_vec)
 
-cs <- cosSim[cosSim$cosSim >= 0.3,]
-g2 <- graph_from_data_frame(cs, directed=F)
-clln2 <- cluster_louvain(g2)
-layout <- layout_nicely(g2,2)
-g2$layout <- layout
-plot(g2, edge.width = sqrt(cs$cosSim) * 2, vertex.size = citingN,
-     vertex.label.cex = 0.7,  edge.curved=.2, vertex.color = membership(clln2))
+cs.cit <- cosSim[cosSim$cosSim >= 0.3,]
+g.cit <- graph_from_data_frame(cs.cit, directed=F)
+clln.cit <- cluster_louvain(g.cit)
+layout <- layout_nicely(g.cit,2)
+g.cit$layout <- layout
+plot(g.cit, edge.width = sqrt(cs.cit$cosSim) * 2, vertex.size = citingN,
+     vertex.label.cex = 0.7,  edge.curved=.2, vertex.color = membership(clln.cit))
 
 
 write.csv(cosSim[order(-cosSim$cosSim),], "SimilarCitations.csv")
@@ -390,15 +390,21 @@ colnames(n) = c("n")
 n$l = nchar(as.character(n$n))
 head(n[order(-n$l),], 20)
 
- tdm.df = as.data.frame(tdm.m)
- write.csv(as.data.frame(tdm.df),"frequencyUseTermsByDoc.csv")
 
+
+ tdm.df = as.data.frame(tdm.m)
+ write.csv(as.data.frame(tdm.df),"TermsByDoc.csv")
+
+ tdm.df.f <- tdm.df / colSums(tdm.df)
+ head(tdm.df.f)
+ write.csv(as.data.frame(tdm.df),"frequencyUseTermsByDoc.csv")
  
- ########## intro stats
+ 
+########## intro stats
  
  ########## network of term similarity
  
- termmat <- t(tdm.m)
+ termmat <- t(as.matrix(tdm.df.f))
  
 refSimTerm <- rownames(termmat)
  cosSimTerm <- data.frame()
@@ -423,37 +429,50 @@ refSimTerm <- rownames(termmat)
  
 totalTerms <- apply(termmat,1, FUN = norm_vec)
 
+summary(cosSimTerm)
+ cs <- cosSimTerm[cosSimTerm$cosSimTerm > 0.7,]
+ g.term <- graph_from_data_frame(cs, directed=F)
+ clln.term <- cluster_louvain(g.term)
+ layout <- layout_nicely(g.term,2)
+ g.term$layout <- layout
+ plot(g.term, edge.width = sqrt(cs$cosSimTerm) * 2, vertex.size = totalTerms *50,
+      vertex.label.cex = 0.7,  
+      edge.curved=.2, vertex.color = membership(clln.term))
+ 
+ 
+write.csv(cosSimTerm[order(-cosSimTerm$cosSimTerm),], "SimilarWording.csv")
+ 
+# membershipTableTerms <- data.frame("IDtxt" = clln.term$names, "groupTerm" = clln.term$membership)
+# membershipTableTerms$ID <- substr(membershipTableTerms$IDtxt, 1, 8)
+# membershipTableCit <- data.frame("IDtxt" = clln.cit$names, "groupTerm" = clln.cit$membership)
+# 
+# 
 
- cs <- cosSimTerm[cosSimTerm$cosSimTerm >= 0.55,]
- g2 <- graph_from_data_frame(cs, directed=F)
- clln2 <- cluster_louvain(g2)
- layout <- layout_nicely(g2,2)
- g2$layout <- layout
- plot(g2, edge.width = sqrt(cs$cosSimTerm) * 2, vertex.size = totalTerms /50,
-      vertex.label.cex = 0.7,  edge.curved=.2, vertex.color = membership(clln2))
- 
- 
- write.csv(cosSimTerm[order(-cosSimTerm$cosSimTerm),], "SimilarWording.csv")
- 
- 
+pap = "And05Reg"
+pap = "Del04Con"
  cosSimTerm$ij <- paste0(cosSimTerm$i, "_", cosSimTerm$j)
- cosSimTerm <- cosSimTerm[,c("ij","cosSimTerm")]
+ cosSimTerm$Paper <- ifelse(cosSimTerm$i == paste0(pap, ".txt") | cosSimTerm$j == paste0(pap, ".txt"), 1, 0)
+ summary(cosSimTerm)
+ cosSimTer <- cosSimTerm[,c("ij","cosSimTerm", "Paper")]
  PairCompa <- cosSim
+ summary(cosSim)
  PairCompa$ij <- paste0(PairCompa$i, ".txt_", PairCompa$j, ".txt")
  PairCompa$ji <- paste0(PairCompa$j, ".txt_", PairCompa$i, ".txt")
  PairCompa$CitationSimilarity <- PairCompa$cosSim
  PairCompa <- PairCompa[,c("ij", "ji", "CitationSimilarity")]
- PairCompa <- data.frame(PairCompa, cosSimTerm[match(PairCompa$ij, cosSimTerm$ij),])
- PairCompa <- data.frame(PairCompa, cosSimTerm[match(PairCompa$ji, cosSimTerm$ij),])
+ PairCompa <- data.frame(PairCompa, cosSimTer[match(PairCompa$ij, cosSimTer$ij),])
+ PairCompa <- data.frame(PairCompa, cosSimTer[match(PairCompa$ji, cosSimTer$ij),])
  PairCompa$TermSimilarity <- ifelse(!is.na(PairCompa$cosSimTerm), PairCompa$cosSimTerm, PairCompa$cosSimTerm.1)
- 
- PairCompaTable <- PairCompa[,c("ij", "CitationSimilarity", "TermSimilarity")]
+ PairCompa$Papers <- as.factor(ifelse(PairCompa$Paper == 1 | PairCompa$Paper.1 == 1, pap, "Other"))
+  summary(PairCompa)
+ PairCompaTable <- PairCompa[,c("ij", "CitationSimilarity", "TermSimilarity", "Papers")]
  summary(PairCompaTable)
  
- q <- ggplot(PairCompaTable, aes(x=CitationSimilarity, y = TermSimilarity))
- q + geom_point(color = "seagreen3", cex=1) +
+ q <- ggplot(PairCompaTable, aes(x=CitationSimilarity, y = TermSimilarity, color = Papers))
+ q + geom_point(cex=1) +
    labs(x="Citation Similarity", y="Wording Similarity")
  
- # PairCompaTable[order(PairCompaTable$TermSimilarity, -PairCompaTable$CitationSimilarity),]
- # PairCompaTable[order(-PairCompaTable$CitationSimilarity, -PairCompaTable$TermSimilarity),]
+ summary(lm(CitationSimilarity~TermSimilarity, data=PairCompaTable))
+  PairCompaTable[order(PairCompaTable$TermSimilarity, PairCompaTable$CitationSimilarity),]
+  PairCompaTable[order(-PairCompaTable$CitationSimilarity, -PairCompaTable$TermSimilarity),]
  
