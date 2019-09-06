@@ -475,4 +475,63 @@ pap = "Del04Con"
  summary(lm(CitationSimilarity~TermSimilarity, data=PairCompaTable))
   PairCompaTable[order(PairCompaTable$TermSimilarity, PairCompaTable$CitationSimilarity),]
   PairCompaTable[order(-PairCompaTable$CitationSimilarity, -PairCompaTable$TermSimilarity),]
- 
+  
+  
+  paperList <- colnames(cites_out[,6:71])
+  
+  ############ repatriate estimates and data from articles
+  
+  data <- read.csv2("data/zipf_meta.csv", sep=",", dec=".")
+ countryData <- data[data$TERRITORY_TYPE == "Country" & data$REFID %in% paperList,]
+country2Ref <- table(countryData$CNTR_ID, countryData$REFID)[-1,]
+dim(country2Ref)
+country2Ref.mat <- as.matrix(country2Ref[rowSums(country2Ref)>0,colnames(country2Ref) %in% paperList])
+country2Ref.mat[country2Ref.mat>0] <- 1
+countrymat <- t(country2Ref.mat)
+
+refSim <- rownames(countrymat)
+cosSimC <- data.frame()
+k=0
+ilist <- c()
+for(i in refSim){
+  ilist <- c(ilist, i)
+  for(j in refSim){
+    if (j %!in% ilist){
+      k <- k + 1
+      cosSimC[k,1] <- i
+      cosSimC[k,2] <- j
+      vi <- countrymat[i,]
+      vj <- countrymat[j,]
+      s <- (sumNum(vi * vj)) / (norm_vec(vi) *  norm_vec(vj)) 
+      cosSimC[k,3] <- ifelse(!is.na(s), s, 0)
+    }
+  }
+}
+colnames(cosSimC) <- c('i', 'j', 'cosSimC')
+head(cosSimC)
+summary(cosSimC)
+
+
+cs.cntr <- cosSimC[cosSimC$cosSimC >= 0.25,]
+
+#countryN <- apply(countrymat[rownames(countrymat) %in% unique(c(cs.cntr$i, cs.cntr$j)),],1, FUN = norm_vec)
+
+g.cntr <- graph_from_data_frame(cs.cntr, directed=F)
+countryN <- as.data.frame(apply(countrymat[rownames(countrymat) %in% V(g.cntr)$name,],1, FUN = norm_vec))
+colnames(countryN) <- "n_countries"
+countryN$ref <- rownames(countryN)
+orderedName <- data.frame(V(g.cntr)$name)
+orderedCountryN <- data.frame(orderedName, countryN[match(orderedName$V.g.cntr..name, countryN$ref),])[,"n_countries"]
+orderedCountryN <- orderedCountryN[!is.na(orderedCountryN)] 
+#V(g.cntr)$size <- orderedCountryN
+
+clln.cntr <- cluster_louvain(g.cntr)
+layout <- layout_nicely(g.cntr,2)
+g.cntr$layout <- layout
+plot(g.cntr, edge.width = sqrt(cs.cntr$cosSimC) * 2, vertex.size = orderedCountryN * 2,
+     vertex.label.cex = 0.7,  edge.curved=.2, vertex.color = membership(clln.cntr))
+
+
+write.csv(cosSimC[order(-cosSimC$cosSimC),], "SimilarCountries.csv")
+
+
