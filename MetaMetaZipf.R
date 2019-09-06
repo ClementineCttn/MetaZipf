@@ -496,6 +496,8 @@ pap = "Del04Con"
   
   ############ repatriate estimates and data from articles
   
+  # estimates by countries
+  
   data <- read.csv2("data/zipf_meta.csv", sep=",", dec=".")
  countryData <- data[data$TERRITORY_TYPE == "Country" & data$REFID %in% paperList,]
 country2Ref <- table(countryData$CNTR_ID, countryData$REFID)[-1,]
@@ -527,7 +529,7 @@ head(cosSimC)
 summary(cosSimC)
 
 
-cs.cntr <- cosSimC[cosSimC$cosSimC >= 0.25,]
+cs.cntr <- cosSimC[cosSimC$cosSimC >= 0.2,]
 
 #countryN <- apply(countrymat[rownames(countrymat) %in% unique(c(cs.cntr$i, cs.cntr$j)),],1, FUN = norm_vec)
 
@@ -548,5 +550,117 @@ plot(g.cntr, edge.width = sqrt(cs.cntr$cosSimC) * 2, vertex.size = orderedCountr
 
 
 write.csv(cosSimC[order(-cosSimC$cosSimC),], "SimilarCountries.csv")
+
+
+
+# estimates by city definition
+
+cityData <- data[!is.na(data$URBANSCALE) & data$REFID %in% paperList,]
+city2Ref <- table(cityData$URBANSCALE, cityData$REFID)[,]
+dim(city2Ref)
+city2Ref.mat <- as.matrix(city2Ref[rowSums(city2Ref)>0,colnames(city2Ref) %in% paperList])
+city2Ref.mat[city2Ref.mat>0] <- 1
+citymat <- t(city2Ref.mat)
+
+refSim <- rownames(citymat)
+cosSimCt <- data.frame()
+k=0
+ilist <- c()
+for(i in refSim){
+  ilist <- c(ilist, i)
+  for(j in refSim){
+    if (j %!in% ilist){
+      k <- k + 1
+      cosSimCt[k,1] <- i
+      cosSimCt[k,2] <- j
+      vi <- citymat[i,]
+      vj <- citymat[j,]
+      s <- (sumNum(vi * vj)) / (norm_vec(vi) *  norm_vec(vj)) 
+      cosSimCt[k,3] <- ifelse(!is.na(s), s, 0)
+    }
+  }
+}
+colnames(cosSimCt) <- c('i', 'j', 'cosSimCt')
+head(cosSimCt)
+summary(cosSimCt)
+
+
+cs.city <- cosSimCt[cosSimCt$cosSimCt >= 0.1,]
+
+#cityN <- apply(citymat[rownames(citymat) %in% unique(c(cs.city$i, cs.city$j)),],1, FUN = norm_vec)
+
+g.city <- graph_from_data_frame(cs.city, directed=F)
+cityN <- as.data.frame(apply(citymat[rownames(citymat) %in% V(g.city)$name,],1, FUN = norm_vec))
+colnames(cityN) <- "n_cities"
+cityN$ref <- rownames(cityN)
+orderedName <- data.frame(V(g.city)$name)
+orderedcityN <- data.frame(orderedName, cityN[match(orderedName$V.g.city..name, cityN$ref),])[,"n_cities"]
+orderedcityN <- orderedcityN[!is.na(orderedcityN)] 
+#V(g.city)$size <- orderedcityN
+
+clln.city <- cluster_louvain(g.city)
+layout <- layout_nicely(g.city,2)
+g.city$layout <- layout
+plot(g.city, edge.width = sqrt(cs.city$cosSimCt) * 2, vertex.size = orderedcityN * 2,
+     vertex.label.cex = 0.7,  edge.curved=.2, vertex.color = membership(clln.city))
+
+
+write.csv(cosSimCt[order(-cosSimCt$cosSimCt),], "Similarcities.csv")
+
+
+
+# estimates by regression estimator
+
+estimData <- data[!is.na(data$ESTIMATION) & data$REFID %in% paperList,]
+estim2Ref <- table(estimData$ESTIMATION, estimData$REFID)[,]
+dim(estim2Ref)
+estim2Ref.mat <- as.matrix(estim2Ref[rowSums(estim2Ref)>0,colnames(estim2Ref) %in% paperList])
+estim2Ref.mat[estim2Ref.mat>0] <- 1
+estimmat <- t(estim2Ref.mat)
+
+refSim <- rownames(estimmat)
+cosSimEs <- data.frame()
+k=0
+ilist <- c()
+for(i in refSim){
+  ilist <- c(ilist, i)
+  for(j in refSim){
+    if (j %!in% ilist){
+      k <- k + 1
+      cosSimEs[k,1] <- i
+      cosSimEs[k,2] <- j
+      vi <- estimmat[i,]
+      vj <- estimmat[j,]
+      s <- (sumNum(vi * vj)) / (norm_vec(vi) *  norm_vec(vj)) 
+      cosSimEs[k,3] <- ifelse(!is.na(s), s, 0)
+    }
+  }
+}
+colnames(cosSimEs) <- c('i', 'j', 'cosSimEs')
+head(cosSimEs)
+summary(cosSimEs)
+
+
+cs.estim <- cosSimEs[cosSimEs$cosSimEs >= 0.7,]
+
+#estimN <- apply(estimmat[rownames(estimmat) %in% unique(c(cs.estim$i, cs.estim$j)),],1, FUN = norm_vec)
+
+g.estim <- graph_from_data_frame(cs.estim, directed=F)
+estimN <- as.data.frame(apply(estimmat[rownames(estimmat) %in% V(g.estim)$name,],1, FUN = norm_vec))
+colnames(estimN) <- "n_estims"
+estimN$ref <- rownames(estimN)
+orderedName <- data.frame(V(g.estim)$name)
+orderedestimN <- data.frame(orderedName, estimN[match(orderedName$V.g.estim..name, estimN$ref),])[,"n_estims"]
+orderedestimN <- orderedestimN[!is.na(orderedestimN)] 
+#V(g.estim)$size <- orderedestimN
+
+clln.estim <- cluster_louvain(g.estim)
+layout <- layout_nicely(g.estim,2)
+g.estim$layout <- layout
+plot(g.estim, edge.width = sqrt(cs.estim$cosSimEs) * 2, vertex.size = orderedestimN * 2,
+     vertex.label.cex = 0.7,  edge.curved=.2, vertex.color = membership(clln.estim))
+
+
+write.csv(cosSimEs[order(-cosSimEs$cosSimEs),], "Similarestims.csv")
 
 
