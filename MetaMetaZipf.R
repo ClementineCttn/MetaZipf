@@ -11,9 +11,13 @@ library(data.table)
 '%!in%' <- function(x,y)!('%in%'(x,y))
 
 cites <- read.csv2("data/zipf_cites.csv", sep=';')
+# meta <- read.csv2("data/zipf_meta.csv", sep=',')
+# length(summary(meta$REFERENCE))
+ head(cites)
+
 J2D <- read.csv2('journals2Disciplines.csv', sep=';')
 head(cites)
-head(J2D)
+summary(J2D)
 
 cites <- data.frame(cites,J2D[match(cites$JOURNAL, J2D$JOURNAL),])
 cites$DISCIPLINE <- ifelse(!is.na(cites$DISCPLINE), as.character(cites$DISCPLINE), as.character(cites$DISCIPLINE))
@@ -239,16 +243,16 @@ cites_out$AUTHOR <- gsub("[[:punct:]]", " ", cites_out$AUTHOR)
 head(cites_out)
 summary(as.factor(cites_out$JOURNAL))/dim(cites_out)[1]
 # Diverse pool of citations. MAx % of journals cited = 2.5% (Journal Regional Science) and 2.3 (Urban Studies)
+#jou <- as.data.frame(summary(as.factor(cites_out$JOURNAL)))
 
-jou <- as.data.frame(summary(as.factor(cites_out$JOURNAL)))
-jou$ref = rownames(jou)
-colnames(jou)[1] <- "n"
-dim(jou)
-jou <- subset(jou[-100,], n>3)
+jou_out <- as.data.frame(table(cites_out$JOURNAL))
+jou_out <- jou_out[order(-jou_out$Freq),] 
+colnames(jou_out) <- c("ref", "n")
+jou <- subset(jou_out[-100,], n>=5)
 q <- ggplot(jou, aes(x=ref, y = n))
 q + geom_lollipop(aes(reorder(ref, -n)),color = "goldenrod3", cex=1) +
   coord_flip() +
-  labs(x="Journal", y="Number of citations from the sample (>3)")
+  labs(x="Journal", y="Number of citations from the sample (>=5)")
 
 #######
 
@@ -662,5 +666,13 @@ plot(g.estim, edge.width = sqrt(cs.estim$cosSimEs) * 2, vertex.size = orderedest
 
 
 write.csv(cosSimEs[order(-cosSimEs$cosSimEs),], "Similarestims.csv")
+
+# similarity of journal
+# similarity of discipline
+# similarity of estimate mean value
+# similarity of estimate variance
+# similarity of year
+
+# predict citation?
 
 
