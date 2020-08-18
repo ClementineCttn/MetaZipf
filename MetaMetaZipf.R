@@ -126,10 +126,14 @@ length(cop)
 ref <- names(cop)
 cope <- data.frame(ref, cop)
 cope
-q <- ggplot(cope, aes(x=ref, y = cop))
+
+cope_full_names <- data.frame(cope, cites[match(cope$ref, cites$REFID),c("AUTHOR", "YEAR", "JOURNAL")])
+cope_full_names$ref <- paste(cope_full_names$AUTHOR, cope_full_names$YEAR, sep=" ")
+
+q <- ggplot(cope_full_names, aes(x=ref, y = cop))
 q + geom_lollipop(aes(reorder(ref, -cop)),color = "seagreen3", cex=1) +
   coord_flip() +
-  labs(x="Reference", y="Number of in-citations from the sample")
+  labs(x="Reference", y="Number of in-citations from the corpus")
   
 ################## intro
 
@@ -145,13 +149,13 @@ journals <- aggregate(j[,"n"], by=list(j[,"JOURNAL"]), FUN = sum)
 q <- ggplot(journals, aes(x= Group.1, y = x))
  q + geom_lollipop(aes(reorder( Group.1, -x)),color = "orangered", cex=1) +
   coord_flip() +
-  labs(x="Journal", y="Number of articles in the sample")
+  labs(x="Journal", y="Number of articles in the corpus")
 
 
- samplesummary <- data.frame(j, cope[match(j$REFID, cope$ref),])
-colnames(samplesummary)[8] <- "in_citations"
-mean(samplesummary$YEAR)
-mean(samplesummary[samplesummary$in_citations > 10, "YEAR"])
+ corpussummary <- data.frame(j, cope[match(j$REFID, cope$ref),])
+colnames(corpussummary)[8] <- "in_citations"
+mean(corpussummary$YEAR)
+mean(corpussummary[corpussummary$in_citations > 10, "YEAR"])
 
 
 ########### network between disciplines
@@ -249,17 +253,37 @@ cites_out$n_cites <- rowSums(cites_out[,6:71])
 single_outcites <- cites_out[order(-cites_out$n_cites),c(1:5,72:73)] 
 s_outcites <- single_outcites[,c("REFID", "n_cites")]
 colnames(s_outcites) <- c("ref", "n")
-s_outcites <- subset(s_outcites[-100,], n>=10)
+s_outcites <- subset(s_outcites[-100,], n>=5)
 q <- ggplot(s_outcites, aes(x=ref, y = n))
 q + geom_lollipop(aes(reorder(ref, -n)),color = "coral3", cex=1) +
   coord_flip() +
-  labs(x="Reference", y="Number of citations from the sample (>=5)")
+  labs(x="Reference", y="Number of citations from the corpus (>=5)")
 
-# Nitsch cited by 14 of the 66 sample articles but how many were published after 2005?
+# Nitsch cited by 14 of the 66 corpus articles but how many were published after 2005?
 cites_out[cites_out$REFID == "Nitsch_2005_Journal_Urban_Economics",]
 # 41
 14/66
 14/41
+
+## look for articles who do not cite Zipf
+nozipf<- as.data.frame(colSums(cites_out[cites_out$REFID %in% c("Zipf_1941_Unity_disunity",
+                                                                "Zipf_1949_Human_Behavior_Principle_Least_Effort"),6:71]))
+colnames(nozipf) <- "ref_zipf"
+nozipf$ref_zipf <- ifelse(nozipf$ref_zipf == 0 , "no ref to zipf", "ref to zipf")
+nozipf$REFID <- rownames(nozipf)
+cites_for_ref_zipfs <- cites[1:66,]
+referencing_zipf <- data.frame(cites_for_ref_zipfs, nozipf[match(cites_for_ref_zipfs$REFID, nozipf$REFID),])
+rfczpf <- referencing_zipf[,c("YEAR", "DISCIPLINE", "ref_zipf")]
+
+q <- ggplot(rfczpf, aes(x=YEAR))
+q + geom_histogram(aes(y = stat(density), color = ref_zipf, fill = ref_zipf), 
+                   alpha = 0.2, position = "identity", binwidth = 2) +
+  geom_density(aes(color = ref_zipf), size = 1) +
+  scale_color_manual(values = c("Coral2", "dodgerblue3")) +
+scale_fill_manual(values = c("Coral2", "dodgerblue3"))
+
+table(rfczpf$ref_zipf, rfczpf$DISCIPLINE)
+
 
 ## look for articles published in particular journals
 cites_out[cites_out$JOURNAL == "Papers in Regional Science",]
@@ -272,7 +296,7 @@ jou <- subset(jou_out[-100,], n>=5)
 q <- ggplot(jou, aes(x=ref, y = n))
 q + geom_lollipop(aes(reorder(ref, -n)),color = "goldenrod3", cex=1) +
   coord_flip() +
-  labs(x="Journal", y="Number of citations from the sample (>=5)")
+  labs(x="Journal", y="Number of citations from the corpus (>=5)")
 
 
 jou_test<- data.frame(jou, J2D[match(jou$ref,J2D$JOURNAL),])
