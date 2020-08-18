@@ -10,7 +10,7 @@ library(data.table)
 
 '%!in%' <- function(x,y)!('%in%'(x,y))
 
-cites <- read.csv2("data/zipf_cites.csv", sep=';')
+cites <- read.csv2("data/zipf_cites.csv", sep=',')
 # meta <- read.csv2("data/zipf_meta.csv", sep=',')
 # length(summary(meta$REFERENCE))
  head(cites)
@@ -244,6 +244,26 @@ head(cites_out)
 summary(as.factor(cites_out$JOURNAL))/dim(cites_out)[1]
 # Diverse pool of citations. MAx % of journals cited = 2.5% (Journal Regional Science) and 2.3 (Urban Studies)
 #jou <- as.data.frame(summary(as.factor(cites_out$JOURNAL)))
+colnames(cites_out)
+cites_out$n_cites <- rowSums(cites_out[,6:71])
+single_outcites <- cites_out[order(-cites_out$n_cites),c(1:5,72:73)] 
+s_outcites <- single_outcites[,c("REFID", "n_cites")]
+colnames(s_outcites) <- c("ref", "n")
+s_outcites <- subset(s_outcites[-100,], n>=10)
+q <- ggplot(s_outcites, aes(x=ref, y = n))
+q + geom_lollipop(aes(reorder(ref, -n)),color = "coral3", cex=1) +
+  coord_flip() +
+  labs(x="Reference", y="Number of citations from the sample (>=5)")
+
+# Nitsch cited by 14 of the 66 sample articles but how many were published after 2005?
+cites_out[cites_out$REFID == "Nitsch_2005_Journal_Urban_Economics",]
+# 41
+14/66
+14/41
+
+## look for articles published in particular journals
+cites_out[cites_out$JOURNAL == "Papers in Regional Science",]
+
 
 jou_out <- as.data.frame(table(cites_out$JOURNAL))
 jou_out <- jou_out[order(-jou_out$Freq),] 
@@ -254,7 +274,14 @@ q + geom_lollipop(aes(reorder(ref, -n)),color = "goldenrod3", cex=1) +
   coord_flip() +
   labs(x="Journal", y="Number of citations from the sample (>=5)")
 
-#######
+
+jou_test<- data.frame(jou, J2D[match(jou$ref,J2D$JOURNAL),])
+write.csv2(jou_test,"test_scimago.csv")
+
+
+  
+####### outcitation bipartite network
+
 
 sumNum = function(x) { 
   s = sum(x, na.rm = T)
