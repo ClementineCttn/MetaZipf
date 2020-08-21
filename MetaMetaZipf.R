@@ -7,25 +7,54 @@ library(ggrepel)
 library(ggalt)
 library(gridExtra)
 library(data.table)
+library(stringr)
+
 
 '%!in%' <- function(x,y)!('%in%'(x,y))
+norm_vec <- function(x) sqrt(sumNum(x^2))
+
+sumNum = function(x) { 
+  s = sum(x, na.rm = T)
+  return(s)
+}
+meanNum = function(x) { 
+  s = mean(x, na.rm = T)
+  return(s)
+}
+
+sdNum = function(x) { 
+  s = sd(x, na.rm = T)
+  return(s)
+}
+
 
 cites <- read.csv2("data/zipf_cites.csv", sep=',')
 # meta <- read.csv2("data/zipf_meta.csv", sep=',')
 # length(summary(meta$REFERENCE))
- head(cites)
+head(cites)
+cites_out <- cites[67:1221,]
+
+cites_out$YEAR <- as.numeric(gsub("\\D+", "", cites_out$REFID))
+cites_out$JOURNAL <- gsub(".*\\d.", "", cites_out$REFID)
+cites_out$AUTHOR <- gsub("\\d.*", "", cites_out$REFID)
+cites_out$JOURNAL <- gsub("[[:punct:]]", " ", cites_out$JOURNAL)
+cites_out$AUTHOR <- gsub("[[:punct:]]", " ", cites_out$AUTHOR)
 
 J2D <- read.csv2('journals2Disciplines.csv', sep=';')
-head(cites)
 summary(J2D)
 
-cites <- data.frame(cites,J2D[match(cites$JOURNAL, J2D$JOURNAL),])
-cites$DISCIPLINE <- ifelse(!is.na(cites$DISCPLINE), as.character(cites$DISCPLINE), as.character(cites$DISCIPLINE))
-cites$DISCPLINE <- NULL
-cites$JOURNAL.1<- NULL
+cites_out <- data.frame(cites_out,J2D[match(cites_out$JOURNAL, J2D$JOURNAL),])
+summary(cites_out)
+cites_out$DISCIPLINE <- cites_out$DISCPLINE
+cites_out$DISCPLINE <- NULL
+cites_out$JOURNAL.1 <- NULL
+dim(cites)
+dim(cites_out)
 
+cites <- rbind(cites[1:66,],cites_out)
+tail(cites)
 cites[is.na(cites)] <- 0
-head(cites)
+
 
 cites_within <- cites[1:66,c(1,6:71)]
 tail(cites_within)
@@ -232,17 +261,19 @@ write.csv(yearIntraJour, "average_year_publi_internal_all_per_journal.csv")
   
   ############## external citations
 
-library(stringr)
+
 head(cites)
 dim(cites)
 cites_out <- cites[67:1221,]
 tail(cites_out)
 
-cites_out$YEAR <- gsub("\\D+", "", cites_out$REFID)
+cites_out$YEAR <- as.numeric(gsub("\\D+", "", cites_out$REFID))
 cites_out$JOURNAL <- gsub(".*\\d.", "", cites_out$REFID)
 cites_out$AUTHOR <- gsub("\\d.*", "", cites_out$REFID)
 cites_out$JOURNAL <- gsub("[[:punct:]]", " ", cites_out$JOURNAL)
 cites_out$AUTHOR <- gsub("[[:punct:]]", " ", cites_out$AUTHOR)
+yearInter <- round(mean(cites_out$YEAR, na.rm = T), digit=0)
+write.csv(yearInter, "average_year_publi_external_all.csv")
 
 head(cites_out)
 summary(as.factor(cites_out$JOURNAL))/dim(cites_out)[1]
@@ -250,7 +281,7 @@ summary(as.factor(cites_out$JOURNAL))/dim(cites_out)[1]
 #jou <- as.data.frame(summary(as.factor(cites_out$JOURNAL)))
 colnames(cites_out)
 cites_out$n_cites <- rowSums(cites_out[,6:71])
-single_outcites <- cites_out[order(-cites_out$n_cites),c(1:5,72:73)] 
+single_outcites <- cites_out[order(-cites_out$n_cites),c(1:5,72)] 
 s_outcites <- single_outcites[,c("REFID", "n_cites")]
 colnames(s_outcites) <- c("ref", "n")
 s_outcites <- subset(s_outcites[-100,], n>=5)
@@ -265,7 +296,7 @@ cites_out[cites_out$REFID == "Nitsch_2005_Journal_Urban_Economics",]
 14/66
 14/41
 
-## look for articles who do not cite Zipf
+## look for articles who do not cite Zipf (+ summary by year and discipline of publi)
 nozipf<- as.data.frame(colSums(cites_out[cites_out$REFID %in% c("Zipf_1941_Unity_disunity",
                                                                 "Zipf_1949_Human_Behavior_Principle_Least_Effort"),6:71]))
 colnames(nozipf) <- "ref_zipf"
@@ -277,17 +308,36 @@ rfczpf <- referencing_zipf[,c("YEAR", "DISCIPLINE", "ref_zipf")]
 
 q <- ggplot(rfczpf, aes(x=YEAR))
 q + geom_histogram(aes(y = stat(density), color = ref_zipf, fill = ref_zipf), 
-                   alpha = 0.2, position = "identity", binwidth = 2) +
+                   alpha = 0.4, position = "identity", binwidth = 1) +
   geom_density(aes(color = ref_zipf), size = 1) +
   scale_color_manual(values = c("Coral2", "dodgerblue3")) +
-scale_fill_manual(values = c("Coral2", "dodgerblue3"))
+scale_fill_manual(values = c("Coral2", "dodgerblue3"))  + labs(color = "") + guides(fill = FALSE, size = FALSE)+ theme(legend.position = "top")
 
 table(rfczpf$ref_zipf, rfczpf$DISCIPLINE)
-
 
 ## look for articles published in particular journals
 cites_out[cites_out$JOURNAL == "Papers in Regional Science",]
 
+## look for total citations per corpus paper
+n_citations <- as.data.frame(colSums(cites_out[,6:71], na.rm=T))
+colnames(n_citations) <- "n_citations"
+n_citations$REFID <- rownames(n_citations)
+n_citations_corpus <- data.frame(cites_for_ref_zipfs, n_citations[match(cites_for_ref_zipfs$REFID, n_citations$REFID),])
+n_citations_corpus$ref <- paste(n_citations_corpus$AUTHOR, n_citations_corpus$YEAR, sep=" ")
+
+q <- ggplot(n_citations_corpus, aes(x=ref, y = n_citations))
+q + geom_lollipop(aes(reorder(ref, -n_citations)),color = "dodgerblue3", cex=1) +
+  coord_flip() +
+  labs(x="Reference", y="Size of bibliography by corpus article")
+
+q <- ggplot(n_citations_corpus, aes(y=n_citations, x = DISCIPLINE,fill = DISCIPLINE))
+q + geom_boxplot(alpha = 0.4) + theme(legend.position = "none")
+
+
+n_citations_corpus[order(-n_citations_corpus$n_citations),c("ref", "n_citations")]
+
+
+#####
 
 jou_out <- as.data.frame(table(cites_out$JOURNAL))
 jou_out <- jou_out[order(-jou_out$Freq),] 
@@ -298,25 +348,14 @@ q + geom_lollipop(aes(reorder(ref, -n)),color = "goldenrod3", cex=1) +
   coord_flip() +
   labs(x="Journal", y="Number of citations from the corpus (>=5)")
 
-
-jou_test<- data.frame(jou, J2D[match(jou$ref,J2D$JOURNAL),])
-write.csv2(jou_test,"test_scimago.csv")
+# 
+# jou_test<- data.frame(jou, J2D[match(jou$ref,J2D$JOURNAL),])
+# write.csv2(jou_test,"test_scimago.csv")
 
 
   
 ####### outcitation bipartite network
 
-
-sumNum = function(x) { 
-  s = sum(x, na.rm = T)
-  return(s)
-}
-meanNum = function(x) { 
-  s = mean(x, na.rm = T)
-  return(s)
-}
-
-head(cites_out)
 rownames(cites_out) <- paste0(substr(cites_out$AUTHOR,1,3), substr(cites_out$YEAR,1,4),
                               substr(cites_out$JOURNAL,1,3),rownames(cites_out))
 total_cite_out <- apply(cites_out[,6:71], 2, FUN = sumNum)
@@ -342,8 +381,7 @@ cited_out <- data.frame(cited_out, cites_out[match(cited_out$ID,cites_out$ID), ]
 write.csv(cited_out[cited_out$n_cites > 5, c("REFID","n_cites")], "most_out_cites.csv")
 
 
-######### network of disciplines
-######### network of journals
+
 
 
 ######### Bipartite Network of similarity between in papers based on out papers they cite
@@ -351,8 +389,7 @@ dim(cites_out)
 outcitemat <- as.matrix(cites_out[,6:71])
 toutcitemat <- t(outcitemat)
 
-norm_vec <- function(x) sqrt(sumNum(x^2))
-
+dim(toutcitemat)
 refSim <- rownames(toutcitemat)
 cosSim <- data.frame()
 k=0
@@ -373,19 +410,21 @@ for(i in refSim){
 colnames(cosSim) <- c('i', 'j', 'cosSim')
 dim(cosSim)
 head(cosSim)
+summary(cosSim$cosSim)
+write.csv(cosSim[order(-cosSim$cosSim),], "simNets/SimilarCitations.csv")
 
 #citingN <- apply(toutcitemat,1, FUN = norm_vec)
 
-cs.cit <- cosSim[cosSim$cosSim >= 0.3,]
+cs.cit <- cosSim[cosSim$cosSim >= 0.25,]
 g.cit <- graph_from_data_frame(cs.cit, directed=F)
+
 
 citingNs <- as.data.frame(apply(toutcitemat[rownames(toutcitemat) %in% V(g.cit)$name,],1, FUN = norm_vec))
 colnames(citingNs) <- "citingN"
 citingNs$ref <- rownames(citingNs)
 orderedName <- data.frame(V(g.cit)$name)
-citingN <- data.frame(orderedName, citingNs[match(orderedName$g.cit..name, citingNs$ref),])[,"citingN"]
-citingN <- totalTerms[!is.na(citingN)] 
-
+citingN <- data.frame(orderedName, citingNs[match(orderedName$V.g.cit..name, citingNs$ref),])[,"citingN"]
+citingN <- citingN[!is.na(citingN)] 
 
 clln.cit <- cluster_louvain(g.cit)
 layout <- layout_nicely(g.cit,2)
@@ -394,7 +433,133 @@ plot(g.cit, edge.width = sqrt(cs.cit$cosSim) * 2, vertex.size = citingN,
      vertex.label.cex = 0.7,  edge.curved=.2, vertex.color = membership(clln.cit))
 
 
-write.csv(cosSim[order(-cosSim$cosSim),], "SimilarCitations.csv")
+
+
+######### Bipartite Network of similarity between in papers based on the discpline of references they cite
+summary(as.factor(cites[1:66,"DISCIPLINE"]))
+summary(as.factor(cites_out$DISCIPLINE))
+discipline2ref <- aggregate(cites_out[,c(6:71)], by=list(cites_out$DISCIPLINE), FUN = sumNum)
+rownames(discipline2ref) <- discipline2ref$Group.1
+discipline2ref$Group.1 <- NULL
+
+cols <- colnames(discipline2ref)
+for(i in cols){
+  absolute <- discipline2ref[,i]
+  total <- sum(absolute)
+  relative <- absolute/total
+  discipline2ref[,paste0("freq_",i)] <- relative
+}
+
+summary(discipline2ref)
+dim(discipline2ref)
+
+#ABSOLUTE NUMBERS
+disc2ref <- as.matrix(discipline2ref[,1:66])
+str(disc2ref)
+scaled_disc2ref <- disc2ref / colSums(disc2ref)
+tdisc2ref <- t(disc2ref)
+
+refSim <- rownames(tdisc2ref)
+cosSim <- data.frame()
+k=0
+ilist <- c()
+for(i in refSim){
+  ilist <- c(ilist, i)
+  for(j in refSim){
+    if (j %!in% ilist){
+      k <- k + 1
+      cosSim[k,1] <- i
+      cosSim[k,2] <- j
+      vi <- tdisc2ref[i,]
+      vj <- tdisc2ref[j,]
+      cosSim[k,3] <- (sumNum(vi * vj)) / (norm_vec(vi) *  norm_vec(vj)) 
+    }
+  }
+}
+colnames(cosSim) <- c('i', 'j', 'cosSim')
+dim(cosSim)
+head(cosSim)
+summary(cosSim$cosSim)
+write.csv(cosSim[order(-cosSim$cosSim),], "simNets/SimilarDisciplinesCited_abs.csv")
+head(cosSim[order(-cosSim$cosSim),])
+#citingN <- apply(toutcitemat,1, FUN = norm_vec)
+
+cs.cit <- cosSim[cosSim$cosSim >= 0.9,]
+g.cit <- graph_from_data_frame(cs.cit, directed=F)
+
+disCitedNs <- as.data.frame(apply(toutcitemat[rownames(tdisc2ref) %in% V(g.cit)$name,],1, FUN = norm_vec))
+colnames(disCitedNs) <- "disCitedNs"
+disCitedNs$ref <- rownames(disCitedNs)
+orderedName <- data.frame(V(g.cit)$name)
+disCitedNs <- data.frame(orderedName, disCitedNs[match(orderedName$V.g.cit..name, disCitedNs$ref),])[,"disCitedNs"]
+disCitedNs <- disCitedNs[!is.na(disCitedNs)] 
+
+colnames(orderedName) <- "REFID"
+refinfo <- cites[1:66,c("REFID", "DISCIPLINE")]
+own_discipline <- data.frame(orderedName, refinfo[match(orderedName$REFID, refinfo$REFID),])
+odisc <- own_discipline$DISCIPLINE
+  
+#clln.cit <- cluster_louvain(g.cit)
+layout <- layout_nicely(g.cit,2)
+g.cit$layout <- layout
+plot(g.cit, edge.width = sqrt(cs.cit$cosSim) * 2, vertex.size = disCitedNs,
+     vertex.label.cex = 0.7,  edge.curved=.2, vertex.color = odisc)
+
+
+
+#RELATIVE NUMBERS
+disc2ref <- as.matrix(discipline2ref[,67:132])
+colnames(disc2ref) <- cols
+str(disc2ref)
+scaled_disc2ref <- disc2ref / colSums(disc2ref)
+tdisc2ref <- t(disc2ref)
+
+refSim <- rownames(tdisc2ref)
+cosSim <- data.frame()
+k=0
+ilist <- c()
+for(i in refSim){
+  ilist <- c(ilist, i)
+  for(j in refSim){
+    if (j %!in% ilist){
+      k <- k + 1
+      cosSim[k,1] <- i
+      cosSim[k,2] <- j
+      vi <- tdisc2ref[i,]
+      vj <- tdisc2ref[j,]
+      cosSim[k,3] <- (sumNum(vi * vj)) / (norm_vec(vi) *  norm_vec(vj)) 
+    }
+  }
+}
+colnames(cosSim) <- c('i', 'j', 'cosSim')
+dim(cosSim)
+head(cosSim)
+summary(cosSim$cosSim)
+write.csv(cosSim[order(-cosSim$cosSim),], "simNets/SimilarDisciplinesCited_rel.csv")
+head(cosSim[order(-cosSim$cosSim),])
+#citingN <- apply(toutcitemat,1, FUN = norm_vec)
+
+cs.cit <- cosSim[cosSim$cosSim >= 0.9,]
+g.cit <- graph_from_data_frame(cs.cit, directed=F)
+
+disCitedNs <- as.data.frame(apply(toutcitemat[rownames(tdisc2ref) %in% V(g.cit)$name,],1, FUN = norm_vec))
+colnames(disCitedNs) <- "disCitedNs"
+disCitedNs$ref <- rownames(disCitedNs)
+orderedName <- data.frame(V(g.cit)$name)
+disCitedNs <- data.frame(orderedName, disCitedNs[match(orderedName$V.g.cit..name, disCitedNs$ref),])[,"disCitedNs"]
+disCitedNs <- disCitedNs[!is.na(disCitedNs)] 
+
+colnames(orderedName) <- "REFID"
+refinfo <- cites[1:66,c("REFID", "DISCIPLINE")]
+own_discipline <- data.frame(orderedName, refinfo[match(orderedName$REFID, refinfo$REFID),])
+odisc <- own_discipline$DISCIPLINE
+
+#clln.cit <- cluster_louvain(g.cit)
+layout <- layout_nicely(g.cit,2)
+g.cit$layout <- layout
+plot(g.cit, edge.width = sqrt(cs.cit$cosSim) * 2, vertex.size = disCitedNs,
+     vertex.label.cex = 0.7,  edge.curved=.2, vertex.color = odisc)
+
 
 
 ####### import full texts
@@ -461,7 +626,42 @@ head(n[order(-n$l),], 20)
 
  tdm.df.f <- tdm.df / colSums(tdm.df)
  head(tdm.df.f)
- write.csv(as.data.frame(tdm.df),"frequencyUseTermsByDoc.csv")
+ write.csv(as.data.frame(tdm.df.f),"frequencyUseTermsByDoc.csv")
+ 
+ 
+ 
+ 
+ ## look for total words per corpus paper
+ n_words <- as.data.frame(colSums(tdm.df, na.rm=T))
+ colnames(n_words) <- "n_words"
+ n_words$REFID <- substr(rownames(n_words), 1,8)
+ n_words_corpus <- data.frame(cites_for_ref_zipfs, n_words[match(cites_for_ref_zipfs$REFID, n_words$REFID),])
+ n_words_corpus$ref <- paste(n_words_corpus$AUTHOR, n_words_corpus$YEAR, sep=" ")
+ n_words_corpus <- n_words_corpus[n_words_corpus$AUTHOR != "Krakover S.",]
+ q <- ggplot(n_words_corpus, aes(x=ref, y = n_words))
+ q + geom_lollipop(aes(reorder(ref, -n_words)),color = "seagreen4", cex=1) +
+   coord_flip() +
+   labs(x="Reference", y="Number of words by corpus article")
+ 
+ q <- ggplot(n_words_corpus, aes(y=n_words, x = DISCIPLINE,fill = DISCIPLINE))
+ q + geom_boxplot(alpha = 0.4) + theme(legend.position = "none")
+ 
+ plot(n_words_corpus$n_words,n_words_corpus$YEAR)
+ 
+ # 
+ # 
+ # 
+ # library(scales)
+ # library(reshape2)
+ # frequency <- as.data.frame(tdm.df.f)
+ # frequency$word <- rownames(frequency)
+ # names(frequency) 
+ # freq.long <- reshape2::melt(data = frequency, id=c("word"))
+ # colnames(freq.long) <- c("word", "text", "frequency")
+ # dim(freq.long)
+ # 
+ # library(quanteda)
+ 
  
  
 ########## intro stats
@@ -549,9 +749,13 @@ pap = "Del04Con"
   
   paperList <- colnames(cites_out[,6:71])
   
+  
+  
+  
+  
   ############ repatriate estimates and data from articles
   
-  # estimates by countries
+  ##### similarity network of countroes studied
   
   data <- read.csv2("data/zipf_meta.csv", sep=",", dec=".")
  countryData <- data[data$TERRITORY_TYPE == "Country" & data$REFID %in% paperList,]
@@ -583,6 +787,9 @@ colnames(cosSimC) <- c('i', 'j', 'cosSimC')
 head(cosSimC)
 summary(cosSimC)
 
+write.csv(cosSimC[order(-cosSimC$cosSimC),], "simNets/SimilarCountries.csv")
+
+
 
 cs.cntr <- cosSimC[cosSimC$cosSimC >= 0.2,]
 
@@ -604,11 +811,9 @@ plot(g.cntr, edge.width = sqrt(cs.cntr$cosSimC) * 2, vertex.size = orderedCountr
      vertex.label.cex = 0.7,  edge.curved=.2, vertex.color = membership(clln.cntr))
 
 
-write.csv(cosSimC[order(-cosSimC$cosSimC),], "SimilarCountries.csv")
 
 
-
-# estimates by city definition
+##### similarity network of city definition used
 
 cityData <- data[!is.na(data$URBANSCALE) & data$REFID %in% paperList,]
 city2Ref <- table(cityData$URBANSCALE, cityData$REFID)[,]
@@ -639,6 +844,8 @@ colnames(cosSimCt) <- c('i', 'j', 'cosSimCt')
 head(cosSimCt)
 summary(cosSimCt)
 
+write.csv(cosSimCt[order(-cosSimCt$cosSimCt),], "simNets/SimilarCities.csv")
+
 
 cs.city <- cosSimCt[cosSimCt$cosSimCt >= 0.1,]
 
@@ -660,21 +867,22 @@ plot(g.city, edge.width = sqrt(cs.city$cosSimCt) * 2, vertex.size = orderedcityN
      vertex.label.cex = 0.7,  edge.curved=.2, vertex.color = membership(clln.city))
 
 
-write.csv(cosSimCt[order(-cosSimCt$cosSimCt),], "Similarcities.csv")
 
 
 
-# estimates by regression estimator
+##### similarity network of decades studied
 
-estimData <- data[!is.na(data$ESTIMATION) & data$REFID %in% paperList,]
-estim2Ref <- table(estimData$ESTIMATION, estimData$REFID)[,]
-dim(estim2Ref)
-estim2Ref.mat <- as.matrix(estim2Ref[rowSums(estim2Ref)>0,colnames(estim2Ref) %in% paperList])
-estim2Ref.mat[estim2Ref.mat>0] <- 1
-estimmat <- t(estim2Ref.mat)
+str(data)
+decadeData <- data[!is.na(data$DATE) & data$REFID %in% paperList,]
+decadeData$DECADE <- paste0(substr(as.character(decadeData$DATE), 1, 3), 0, "s")
+decade2Ref <- table(decadeData$DECADE, decadeData$REFID)[,]
+dim(decade2Ref)
+decade2Ref.mat <- as.matrix(decade2Ref[rowSums(decade2Ref)>0,colnames(decade2Ref) %in% paperList])
+decade2Ref.mat[decade2Ref.mat>0] <- 1
+decademat <- t(decade2Ref.mat)
 
-refSim <- rownames(estimmat)
-cosSimEs <- data.frame()
+ refSim <- rownames(decademat)
+cosSimCt <- data.frame()
 k=0
 ilist <- c()
 for(i in refSim){
@@ -682,48 +890,303 @@ for(i in refSim){
   for(j in refSim){
     if (j %!in% ilist){
       k <- k + 1
-      cosSimEs[k,1] <- i
-      cosSimEs[k,2] <- j
-      vi <- estimmat[i,]
-      vj <- estimmat[j,]
-      s <- (sumNum(vi * vj)) / (norm_vec(vi) *  norm_vec(vj)) 
-      cosSimEs[k,3] <- ifelse(!is.na(s), s, 0)
+      cosSimCt[k,1] <- i
+      cosSimCt[k,2] <- j
+      vi <- decademat[i,]
+      vj <- decademat[j,]
+      s <- (sumNum(vi * vj)) / (norm_vec(vi) *  norm_vec(vj))
+      cosSimCt[k,3] <- ifelse(!is.na(s), s, 0)
     }
   }
 }
-colnames(cosSimEs) <- c('i', 'j', 'cosSimEs')
-head(cosSimEs)
-summary(cosSimEs)
+colnames(cosSimCt) <- c('i', 'j', 'cosSimCt')
+head(cosSimCt)
+summary(cosSimCt$cosSimCt)
 
 
-cs.estim <- cosSimEs[cosSimEs$cosSimEs >= 0.7,]
-
-#estimN <- apply(estimmat[rownames(estimmat) %in% unique(c(cs.estim$i, cs.estim$j)),],1, FUN = norm_vec)
-
-g.estim <- graph_from_data_frame(cs.estim, directed=F)
-estimN <- as.data.frame(apply(estimmat[rownames(estimmat) %in% V(g.estim)$name,],1, FUN = norm_vec))
-colnames(estimN) <- "n_estims"
-estimN$ref <- rownames(estimN)
-orderedName <- data.frame(V(g.estim)$name)
-orderedestimN <- data.frame(orderedName, estimN[match(orderedName$V.g.estim..name, estimN$ref),])[,"n_estims"]
-orderedestimN <- orderedestimN[!is.na(orderedestimN)] 
-#V(g.estim)$size <- orderedestimN
-
-clln.estim <- cluster_louvain(g.estim)
-layout <- layout_nicely(g.estim,2)
-g.estim$layout <- layout
-plot(g.estim, edge.width = sqrt(cs.estim$cosSimEs) * 2, vertex.size = orderedestimN * 2,
-     vertex.label.cex = 0.7,  edge.curved=.2, vertex.color = membership(clln.estim))
+write.csv(cosSimCt[order(-cosSimCt$cosSimCt),], "simNets/SimilarDecades.csv")
 
 
-write.csv(cosSimEs[order(-cosSimEs$cosSimEs),], "Similarestims.csv")
+cs.decade <- cosSimCt[cosSimCt$cosSimCt >= 0.65,]
 
-# similarity of journal
-# similarity of discipline
-# similarity of estimate mean value
-# similarity of estimate variance
-# similarity of year
+#decadeN <- apply(decademat[rownames(decademat) %in% unique(c(cs.decade$i, cs.decade$j)),],1, FUN = norm_vec)
 
-# predict citation?
+g.decade <- graph_from_data_frame(cs.decade, directed=F)
+decadeN <- as.data.frame(apply(decademat[rownames(decademat) %in% V(g.decade)$name,],1, FUN = norm_vec))
+colnames(decadeN) <- "n_decades"
+decadeN$ref <- rownames(decadeN)
+orderedName <- data.frame(V(g.decade)$name)
+ordereddecadeN <- data.frame(orderedName, decadeN[match(orderedName$V.g.decade..name, decadeN$ref),])[,"n_decades"]
+ordereddecadeN <- ordereddecadeN[!is.na(ordereddecadeN)]
+#V(g.decade)$size <- ordereddecadeN
 
+clln.decade <- cluster_louvain(g.decade)
+layout <- layout_nicely(g.decade,2)
+g.decade$layout <- layout
+plot(g.decade, edge.width = sqrt(cs.decade$cosSimCt) * 2, vertex.size = ordereddecadeN * 2,
+     vertex.label.cex = 0.7,  edge.curved=.2, vertex.color = membership(clln.decade))
+
+
+
+decade2Ref.mat[,"She12Com"]
+
+
+
+
+
+
+##### similarity of alpha(s) estimated
+head(data)
+alphaData <- data[!is.na(data$ALPHALOTKA) & data$REFID %in% paperList,]
+head(alphaData)
+
+meanAlphaPerRef <- aggregate(alphaData[,"ALPHALOTKA"], by=list(alphaData$REFID), FUN=meanNum)
+medAlphaPerRef <- aggregate(alphaData[,"ALPHALOTKA"], by=list(alphaData$REFID), FUN=median)
+sdAlphaPerRef <- aggregate(alphaData[,"ALPHALOTKA"], by=list(alphaData$REFID), FUN=sdNum)
+sdAlphaPerRef[is.na(sdAlphaPerRef$x),"x"] <- 0
+minAlphaPerRef <- aggregate(alphaData[,"ALPHALOTKA"], by=list(alphaData$REFID), FUN=min)
+maxAlphaPerRef <- aggregate(alphaData[,"ALPHALOTKA"], by=list(alphaData$REFID), FUN=max)
+
+similarAlpha <- cbind(meanAlphaPerRef, medAlphaPerRef, sdAlphaPerRef, minAlphaPerRef, maxAlphaPerRef)
+rownames(similarAlpha) <- similarAlpha$Group.1
+similarAlpha[,c(1,3, 5, 7, 9)] <- NULL
+colnames(similarAlpha) <- c("meanAlpha", "medAlpha", "sdAlpha", "minAlpha", "maxAlpha")
+alphamat <- as.matrix(similarAlpha)
+
+refSim <- rownames(alphamat)
+cosSimCt <- data.frame()
+k=0
+ilist <- c()
+for(i in refSim){
+  ilist <- c(ilist, i)
+  for(j in refSim){
+    if (j %!in% ilist){
+      k <- k + 1
+      cosSimCt[k,1] <- i
+      cosSimCt[k,2] <- j
+      vi <- alphamat[i,]
+      vj <- alphamat[j,]
+      s <- (sumNum(vi * vj)) / (norm_vec(vi) *  norm_vec(vj))
+      cosSimCt[k,3] <- ifelse(!is.na(s), s, 0)
+    }
+  }
+}
+colnames(cosSimCt) <- c('i', 'j', 'cosSimCt')
+head(cosSimCt)
+summary(cosSimCt$cosSimCt)
+
+
+write.csv(cosSimCt[order(-cosSimCt$cosSimCt),], "simNets/SimilarAlphas.csv")
+
+
+cs.alpha <- cosSimCt[cosSimCt$cosSimCt >= 0.998,]
+
+#alphaN <- apply(alphamat[rownames(alphamat) %in% unique(c(cs.alpha$i, cs.alpha$j)),],1, FUN = norm_vec)
+
+g.alpha <- graph_from_data_frame(cs.alpha, directed=F)
+alphaN <- as.data.frame(apply(alphamat[rownames(alphamat) %in% V(g.alpha)$name,],1, FUN = norm_vec))
+colnames(alphaN) <- "n_alphas"
+alphaN$ref <- rownames(alphaN)
+orderedName <- data.frame(V(g.alpha)$name)
+orderedalphaN <- data.frame(orderedName, alphaN[match(orderedName$V.g.alpha..name, alphaN$ref),])[,"n_alphas"]
+orderedalphaN <- orderedalphaN[!is.na(orderedalphaN)]
+#V(g.alpha)$size <- orderedalphaN
+
+clln.alpha <- cluster_louvain(g.alpha)
+layout <- layout_nicely(g.alpha,2)
+g.alpha$layout <- layout
+plot(g.alpha, edge.width = sqrt(cs.alpha$cosSimCt) * 2, vertex.size = orderedalphaN * 2,
+     vertex.label.cex = 0.7,  edge.curved=.2, vertex.color = membership(clln.alpha))
+
+alphamat["Son02Urb",]
+
+
+
+################
+## FINAL STEP
+################
+
+
+
+# model of similarity of alpha
+
+# import similarity in alpha distributions
+alphaDyads <- read.csv2("simNets/SimilarAlphas.csv", sep=",", stringsAsFactors = F)[,-1]
+alphaDyads$dyadID <- paste(alphaDyads$i, alphaDyads$j, sep = "_")
+alphaDyads$alphaCosSim <- as.numeric(alphaDyads$cosSimCt)
+alphaDyads[,1:3] <- NULL
+summary(alphaDyads)
+DYADS <- alphaDyads
+
+DYAD_ID_order <- DYADS$dyadID
+
+# import similarity in wording as explanation
+wordingDyads <- read.csv2("simNets/SimilarWording.csv", sep=",", stringsAsFactors = F)[,-1]
+head(wordingDyads)
+wordingDyads$dyadIJ <- paste(substr(wordingDyads$i, 1, 8), 
+                             substr(wordingDyads$j, 1, 8), sep = "_")
+wordingDyads$dyadJI <- paste(substr(wordingDyads$i, 1, 8), 
+                             substr(wordingDyads$j, 1, 8), sep = "_")
+wordingDyads$dyadID <- ifelse(wordingDyads$dyadIJ %in% DYAD_ID_order, wordingDyads$dyadIJ, wordingDyads$dyadJI)
+
+wordingDyads$wordingCosSim <- as.numeric(wordingDyads$cosSimTerm)
+wordingDyads[,1:5] <- NULL
+summary(wordingDyads)
+DYADS <- data.frame(DYADS, wordingDyads[match(DYADS$dyadID, wordingDyads$dyadID),"wordingCosSim"])
+
+
+# import similarity in citation as explanation
+citationDyads <- read.csv2("simNets/SimilarCitations.csv", sep=",", stringsAsFactors = F)[,-1]
+head(citationDyads)
+citationDyads$dyadIJ <- paste(citationDyads$i, citationDyads$j, sep = "_")
+citationDyads$dyadJI <- paste(citationDyads$j, citationDyads$i, sep = "_")
+citationDyads$dyadID <- ifelse(citationDyads$dyadIJ %in% DYAD_ID_order, citationDyads$dyadIJ, citationDyads$dyadJI)
+citationDyads$citationCosSim <- as.numeric(citationDyads$cosSim)
+citationDyads[,1:5] <- NULL
+summary(citationDyads)
+DYADS <- data.frame(DYADS, citationDyads[match(DYADS$dyadID, citationDyads$dyadID),"citationCosSim"])
+
+
+# import similarity in discipline as explanation
+disciplineDyads <- read.csv2("simNets/SimilarDisciplinesCited.csv", sep=",", stringsAsFactors = F)[,-1]
+head(disciplineDyads)
+disciplineDyads$dyadIJ <- paste(disciplineDyads$i, disciplineDyads$j, sep = "_")
+disciplineDyads$dyadJI <- paste(disciplineDyads$j, disciplineDyads$i, sep = "_")
+disciplineDyads$dyadID <- ifelse(disciplineDyads$dyadIJ %in% DYAD_ID_order, disciplineDyads$dyadIJ, disciplineDyads$dyadJI)
+disciplineDyads$disciplineCosSim <- as.numeric(disciplineDyads$cosSim)
+disciplineDyads[,1:5] <- NULL
+summary(disciplineDyads)
+DYADS <- data.frame(DYADS, disciplineDyads[match(DYADS$dyadID, disciplineDyads$dyadID),"disciplineCosSim"])
+
+
+# import similarity in countries studied as control
+countryDyads <- read.csv2("simNets/SimilarCountries.csv", sep=",", stringsAsFactors = F)[,-1]
+head(countryDyads)
+countryDyads$dyadIJ <- paste(countryDyads$i, countryDyads$j, sep = "_")
+countryDyads$dyadJI <- paste(countryDyads$j, countryDyads$i, sep = "_")
+countryDyads$dyadID <- ifelse(countryDyads$dyadIJ %in% DYAD_ID_order, countryDyads$dyadIJ, countryDyads$dyadJI)
+countryDyads$countryCosSim <- as.numeric(countryDyads$cosSimC)
+countryDyads[,1:5] <- NULL
+summary(countryDyads)
+DYADS <- data.frame(DYADS, countryDyads[match(DYADS$dyadID, countryDyads$dyadID),"countryCosSim"])
+
+# import similarity in decades studied as control
+decadeDyads <- read.csv2("simNets/SimilarDecades.csv", sep=",", stringsAsFactors = F)[,-1]
+head(decadeDyads)
+decadeDyads$dyadIJ <- paste(decadeDyads$i, decadeDyads$j, sep = "_")
+decadeDyads$dyadJI <- paste(decadeDyads$j, decadeDyads$i, sep = "_")
+decadeDyads$dyadID <- ifelse(decadeDyads$dyadIJ %in% DYAD_ID_order, decadeDyads$dyadIJ, decadeDyads$dyadJI)
+decadeDyads$decadeCosSim <- as.numeric(decadeDyads$cosSimCt)
+decadeDyads[,1:5] <- NULL
+summary(decadeDyads)
+DYADS <- data.frame(DYADS, decadeDyads[match(DYADS$dyadID, decadeDyads$dyadID),"decadeCosSim"])
+
+# import similarity in city definition used as control
+cityDefDyads <- read.csv2("simNets/SimilarCities.csv", sep=",", stringsAsFactors = F)[,-1]
+head(cityDefDyads)
+cityDefDyads$dyadIJ <- paste(cityDefDyads$i, cityDefDyads$j, sep = "_")
+cityDefDyads$dyadJI <- paste(cityDefDyads$j, cityDefDyads$i, sep = "_")
+cityDefDyads$dyadID <- ifelse(cityDefDyads$dyadIJ %in% DYAD_ID_order, cityDefDyads$dyadIJ, cityDefDyads$dyadJI)
+cityDefDyads$cityDefCosSim <- as.numeric(cityDefDyads$cosSimCt)
+cityDefDyads[,1:5] <- NULL
+summary(cityDefDyads)
+DYADS <- data.frame(DYADS, cityDefDyads[match(DYADS$dyadID, cityDefDyads$dyadID),"cityDefCosSim"])
+
+head(DYADS)
+colnames(DYADS) <- c("dyadID","alphaCosSim", 
+                     "fullTextCosSim", "externalCitationCosSim", "disciplineCitationCosSim",
+                     "countriesCosSim", "decadesCosSim", "cityDefCosSim")
+
+DYADS$alphaCosSim_scaled <- scale(DYADS$alphaCosSim)
+DYADS$fullTextCosSim_scaled <- scale(DYADS$fullTextCosSim)
+DYADS$externalCitationCosSim_scaled <- scale(DYADS$externalCitationCosSim)
+DYADS$disciplineCitationCosSim_scaled <- scale(DYADS$disciplineCitationCosSim)
+DYADS$countriesCosSim_scaled <- scale(DYADS$countriesCosSim)
+DYADS$decadesCosSim_scaled <- scale(DYADS$decadesCosSim)
+DYADS$cityDefCosSim_scaled <- scale(DYADS$cityDefCosSim)
+
+
+DYADSwithNA <- DYADS
+DYADS <- DYADS[complete.cases(DYADS),]
+dim(DYADSwithNA)
+dim(DYADS)
+
+
+model <- lm(data = DYADS,
+            formula = alphaCosSim_scaled ~ fullTextCosSim_scaled,
+            na.action = na.omit)
+summary(model)
+model <- lm(data = DYADS,
+            formula = alphaCosSim_scaled ~ externalCitationCosSim_scaled,
+            na.action = na.omit)
+summary(model)
+model <- lm(data = DYADS,
+            formula = alphaCosSim_scaled ~ disciplineCitationCosSim,
+            na.action = na.omit)
+summary(model)
+
+model <- lm(data = DYADS,
+            formula = alphaCosSim_scaled ~ countriesCosSim_scaled,
+            na.action = na.omit)
+summary(model)
+model <- lm(data = DYADS,
+            formula = alphaCosSim_scaled ~ decadesCosSim_scaled,
+            na.action = na.omit)
+summary(model)
+model <- lm(data = DYADS,
+            formula = alphaCosSim_scaled ~ cityDefCosSim_scaled,
+            na.action = na.omit)
+summary(model)
+
+model <- lm(data = DYADS,
+            formula = alphaCosSim_scaled ~ fullTextCosSim_scaled + 
+              countriesCosSim_scaled + decadesCosSim_scaled + cityDefCosSim_scaled,
+            na.action = na.omit)
+summary(model)
+model <- lm(data = DYADS,
+            formula = alphaCosSim_scaled ~ externalCitationCosSim_scaled + 
+              countriesCosSim_scaled + decadesCosSim_scaled + cityDefCosSim_scaled,
+            na.action = na.omit)
+summary(model)
+model <- lm(data = DYADS,
+            formula = alphaCosSim_scaled ~ disciplineCitationCosSim+ 
+              countriesCosSim_scaled + decadesCosSim_scaled + cityDefCosSim_scaled,
+            na.action = na.omit)
+summary(model)
+
+model <- lm(data = DYADS,
+            formula = alphaCosSim_scaled ~ 
+              fullTextCosSim_scaled + externalCitationCosSim_scaled + disciplineCitationCosSim,
+            na.action = na.omit)
+summary(model)
+
+
+model <- lm(data = DYADS,
+            formula = alphaCosSim_scaled ~ 
+              fullTextCosSim_scaled + externalCitationCosSim_scaled + disciplineCitationCosSim + 
+              countriesCosSim_scaled + decadesCosSim_scaled + cityDefCosSim_scaled,
+            na.action = na.omit)
+summary(model)
+
+model <- lm(data = DYADS,
+            formula = alphaCosSim_scaled ~ 
+              fullTextCosSim_scaled + 
+              countriesCosSim_scaled + decadesCosSim_scaled,
+            na.action = na.omit)
+summary(model)
+
+
+DYADSfinal <- DYADS[!is.na(DYADS$fullTextCosSim) & !is.na(DYADS$countriesCosSim) & !is.na(DYADS$decadesCosSim),]
+model <- lm(data = DYADSfinal,
+            formula = alphaCosSim_scaled ~ 
+              fullTextCosSim_scaled + disciplineCitationCosSim_scaled +
+              countriesCosSim_scaled + decadesCosSim_scaled,
+            na.action = na.omit)
+summary(model)
+DYADSfinal$residualsModelFulltextCountriesDecades <- summary(model)$residuals
+head(DYADSfinal[order(-DYADSfinal$residualsModelFulltextCountriesDecades),],10)
+data[data$REFID %in% c("Gab11Jou", "Kru96Jou", "Gab99Qua", "Roz11Ame", "Ber12Cit", "Bre15Int"),]
+
+head(DYADSfinal[order(DYADSfinal$residualsModelFulltextCountriesDecades),],10)
+data[data$REFID %in% c("Ziq16Asi"),]
 
