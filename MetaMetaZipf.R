@@ -8,7 +8,10 @@ library(ggalt)
 library(gridExtra)
 library(data.table)
 library(stringr)
-
+library(tm)
+library(cluster)
+library(SnowballC)
+library(reshape2)
 
 '%!in%' <- function(x,y)!('%in%'(x,y))
 norm_vec <- function(x) sqrt(sumNum(x^2))
@@ -27,13 +30,29 @@ sdNum = function(x) {
   return(s)
 }
 
+toSpace <- content_transformer(function(x, pattern) {
+  return (gsub(pattern, " ", x))
+})
 
+stat.comp<-  function( x,y){
+  K <-length(unique(y))
+  n <-length(x)
+  m <-mean(x)
+  TSS <-sum((x-m)^2)
+  nk<-table(y)
+  mk<-tapply(x,y,mean)
+  BSS <-sum(nk* (mk-m)^2)
+  result<-c(mk,100.0*BSS/TSS)
+  names(result) <-c( paste("G",1:K),"% epl.")
+  return(result)
+}
+
+## import data
 cites <- read.csv2("data/zipf_cites.csv", sep=',')
-# meta <- read.csv2("data/zipf_meta.csv", sep=',')
-# length(summary(meta$REFERENCE))
+
+
 head(cites)
 cites_out <- cites[67:1221,]
-
 cites_out$YEAR <- as.numeric(gsub("\\D+", "", cites_out$REFID))
 cites_out$JOURNAL <- gsub(".*\\d.", "", cites_out$REFID)
 cites_out$AUTHOR <- gsub("\\d.*", "", cites_out$REFID)
@@ -54,92 +73,90 @@ dim(cites_out)
 cites <- rbind(cites[1:66,],cites_out)
 tail(cites)
 cites[is.na(cites)] <- 0
-
-
 cites_within <- cites[1:66,c(1,6:71)]
 tail(cites_within)
 rownames(cites_within) <- cites_within$REFID
 cites_within$REFID <- NULL
-
-
 cmat <- t(as.matrix(cites_within))
-dim(cmat)
-
-node.size <- colSums(cmat) +1
-
-
-cite_year <- cites[1:66,c('REFID', 'YEAR')]
-ids <- cite_year$REFID
-rownames(cite_year) <- ids
-cite_year$REFID <- NULL
-node.year <- cite_year$YEAR - 1974
-
-cite_disc <- cites[1:66,c('REFID', 'DISCIPLINE')]
-rownames(cite_disc) <- ids
-cite_disc$REFID <- NULL
-node.disc <- as.character(cite_disc$DISCIPLINE)
-
-
-node.disc[node.disc == "ECO"] <- "slateblue3"
-node.disc[node.disc == "REG"] <- "orangered"
-node.disc[node.disc == "GEO"] <- "darkgoldenrod2"
-node.disc[node.disc == "PHY"] <- "seagreen3"
-
-
-
-
-########### Network of intra citations
-
-g <- graph_from_adjacency_matrix(cmat, mode = "directed", diag = F)
-
-layout <- layout_nicely(g,2)
-g$layout <- layout
-fine = 500 # this will adjust the resolving power.
-pal.lab = colorRampPalette(c('grey30','black'))
-graphCol.lab = pal.lab(fine)[as.numeric(cut(node.year,breaks = fine))]
-
-par(mar = c(0.5, 0.3, 0.5, 0.5))
-
-plot(g, vertex.size=node.size*0.5,
-     vertex.label.dist=0.5, 
-     vertex.color= alpha("grey",0.6), edge.color = "black", 
-     vertex.label.cex = 0.7,  vertex.label.color = node.disc,
-     vertex.label.font = 2,  
-     edge.arrow.size=0.2)
-
-solos = c("Sua80Jou", "Par83Jou", "Oka79Reg", "Mir86Urb", "Pop74Sov")
-cmat_linked <- cmat[rownames(cmat) %!in% solos, colnames(cmat) %!in% solos]
-dim(cmat_linked)
-
-node.size <- colSums(cmat_linked) +1
-
-cite_year_linked <- cite_year[rownames(cite_year) %!in% solos, ]
-node.year_linked <- cite_year_linked - 1974
-
-cite_disc_linked <- cite_disc[rownames(cite_disc) %!in% solos, ]
-node.disc_linked <- as.character(cite_disc_linked)
+# 
+# 
+# dim(cmat)
+# 
+# node.size <- colSums(cmat) +1
+# 
+# 
+# cite_year <- cites[1:66,c('REFID', 'YEAR')]
+# ids <- cite_year$REFID
+# rownames(cite_year) <- ids
+# cite_year$REFID <- NULL
+# node.year <- cite_year$YEAR - 1974
+# 
+# cite_disc <- cites[1:66,c('REFID', 'DISCIPLINE')]
+# rownames(cite_disc) <- ids
+# cite_disc$REFID <- NULL
+# node.disc <- as.character(cite_disc$DISCIPLINE)
+# 
+# 
+# node.disc[node.disc == "ECO"] <- "slateblue3"
+# node.disc[node.disc == "REG"] <- "orangered"
+# node.disc[node.disc == "GEO"] <- "darkgoldenrod2"
+# node.disc[node.disc == "PHY"] <- "seagreen3"
 
 
-node.disc_linked[node.disc_linked == "ECO"] <- "slateblue3"
-node.disc_linked[node.disc_linked == "REG"] <- "orangered"
-node.disc_linked[node.disc_linked == "GEO"] <- "darkgoldenrod2"
-node.disc_linked[node.disc_linked == "PHY"] <- "seagreen3"
 
 
-g <- graph_from_adjacency_matrix(cmat_linked, mode = "directed", diag = F)
-
-layout <- layout_nicely(g,2)
-g$layout <- layout
-
-graphCol.lab = pal.lab(fine)[as.numeric(cut(node.year_linked,breaks = fine))]
-
-
-plot(g, vertex.size=node.size*0.5,
-     vertex.label.dist=0.5, 
-     vertex.color= alpha("grey",0.6), edge.color = "black", 
-     vertex.label.cex = 0.7,  vertex.label.color = node.disc_linked,
-     vertex.label.font = 2,  
-     edge.arrow.size=0.2)
+# ########### Network of intra citations
+# 
+# g <- graph_from_adjacency_matrix(cmat, mode = "directed", diag = F)
+# 
+# layout <- layout_nicely(g,2)
+# g$layout <- layout
+# fine = 500 # this will adjust the resolving power.
+# pal.lab = colorRampPalette(c('grey30','black'))
+# graphCol.lab = pal.lab(fine)[as.numeric(cut(node.year,breaks = fine))]
+# 
+# par(mar = c(0.5, 0.3, 0.5, 0.5))
+# 
+# plot(g, vertex.size=node.size*0.5,
+#      vertex.label.dist=0.5, 
+#      vertex.color= alpha("grey",0.6), edge.color = "black", 
+#      vertex.label.cex = 0.7,  vertex.label.color = node.disc,
+#      vertex.label.font = 2,  
+#      edge.arrow.size=0.2)
+# 
+# solos = c("Sua80Jou", "Par83Jou", "Oka79Reg", "Mir86Urb", "Pop74Sov")
+# cmat_linked <- cmat[rownames(cmat) %!in% solos, colnames(cmat) %!in% solos]
+# dim(cmat_linked)
+# 
+# node.size <- colSums(cmat_linked) +1
+# 
+# cite_year_linked <- cite_year[rownames(cite_year) %!in% solos, ]
+# node.year_linked <- cite_year_linked - 1974
+# 
+# cite_disc_linked <- cite_disc[rownames(cite_disc) %!in% solos, ]
+# node.disc_linked <- as.character(cite_disc_linked)
+# 
+# 
+# node.disc_linked[node.disc_linked == "ECO"] <- "slateblue3"
+# node.disc_linked[node.disc_linked == "REG"] <- "orangered"
+# node.disc_linked[node.disc_linked == "GEO"] <- "darkgoldenrod2"
+# node.disc_linked[node.disc_linked == "PHY"] <- "seagreen3"
+# 
+# 
+# g <- graph_from_adjacency_matrix(cmat_linked, mode = "directed", diag = F)
+# 
+# layout <- layout_nicely(g,2)
+# g$layout <- layout
+# 
+# graphCol.lab = pal.lab(fine)[as.numeric(cut(node.year_linked,breaks = fine))]
+# 
+# 
+# plot(g, vertex.size=node.size*0.5,
+#      vertex.label.dist=0.5, 
+#      vertex.color= alpha("grey",0.6), edge.color = "black", 
+#      vertex.label.cex = 0.7,  vertex.label.color = node.disc_linked,
+#      vertex.label.font = 2,  
+#      edge.arrow.size=0.2)
 
 
 
@@ -167,10 +184,6 @@ q + geom_lollipop(aes(reorder(ref, -cop)),color = "seagreen3", cex=1) +
 ################## intro
 
 refs <- read.csv2("data/zipf_refs.csv", sep=';')
-dim(refs[refs$IN_HERE == 1,])
-head(cites[1:66,])
-
-cites[1:66,1:5]
 
 j <- cites[1:66,1:5]
 j$n <- 1
@@ -187,55 +200,54 @@ mean(corpussummary$YEAR)
 mean(corpussummary[corpussummary$in_citations > 10, "YEAR"])
 
 
-########### network between disciplines
+# ########### network between disciplines
+# 
+# cites_long <- melt(cmat)
+# head(cites_long)
+# cites_long_pos <- cites_long[cites_long$value > 0,]
+# head(cites_long_pos)
+# j_citing <- j
+# colnames(j_citing) <- paste("citing", colnames(j), sep="_")
+# clpd <- data.frame(cites_long_pos, j_citing[match(cites_long_pos$Var1, j_citing$citing_REFID),])
+# j_cited <- j
+# colnames(j_cited) <- paste("cited", colnames(j), sep="_")
+# clpd <- data.frame(clpd, j_cited[match(clpd$Var2, j_cited$cited_REFID),])
+# head(clpd)
+# 
+# dmat <- dcast(clpd, citing_DISCIPLINE ~ cited_DISCIPLINE, sum)
+# dmatm <- melt(dmat)
+# 
+# 
+# 
+# gd <- graph_from_data_frame(dmatm, directed = T)
+# vd <- as.data.frame(names(V(gd)))
+# colnames(vd) <- "discipline"
+# disciplines <- aggregate(j[,"n"], by=list(j[,"DISCIPLINE"]), FUN = sum)
+# 
+# size.nodes <- data.frame(vd, disciplines[match(vd$discipline, disciplines$Group.1),])
+# size.nodes.d <- size.nodes$x
+# 
+# plot(gd,edge.width = dmatm$value * 0.5, vertex.size = size.nodes.d * 3,
+#      vertex.label.cex = 0.7,  edge.curved=.8)
 
-cites_long <- melt(cmat)
-head(cites_long)
-cites_long_pos <- cites_long[cites_long$value > 0,]
-head(cites_long_pos)
-j_citing <- j
-colnames(j_citing) <- paste("citing", colnames(j), sep="_")
-clpd <- data.frame(cites_long_pos, j_citing[match(cites_long_pos$Var1, j_citing$citing_REFID),])
-j_cited <- j
-colnames(j_cited) <- paste("cited", colnames(j), sep="_")
-clpd <- data.frame(clpd, j_cited[match(clpd$Var2, j_cited$cited_REFID),])
-head(clpd)
 
-dmat <- dcast(clpd, citing_DISCIPLINE ~ cited_DISCIPLINE, sum)
-dmatm <- melt(dmat)
-
-library(igraph)
-
-
-gd <- graph_from_data_frame(dmatm, directed = T)
-vd <- as.data.frame(names(V(gd)))
-colnames(vd) <- "discipline"
-disciplines <- aggregate(j[,"n"], by=list(j[,"DISCIPLINE"]), FUN = sum)
-
-size.nodes <- data.frame(vd, disciplines[match(vd$discipline, disciplines$Group.1),])
-size.nodes.d <- size.nodes$x
-
-plot(gd,edge.width = dmatm$value * 0.5, vertex.size = size.nodes.d * 3,
-     vertex.label.cex = 0.7,  edge.curved=.8)
-
-
-########### network between journals
-
-dmat <- dcast(clpd, citing_JOURNAL ~ cited_JOURNAL, sum)
-dmatm <- melt(dmat)
-dmatmp <- dmatm[dmatm$value>1,]
-
-gj <- graph_from_data_frame(dmatmp, directed = T)
-
-v <- as.data.frame(names(V(gj)))
-colnames(v) <- "journal"
-
-size.nodes <- data.frame(v, journals[match(v$journal, journals$Group.1),])
-size.nodes.l <- size.nodes$x
-size.nodes
-
-plot(gj,edge.width = dmatmp$value, vertex.label.cex = 0.7,  edge.curved=.4,
-     vertex.size = size.nodes.l * 3)
+# ########### network between journals
+# 
+# dmat <- dcast(clpd, citing_JOURNAL ~ cited_JOURNAL, sum)
+# dmatm <- melt(dmat)
+# dmatmp <- dmatm[dmatm$value>1,]
+# 
+# gj <- graph_from_data_frame(dmatmp, directed = T)
+# 
+# v <- as.data.frame(names(V(gj)))
+# colnames(v) <- "journal"
+# 
+# size.nodes <- data.frame(v, journals[match(v$journal, journals$Group.1),])
+# size.nodes.l <- size.nodes$x
+# size.nodes
+# 
+# plot(gj,edge.width = dmatmp$value, vertex.label.cex = 0.7,  edge.curved=.4,
+#      vertex.size = size.nodes.l * 3)
 
 
 
@@ -260,26 +272,22 @@ write.csv(yearIntraJour, "average_year_publi_internal_all_per_journal.csv")
 
   
   ############## external citations
-
-
-head(cites)
-dim(cites)
-cites_out <- cites[67:1221,]
-tail(cites_out)
-
-cites_out$YEAR <- as.numeric(gsub("\\D+", "", cites_out$REFID))
-cites_out$JOURNAL <- gsub(".*\\d.", "", cites_out$REFID)
-cites_out$AUTHOR <- gsub("\\d.*", "", cites_out$REFID)
-cites_out$JOURNAL <- gsub("[[:punct:]]", " ", cites_out$JOURNAL)
-cites_out$AUTHOR <- gsub("[[:punct:]]", " ", cites_out$AUTHOR)
-yearInter <- round(mean(cites_out$YEAR, na.rm = T), digit=0)
-write.csv(yearInter, "average_year_publi_external_all.csv")
-
-head(cites_out)
-summary(as.factor(cites_out$JOURNAL))/dim(cites_out)[1]
-# Diverse pool of citations. MAx % of journals cited = 2.5% (Journal Regional Science) and 2.3 (Urban Studies)
+# 
+# # 
+# cites_out$YEAR <- as.numeric(gsub("\\D+", "", cites_out$REFID))
+# cites_out$JOURNAL <- gsub(".*\\d.", "", cites_out$REFID)
+# cites_out$AUTHOR <- gsub("\\d.*", "", cites_out$REFID)
+# cites_out$JOURNAL <- gsub("[[:punct:]]", " ", cites_out$JOURNAL)
+# cites_out$AUTHOR <- gsub("[[:punct:]]", " ", cites_out$AUTHOR)
+# yearInter <- round(mean(cites_out$YEAR, na.rm = T), digit=0)
+# write.csv(yearInter, "average_year_publi_external_all.csv")
+# # 
+# head(cites_out)
+# summary(as.factor(cites_out$JOURNAL))/dim(cites_out)[1]
+# # Diverse pool of citations. MAx % of journals cited = 2.5% (Journal Regional Science) and 2.3 (Urban Studies)
 #jou <- as.data.frame(summary(as.factor(cites_out$JOURNAL)))
 colnames(cites_out)
+cites_out <- cites[67:1221,]
 cites_out$n_cites <- rowSums(cites_out[,6:71])
 single_outcites <- cites_out[order(-cites_out$n_cites),c(1:5,72)] 
 s_outcites <- single_outcites[,c("REFID", "n_cites")]
@@ -315,8 +323,8 @@ scale_fill_manual(values = c("Coral2", "dodgerblue3"))  + labs(color = "") + gui
 
 table(rfczpf$ref_zipf, rfczpf$DISCIPLINE)
 
-## look for articles published in particular journals
-cites_out[cites_out$JOURNAL == "Papers in Regional Science",]
+## Which are the authors cited from Urban Studies
+cites_out[cites_out$JOURNAL == "Urban Studies","AUTHOR"]
 
 ## look for total citations per corpus paper
 n_citations <- as.data.frame(colSums(cites_out[,6:71], na.rm=T))
@@ -565,34 +573,14 @@ plot(g.cit, edge.width = sqrt(cs.cit$cosSim) * 2, vertex.size = disCitedNs,
 ####### import full texts
 
 cname <- "data/FullText/"
-stat.comp<-  function( x,y){
-  K <-length(unique(y))
-  n <-length(x)
-  m <-mean(x)
-  TSS <-sum((x-m)^2)
-  nk<-table(y)
-  mk<-tapply(x,y,mean)
-  BSS <-sum(nk* (mk-m)^2)
-  result<-c(mk,100.0*BSS/TSS)
-  names(result) <-c( paste("G",1:K),"% epl.")
-  return(result)
-}
-
 dir(cname)
-
-library(tm)
-library(cluster)
-library(SnowballC)
-
 docs <- Corpus(DirSource(cname))   
 
 summary(docs)   
 docs
 inspect(docs[2])
 #docs = tm_map(docs, function(x) iconv(x, to='UTF-8-MAC', sub='byte'))
-toSpace <- content_transformer(function(x, pattern) {
-  return (gsub(pattern, " ", x))
-})
+
 docs <- tm_map(docs, toSpace, "-")
 docs <- tm_map(docs, toSpace, ":")
 docs <- tm_map(docs, toSpace, "'")
@@ -647,20 +635,6 @@ head(n[order(-n$l),], 20)
  q + geom_boxplot(alpha = 0.4) + theme(legend.position = "none")
  
  plot(n_words_corpus$n_words,n_words_corpus$YEAR)
- 
- # 
- # 
- # 
- # library(scales)
- # library(reshape2)
- # frequency <- as.data.frame(tdm.df.f)
- # frequency$word <- rownames(frequency)
- # names(frequency) 
- # freq.long <- reshape2::melt(data = frequency, id=c("word"))
- # colnames(freq.long) <- c("word", "text", "frequency")
- # dim(freq.long)
- # 
- # library(quanteda)
  
  
  
@@ -1302,7 +1276,7 @@ fullmodel_a <- lm(data = modeldata,
             na.action = na.omit)
 summary(fullmodel_a)
 
-library(stargazer)
+
 sgm<- stargazer(ftm_a, ecm_a, dcm_a,
           ctrm_a,
           fullmodel_a,
@@ -1387,7 +1361,7 @@ fullmodel_sd <- lm(data = modeldata,
                   na.action = na.omit)
 summary(fullmodel_sd)
 
-library(stargazer)
+
 sgm<- stargazer(ftm_sd, ecm_sd, dcm_sd,n_sd,
                 ctrm_sd,
                 fullmodel_sd,

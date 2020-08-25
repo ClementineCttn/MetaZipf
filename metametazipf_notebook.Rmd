@@ -1,0 +1,324 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+This is an [R Markdown](http://rmarkdown.rstudio.com) Notebook. When you execute code within the notebook, the results appear beneath the code. 
+
+Try executing this chunk by clicking the *Run* button within the chunk or by placing your cursor inside it and pressing *Cmd+Shift+Enter*. 
+
+
+```{r setup, include = FALSE}
+library(igraph)
+library(scales)
+library(wesanderson)
+library(ggplot2)
+library(ggrepel)
+library(ggalt)
+library(gridExtra)
+library(data.table)
+library(stringr)
+library(tm)
+library(cluster)
+library(SnowballC)
+library(stargazer)
+library(reshape2)
+
+
+'%!in%' <- function(x,y)!('%in%'(x,y))
+norm_vec <- function(x) sqrt(sumNum(x^2))
+
+sumNum = function(x) { 
+  s = sum(x, na.rm = T)
+  return(s)
+}
+meanNum = function(x) { 
+  s = mean(x, na.rm = T)
+  return(s)
+}
+
+sdNum = function(x) { 
+  s = sd(x, na.rm = T)
+  return(s)
+}
+
+toSpace <- content_transformer(function(x, pattern) {
+  return (gsub(pattern, " ", x))
+})
+
+stat.comp<-  function( x,y){
+  K <-length(unique(y))
+  n <-length(x)
+  m <-mean(x)
+  TSS <-sum((x-m)^2)
+  nk<-table(y)
+  mk<-tapply(x,y,mean)
+  BSS <-sum(nk* (mk-m)^2)
+  result<-c(mk,100.0*BSS/TSS)
+  names(result) <-c( paste("G",1:K),"% epl.")
+  return(result)
+}
+
+```
+
+
+# Importing Data from the metaZipf project: 
+* the information about articles in the corpus (refs)
+* the empirical estimations they report along with their specifications (data)
+* the citation matrix (cites)
+* the cleaned full-texts (docs)
+* the lookup table from journal to discipline (J2D)
+
+```{r import}
+refs <- read.csv2("data/zipf_refs.csv", sep=';')
+cites <- read.csv2("data/zipf_cites.csv", sep=',')
+data <- read.csv2("data/zipf_meta.csv", sep=",", dec=".")
+cname <- "data/FullText/"
+docs <- Corpus(DirSource(cname))   
+J2D <- read.csv2('journals2Disciplines.csv', sep=';')
+```
+
+
+## Cleaning citation data
+```{r cleanCitation, warning=FALSE}
+cites_out <- cites[67:1221,]
+cites_out$YEAR <- as.numeric(gsub("\\D+", "", cites_out$REFID))
+cites_out$JOURNAL <- gsub(".*\\d.", "", cites_out$REFID)
+cites_out$AUTHOR <- gsub("\\d.*", "", cites_out$REFID)
+cites_out$JOURNAL <- gsub("[[:punct:]]", " ", cites_out$JOURNAL)
+cites_out$AUTHOR <- gsub("[[:punct:]]", " ", cites_out$AUTHOR)
+cites_out <- data.frame(cites_out,J2D[match(cites_out$JOURNAL, J2D$JOURNAL),])
+cites_out$DISCIPLINE <- cites_out$DISCPLINE
+cites_out$DISCPLINE <- NULL
+cites_out$JOURNAL.1 <- NULL
+cites <- rbind(cites[1:66,],cites_out)
+cites[is.na(cites)] <- 0
+cites_within <- cites[1:66,c(1,6:71)]
+head(cites)
+```
+
+## First analysis of the corpus
+```{r corpusAnalysis}
+
+j <- cites[1:66,1:5]
+j$n <- 1
+journals <- aggregate(j[,"n"], by=list(j[,"JOURNAL"]), FUN = sum)
+q <- ggplot(journals, aes(x= Group.1, y = x))
+ q + geom_lollipop(aes(reorder( Group.1, -x)),color = "orangered", cex=1) +
+  coord_flip() +
+  labs(x="Journal", y="Number of articles in the corpus")
+
+rownames(cites_within) <- cites_within$REFID
+cites_within$REFID <- NULL
+cmat <- t(as.matrix(cites_within))
+c <- colSums(cmat)
+co <- c[order(-c)]
+ref <- names(co)
+cope <- data.frame(ref, co)
+cope_full_names <- data.frame(cope, cites[match(cope$ref, cites$REFID),c("AUTHOR", "YEAR", "JOURNAL")])
+cope_full_names$ref <- paste(cope_full_names$AUTHOR, cope_full_names$YEAR, sep=" ")
+
+par(mar = c(2,2,2,2))
+q <- ggplot(cope_full_names, aes(x=ref, y = cop))
+q + geom_lollipop(aes(reorder(ref, -cop)),color = "seagreen3", cex=1) +
+  coord_flip() +
+  labs(x="Reference", y="Number of in-citations from the corpus")
+
+
+age_journals <- data.frame(aggregate(j[,"YEAR"], by=list(j[,"JOURNAL"]), FUN = mean), journals$x)
+age_disciplines <- data.frame(aggregate(j[,"YEAR"], by=list(j[,"DISCIPLINE"]), FUN = mean), disciplines$x)
+rownames(age_disciplines) = age_disciplines$Group.1
+rownames(age_journals) = age_journals$Group.1
+age_disciplines$Group.1 <- NULL
+age_journals$Group.1 <- NULL
+colnames(age_disciplines) <- c("mean age", "n articles")
+colnames(age_journals) <- c("mean age", "n articles")
+round(mean(j$YEAR), digit=0)
+round(age_disciplines, digit=0)
+corpussummary <- data.frame(j, cope[match(j$REFID, cope$ref),])
+colnames(corpussummary)[8] <- "in_citations"
+mean(corpussummary[corpussummary$in_citations > 10, "YEAR"])
+```
+
+## External citation analysis
+
+```{r citationAnalysis}
+cites_out <- cites[67:1221,]
+cites_out$n_cites <- rowSums(cites_out[,6:71])
+single_outcites <- cites_out[order(-cites_out$n_cites),c(1:5,72)] 
+s_outcites <- single_outcites[,c("REFID", "n_cites")]
+colnames(s_outcites) <- c("ref", "n")
+s_outcites <- subset(s_outcites[-100,], n>=5)
+q <- ggplot(s_outcites, aes(x=ref, y = n))
+q + geom_lollipop(aes(reorder(ref, -n)),color = "coral3", cex=1) +
+  coord_flip() +
+  labs(x="Reference", y="Number of citations from the corpus (>=5)")
+```
+
+Who cited Nitsch (2005)?
+```{r exampleCitation}
+who <- cites_out[cites_out$REFID == "Nitsch_2005_Journal_Urban_Economics",6:71]
+who[1,]
+```
+
+Who did not cite G. K. Zipf himself?
+```{r noZipfCitation}
+nozipf<- as.data.frame(colSums(cites_out[cites_out$REFID %in% c("Zipf_1941_Unity_disunity",
+                                                                "Zipf_1949_Human_Behavior_Principle_Least_Effort"),6:71]))
+colnames(nozipf) <- "ref_zipf"
+nozipf$ref_zipf <- ifelse(nozipf$ref_zipf == 0 , "no ref to zipf", "ref to zipf")
+nozipf$REFID <- rownames(nozipf)
+cites_for_ref_zipfs <- cites[1:66,]
+referencing_zipf <- data.frame(cites_for_ref_zipfs, nozipf[match(cites_for_ref_zipfs$REFID, nozipf$REFID),])
+rfczpf <- referencing_zipf[,c("YEAR", "DISCIPLINE", "ref_zipf")]
+
+q <- ggplot(rfczpf, aes(x=YEAR))
+q + geom_histogram(aes(y = stat(density), color = ref_zipf, fill = ref_zipf), 
+                   alpha = 0.4, position = "identity", binwidth = 1) +
+  geom_density(aes(color = ref_zipf), size = 1) +
+  scale_color_manual(values = c("Coral2", "dodgerblue3")) +
+scale_fill_manual(values = c("Coral2", "dodgerblue3"))  + labs(color = "") + guides(fill = FALSE, size = FALSE)+ theme(legend.position = "top")
+
+table(rfczpf$ref_zipf, rfczpf$DISCIPLINE)
+```
+
+Which are the authors cited from Urban Studies?
+```{r exCitationFromJournal}
+cites_out[cites_out$JOURNAL == "Urban Studies","AUTHOR"]
+```
+
+Size of bibliography of corpus articles
+```{r sizeBiblio}
+n_citations <- as.data.frame(colSums(cites_out[,6:71], na.rm=T))
+colnames(n_citations) <- "n_citations"
+n_citations$REFID <- rownames(n_citations)
+n_citations_corpus <- data.frame(cites_for_ref_zipfs, n_citations[match(cites_for_ref_zipfs$REFID, n_citations$REFID),])
+n_citations_corpus$ref <- paste(n_citations_corpus$AUTHOR, n_citations_corpus$YEAR, sep=" ")
+
+q <- ggplot(n_citations_corpus, aes(x=ref, y = n_citations))
+q + geom_lollipop(aes(reorder(ref, -n_citations)),color = "dodgerblue3", cex=1) +
+  coord_flip() +
+  labs(x="Reference", y="Size of bibliography by corpus article")
+
+```
+
+Most cited external aticles
+```{r MostCitedArticles}
+
+jou_out <- as.data.frame(table(cites_out$JOURNAL))
+jou_out <- jou_out[order(-jou_out$Freq),] 
+colnames(jou_out) <- c("ref", "n")
+jou <- subset(jou_out[-100,], n>=5)
+q <- ggplot(jou, aes(x=ref, y = n))
+q + geom_lollipop(aes(reorder(ref, -n)),color = "goldenrod3", cex=1) +
+  coord_flip() +
+  labs(x="Journal", y="Number of citations from the corpus (>=5)")
+```
+
+# Construction of the citation similarity network
+```{r citationSimilarityNetwork}
+
+outcitemat <- as.matrix(cites_out[,6:71])
+toutcitemat <- t(outcitemat)
+refSim <- rownames(toutcitemat)
+cosSim <- data.frame()
+k=0
+ilist <- c()
+for(i in refSim){
+  ilist <- c(ilist, i)
+  for(j in refSim){
+    if (j %!in% ilist){
+    k <- k + 1
+    cosSim[k,1] <- i
+    cosSim[k,2] <- j
+    vi <- toutcitemat[i,]
+    vj <- toutcitemat[j,]
+    cosSim[k,3] <- (sumNum(vi * vj)) / (norm_vec(vi) *  norm_vec(vj)) 
+    }
+  }
+}
+colnames(cosSim) <- c('i', 'j', 'cosSim')
+
+summary(cosSim$cosSim)
+cs.cit <- cosSim[cosSim$cosSim >= 0.25,]
+g.cit <- graph_from_data_frame(cs.cit, directed=F)
+
+citingNs <- as.data.frame(apply(toutcitemat[rownames(toutcitemat) %in% V(g.cit)$name,],1, FUN = norm_vec))
+colnames(citingNs) <- "citingN"
+citingNs$ref <- rownames(citingNs)
+orderedName <- data.frame(V(g.cit)$name)
+citingN <- data.frame(orderedName, citingNs[match(orderedName$V.g.cit..name, citingNs$ref),])[,"citingN"]
+citingN <- citingN[!is.na(citingN)] 
+
+par(mar = c(0,0,0,0))
+clln.cit <- cluster_louvain(g.cit)
+layout <- layout_nicely(g.cit,2)
+g.cit$layout <- layout
+plot(g.cit, edge.width = sqrt(cs.cit$cosSim) * 2, vertex.size = citingN,
+     vertex.label.cex = 0.7,  edge.curved=.2, vertex.color = membership(clln.cit))
+```
+
+# Construction of the discipline similarity network
+```{r disciplineNetwork}
+discipline2ref <- aggregate(cites_out[,c(6:71)], by=list(cites_out$DISCIPLINE), FUN = sumNum)
+rownames(discipline2ref) <- discipline2ref$Group.1
+discipline2ref$Group.1 <- NULL
+cols <- colnames(discipline2ref)
+for(i in cols){
+  absolute <- discipline2ref[,i]
+  total <- sum(absolute)
+  relative <- absolute/total
+  discipline2ref[,paste0("freq_",i)] <- relative
+}
+
+disc2ref <- as.matrix(discipline2ref[,67:132])
+colnames(disc2ref) <- cols
+scaled_disc2ref <- disc2ref / colSums(disc2ref)
+tdisc2ref <- t(disc2ref)
+
+refSim <- rownames(tdisc2ref)
+cosSim <- data.frame()
+k=0
+ilist <- c()
+for(i in refSim){
+  ilist <- c(ilist, i)
+  for(j in refSim){
+    if (j %!in% ilist){
+      k <- k + 1
+      cosSim[k,1] <- i
+      cosSim[k,2] <- j
+      vi <- tdisc2ref[i,]
+      vj <- tdisc2ref[j,]
+      cosSim[k,3] <- (sumNum(vi * vj)) / (norm_vec(vi) *  norm_vec(vj)) 
+    }
+  }
+}
+colnames(cosSim) <- c('i', 'j', 'cosSim')
+summary(cosSim$cosSim)
+cs.cit <- cosSim[cosSim$cosSim >= 0.9,]
+g.cit <- graph_from_data_frame(cs.cit, directed=F)
+
+disCitedNs <- as.data.frame(apply(toutcitemat[rownames(tdisc2ref) %in% V(g.cit)$name,],1, FUN = norm_vec))
+colnames(disCitedNs) <- "disCitedNs"
+disCitedNs$ref <- rownames(disCitedNs)
+orderedName <- data.frame(V(g.cit)$name)
+disCitedNs <- data.frame(orderedName, disCitedNs[match(orderedName$V.g.cit..name, disCitedNs$ref),])[,"disCitedNs"]
+disCitedNs <- disCitedNs[!is.na(disCitedNs)] 
+
+colnames(orderedName) <- "REFID"
+refinfo <- cites[1:66,c("REFID", "DISCIPLINE")]
+own_discipline <- data.frame(orderedName, refinfo[match(orderedName$REFID, refinfo$REFID),])
+odisc <- own_discipline$DISCIPLINE
+
+layout <- layout_nicely(g.cit,2)
+g.cit$layout <- layout
+par(mar = c(0,0,0,0))
+plot(g.cit, edge.width = sqrt(cs.cit$cosSim) * 2, vertex.size = disCitedNs,
+     vertex.label.cex = 0.7,  edge.curved=.2, vertex.color = odisc)
+
+
+```
+
+
+
+When you save the notebook, an HTML file containing the code and output will be saved alongside it (click the *Preview* button or press *Cmd+Shift+K* to preview the HTML file).
