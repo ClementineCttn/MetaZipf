@@ -1,12 +1,9 @@
 ---
-title: "R Notebook"
+title: "The MetaMetaZipf Notebook"
 output: html_notebook
 ---
 
-This is an [R Markdown](http://rmarkdown.rstudio.com) Notebook. When you execute code within the notebook, the results appear beneath the code. 
-
-Try executing this chunk by clicking the *Run* button within the chunk or by placing your cursor inside it and pressing *Cmd+Shift+Enter*. 
-
+This is an R Notebook which reproduces the analysis, tables and figures of the working paper "MetaMetaZipf. What do analyses of city size distributions have in common?". The data is stored on the [MetaZipf](https://github.com/ClementineCttn/MetaZipf) GitHub repository.
 
 ```{r setup, include = FALSE}
 library(igraph)
@@ -97,7 +94,8 @@ cites_within <- cites[1:66,c(1,6:71)]
 head(cites)
 ```
 
-## First analysis of the corpus
+## Corpus analysis
+
 ```{r corpusAnalysis}
 
 j <- cites[1:66,1:5]
@@ -238,6 +236,7 @@ for(i in refSim){
   }
 }
 colnames(cosSim) <- c('i', 'j', 'cosSim')
+write.csv(cosSim[order(-cosSim$cosSim),], "simNets/SimilarCitations.csv")
 
 summary(cosSim$cosSim)
 cs.cit <- cosSim[cosSim$cosSim >= 0.25,]
@@ -294,6 +293,7 @@ for(i in refSim){
   }
 }
 colnames(cosSim) <- c('i', 'j', 'cosSim')
+write.csv(cosSim[order(-cosSim$cosSim),], "simNets/SimilarDisciplinesCited_rel.csv")
 summary(cosSim$cosSim)
 cs.cit <- cosSim[cosSim$cosSim >= 0.9,]
 g.cit <- graph_from_data_frame(cs.cit, directed=F)
@@ -319,6 +319,660 @@ plot(g.cit, edge.width = sqrt(cs.cit$cosSim) * 2, vertex.size = disCitedNs,
 
 ```
 
+# Construction of full-text similarity network
+```{r fullTextSim}
+docs <- tm_map(docs, toSpace, "-")
+docs <- tm_map(docs, toSpace, ":")
+docs <- tm_map(docs, toSpace, "'")
+docs <- tm_map(docs, toSpace, "`")
+docs <- tm_map(docs, toSpace, "‘")
+docs <- tm_map(docs, toSpace, "_")
+docs <- tm_map(docs, toSpace, "–")
+docs <- tm_map(docs, toSpace, "/")
+docs <- tm_map(docs, removePunctuation)
+docs <- tm_map(docs, tolower)   
+docs <- tm_map(docs, removeNumbers)   
+docs <- tm_map(docs, removeWords, stopwords("english"))   
+dtm <- DocumentTermMatrix(docs)   
+dtm.m = as.matrix(dtm)
+tdm <- TermDocumentMatrix(docs)   
+tdm.m = as.matrix(tdm)
+
+ tdm.df = as.data.frame(tdm.m)
+ tdm.df.f <- tdm.df / colSums(tdm.df)
+
+n_words <- as.data.frame(colSums(tdm.df, na.rm=T))
+ colnames(n_words) <- "n_words"
+ n_words$REFID <- substr(rownames(n_words), 1,8)
+ n_words_corpus <- data.frame(cites_for_ref_zipfs, n_words[match(cites_for_ref_zipfs$REFID, n_words$REFID),])
+ n_words_corpus$ref <- paste(n_words_corpus$AUTHOR, n_words_corpus$YEAR, sep=" ")
+ n_words_corpus <- n_words_corpus[n_words_corpus$AUTHOR != "Krakover S.",]
+ q <- ggplot(n_words_corpus, aes(x=ref, y = n_words))
+ q + geom_lollipop(aes(reorder(ref, -n_words)),color = "seagreen4", cex=1) +
+   coord_flip() +
+   labs(x="Reference", y="Number of words by corpus article")
+ 
+ termmat <- t(as.matrix(tdm.df.f))
+ 
+ refSimTerm <- rownames(termmat)
+ cosSimTerm <- data.frame()
+ k=0
+ ilist <- c()
+ for(i in refSimTerm){
+   ilist <- c(ilist, i)
+   for(j in refSimTerm){
+     if (j %!in% ilist){
+       k <- k + 1
+       cosSimTerm[k,1] <- i
+       cosSimTerm[k,2] <- j
+       vi <- termmat[i,]
+       vj <- termmat[j,]
+       cosSimTerm[k,3] <- (sumNum(vi * vj)) / (norm_vec(vi) *  norm_vec(vj)) 
+     }
+   }
+ }
+ colnames(cosSimTerm) <- c('i', 'j', 'cosSimTerm')
+ write.csv(cosSimTerm[order(-cosSimTerm$cosSimTerm),], "simNets/SimilarWording.csv")
+ summary(cosSimTerm)
+
+ cs <- cosSimTerm[cosSimTerm$cosSimTerm > 0.7,]
+ g.term <- graph_from_data_frame(cs, directed=F)
+ totalTerm <- as.data.frame(apply(termmat[rownames(termmat) %in% V(g.term)$name,],1, FUN = norm_vec))
+ colnames(totalTerm) <- "totalTerms"
+ totalTerm$ref <- rownames(totalTerm)
+ orderedName <- data.frame(V(g.term)$name)
+ totalTerms <- data.frame(orderedName, totalTerm[match(orderedName$V.g.term..name, totalTerm$ref),])[,"totalTerms"]
+ totalTerms <- totalTerms[!is.na(totalTerms)] 
+ clln.term <- cluster_louvain(g.term)
+ layout <- layout_nicely(g.term,2)
+ g.term$layout <- layout
+ par(mar = c(0,0,0,0))
+ plot(g.term, edge.width = sqrt(cs$cosSimTerm) * 2, vertex.size = totalTerms *50,
+      vertex.label.cex = 0.7,  
+      edge.curved=.2, vertex.color = membership(clln.term))
+ 
+```
+
+# Construction country similarity network
+```{r countrySim}
+
+  paperList <- colnames(cites_out[,6:71])
+  countryData <- data[data$TERRITORY_TYPE == "Country" & data$REFID %in% paperList,]
+country2Ref <- table(countryData$CNTR_ID, countryData$REFID)[-1,]
+country2Ref.mat <- as.matrix(country2Ref[rowSums(country2Ref)>0,colnames(country2Ref) %in% paperList])
+country2Ref.mat[country2Ref.mat>0] <- 1
+countrymat <- t(country2Ref.mat)
+
+refSim <- rownames(countrymat)
+cosSimC <- data.frame()
+k=0
+ilist <- c()
+for(i in refSim){
+  ilist <- c(ilist, i)
+  for(j in refSim){
+    if (j %!in% ilist){
+      k <- k + 1
+      cosSimC[k,1] <- i
+      cosSimC[k,2] <- j
+      vi <- countrymat[i,]
+      vj <- countrymat[j,]
+      s <- (sumNum(vi * vj)) / (norm_vec(vi) *  norm_vec(vj)) 
+      cosSimC[k,3] <- ifelse(!is.na(s), s, 0)
+    }
+  }
+}
+colnames(cosSimC) <- c('i', 'j', 'cosSimC')
+write.csv(cosSimC[order(-cosSimC$cosSimC),], "simNets/SimilarCountries.csv")
+summary(cosSimC)
+cs.cntr <- cosSimC[cosSimC$cosSimC >= 0.2,]
+g.cntr <- graph_from_data_frame(cs.cntr, directed=F)
+countryN <- as.data.frame(apply(countrymat[rownames(countrymat) %in% V(g.cntr)$name,],1, FUN = norm_vec))
+colnames(countryN) <- "n_countries"
+countryN$ref <- rownames(countryN)
+orderedName <- data.frame(V(g.cntr)$name)
+orderedCountryN <- data.frame(orderedName, countryN[match(orderedName$V.g.cntr..name, countryN$ref),])[,"n_countries"]
+orderedCountryN <- orderedCountryN[!is.na(orderedCountryN)] 
+clln.cntr <- cluster_louvain(g.cntr)
+layout <- layout_nicely(g.cntr,2)
+g.cntr$layout <- layout
+ par(mar = c(0,0,0,0))
+ plot(g.cntr, edge.width = sqrt(cs.cntr$cosSimC) * 2, vertex.size = orderedCountryN * 2,
+     vertex.label.cex = 0.7,  edge.curved=.2, vertex.color = membership(clln.cntr))
+
+```
+
+# Construction city definition similarity network
+```{r cityDefSim}
+
+cityData <- data[!is.na(data$URBANSCALE) & data$REFID %in% paperList,]
+city2Ref <- table(cityData$URBANSCALE, cityData$REFID)[,]
+city2Ref.mat <- as.matrix(city2Ref[rowSums(city2Ref)>0,colnames(city2Ref) %in% paperList])
+city2Ref.mat[city2Ref.mat>0] <- 1
+citymat <- t(city2Ref.mat)
+
+refSim <- rownames(citymat)
+cosSimCt <- data.frame()
+k=0
+ilist <- c()
+for(i in refSim){
+  ilist <- c(ilist, i)
+  for(j in refSim){
+    if (j %!in% ilist){
+      k <- k + 1
+      cosSimCt[k,1] <- i
+      cosSimCt[k,2] <- j
+      vi <- citymat[i,]
+      vj <- citymat[j,]
+      s <- (sumNum(vi * vj)) / (norm_vec(vi) *  norm_vec(vj)) 
+      cosSimCt[k,3] <- ifelse(!is.na(s), s, 0)
+    }
+  }
+}
+colnames(cosSimCt) <- c('i', 'j', 'cosSimCt')
+write.csv(cosSimCt[order(-cosSimCt$cosSimCt),], "simNets/SimilarCities.csv")
+summary(cosSimCt)
+cs.city <- cosSimCt[cosSimCt$cosSimCt >= 0.1,]
+
+g.city <- graph_from_data_frame(cs.city, directed=F)
+cityN <- as.data.frame(apply(citymat[rownames(citymat) %in% V(g.city)$name,],1, FUN = norm_vec))
+colnames(cityN) <- "n_cities"
+cityN$ref <- rownames(cityN)
+orderedName <- data.frame(V(g.city)$name)
+orderedcityN <- data.frame(orderedName, cityN[match(orderedName$V.g.city..name, cityN$ref),])[,"n_cities"]
+orderedcityN <- orderedcityN[!is.na(orderedcityN)] 
+
+clln.city <- cluster_louvain(g.city)
+layout <- layout_nicely(g.city,2)
+g.city$layout <- layout
+ par(mar = c(0,0,0,0))
+ plot(g.city, edge.width = sqrt(cs.city$cosSimCt) * 2, vertex.size = orderedcityN * 2,
+     vertex.label.cex = 0.7,  edge.curved=.2, vertex.color = membership(clln.city))
+
+```
 
 
-When you save the notebook, an HTML file containing the code and output will be saved alongside it (click the *Preview* button or press *Cmd+Shift+K* to preview the HTML file).
+# Construction decade similarity network
+```{r decadeSim}
+
+decadeData <- data[!is.na(data$DATE) & data$REFID %in% paperList,]
+decadeData$DECADE <- paste0(substr(as.character(decadeData$DATE), 1, 3), 0, "s")
+decade2Ref <- table(decadeData$DECADE, decadeData$REFID)[,]
+decade2Ref.mat <- as.matrix(decade2Ref[rowSums(decade2Ref)>0,colnames(decade2Ref) %in% paperList])
+decade2Ref.mat[decade2Ref.mat>0] <- 1
+decademat <- t(decade2Ref.mat)
+
+refSim <- rownames(decademat)
+cosSimCt <- data.frame()
+k=0
+ilist <- c()
+for(i in refSim){
+  ilist <- c(ilist, i)
+  for(j in refSim){
+    if (j %!in% ilist){
+      k <- k + 1
+      cosSimCt[k,1] <- i
+      cosSimCt[k,2] <- j
+      vi <- decademat[i,]
+      vj <- decademat[j,]
+      s <- (sumNum(vi * vj)) / (norm_vec(vi) *  norm_vec(vj))
+      cosSimCt[k,3] <- ifelse(!is.na(s), s, 0)
+    }
+  }
+}
+colnames(cosSimCt) <- c('i', 'j', 'cosSimCt')
+write.csv(cosSimCt[order(-cosSimCt$cosSimCt),], "simNets/SimilarDecades.csv")
+summary(cosSimCt$cosSimCt)
+cs.decade <- cosSimCt[cosSimCt$cosSimCt >= 0.65,]
+
+g.decade <- graph_from_data_frame(cs.decade, directed=F)
+decadeN <- as.data.frame(apply(decademat[rownames(decademat) %in% V(g.decade)$name,],1, FUN = norm_vec))
+colnames(decadeN) <- "n_decades"
+decadeN$ref <- rownames(decadeN)
+orderedName <- data.frame(V(g.decade)$name)
+ordereddecadeN <- data.frame(orderedName, decadeN[match(orderedName$V.g.decade..name, decadeN$ref),])[,"n_decades"]
+ordereddecadeN <- ordereddecadeN[!is.na(ordereddecadeN)]
+
+clln.decade <- cluster_louvain(g.decade)
+layout <- layout_nicely(g.decade,2)
+g.decade$layout <- layout
+par(mar = c(0,0,0,0))
+plot(g.decade, edge.width = sqrt(cs.decade$cosSimCt) * 2, vertex.size = ordereddecadeN * 2,
+     vertex.label.cex = 0.7,  edge.curved=.2, vertex.color = membership(clln.decade))
+ 
+```
+
+# Construction of the networks of alpha similarity
+```{r alphaSim}
+alphaData <- data[!is.na(data$ALPHALOTKA) & data$REFID %in% paperList,]
+alphaData$n <- 1
+meanAlphaPerRef <- aggregate(alphaData[,"ALPHALOTKA"], by=list(alphaData$REFID), FUN=meanNum)
+sdAlphaPerRef <- aggregate(alphaData[,"ALPHALOTKA"], by=list(alphaData$REFID), FUN=sdNum)
+sdAlphaPerRef[is.na(sdAlphaPerRef$x),"x"] <- 0
+nAlphaPerRef <- aggregate(alphaData[,"n"], by=list(alphaData$REFID), FUN=sumNum)
+
+similarAlpha <- cbind(meanAlphaPerRef, sdAlphaPerRef, nAlphaPerRef)
+rownames(similarAlpha) <- similarAlpha$Group.1
+similarAlpha[,c(1,3, 5)] <- NULL
+colnames(similarAlpha) <- c("meanAlpha", "sdAlpha", "nAlpha")
+
+alphamat <- as.matrix(similarAlpha)
+
+meanData <- mean(alphaData[,"ALPHALOTKA"])
+sdData <- sd(alphaData[,"ALPHALOTKA"])
+meanN <- mean(similarAlpha$nAlpha)
+
+refSim <- rownames(alphamat)
+diff_mean <- data.frame()
+diff_sd <- data.frame()
+diff_n <- data.frame()
+k=0
+ilist <- c()
+for(i in refSim){
+  ilist <- c(ilist, i)
+  for(j in refSim){
+    if (j %!in% ilist){
+      k <- k + 1
+      diff_mean[k,1] <- i
+      diff_mean[k,2] <- j
+      mi <- similarAlpha[i,1]
+      mj <- similarAlpha[j,1]
+      m <- abs((mi - mj) / meanData)
+      diff_mean[k,3] <- m
+      
+      diff_sd[k,1] <- i
+      diff_sd[k,2] <- j
+      sdi <-similarAlpha[i,2]
+      sdj <- similarAlpha[j,2]
+      sd <- abs((sdi - sdj) / sdData)
+      diff_sd[k,3] <- sd
+      
+      diff_n[k,1] <- i
+      diff_n[k,2] <- j
+      ni <-similarAlpha[i,3]
+      nj <- similarAlpha[j,3]
+      n <- abs((ni - nj) / meanN)
+      diff_n[k,3] <- n
+    }
+  }
+}
+
+colnames(diff_mean) <- c('i', 'j', 'diff_mean')
+write.csv(diff_mean[order(diff_mean$diff_mean),], "simNets/diff_mean.csv")
+summary(diff_mean$diff_mean)
+colnames(diff_sd) <- c('i', 'j', 'diff_sd')
+write.csv(diff_sd[order(diff_sd$diff_sd),], "simNets/diff_sd.csv")
+summary(diff_sd$diff_sd)
+colnames(diff_n) <- c('i', 'j', 'diff_n')
+write.csv(diff_n[order(diff_n$diff_n),], "simNets/diff_n.csv")
+summary(diff_n$diff_n)
+
+```
+
+## Similarity of mean alpha
+```{r meanAlphaSim}
+cs.alpha <- diff_mean[diff_mean$diff_mean < 0.025,]
+g.alpha <- graph_from_data_frame(cs.alpha, directed=F)
+alphaM <- as.data.frame(apply(alphamat[rownames(alphamat) %in% V(g.alpha)$name,],1, FUN = norm_vec))
+colnames(alphaM) <- "mean_alphas"
+alphaM$ref <- rownames(alphaM)
+orderedName <- data.frame(V(g.alpha)$name)
+orderedalphaM <- data.frame(orderedName, alphaM[match(orderedName$V.g.alpha..name, alphaM$ref),])[,"mean_alphas"]
+orderedalphaM <- orderedalphaM[!is.na(orderedalphaM)]
+similarAlpha$REFID <- rownames(similarAlpha)
+clln.alpha <- cluster_louvain(g.alpha)
+layout <- layout_nicely(g.alpha,2)
+g.alpha$layout <- layout
+
+memb <- as.list(membership(clln.alpha))
+
+vertexData <- data.frame(orderedREFID= names(membership(clln.alpha)))
+vertexData <- data.frame(vertexData, similarAlpha[match(vertexData$orderedREFID, similarAlpha$REFID),])
+
+for (r in vertexData$REFID){
+  vertexData[vertexData$REFID == r,"memb_mean"] <- memb[r]
+}
+
+par(mar = c(0,0,0,0))
+plot(g.alpha, edge.width = sqrt(cs.alpha$diff_mean) * 2, vertex.size = vertexData$meanAlpha^2 * 5,
+     vertex.label.cex = 0.7,  edge.curved=.2, vertex.color = membership(clln.alpha))
+
+# mean average value of alpha reported by group
+aggregate(vertexData[,"meanAlpha"], by=list(vertexData$memb_mean), FUN=meanNum)
+
+```
+
+## Similarity of sd alpha
+```{r sdAlphaSim}
+cs.alpha <- diff_sd[diff_sd$diff_sd < 0.1,]
+g.alpha <- graph_from_data_frame(cs.alpha, directed=F)
+alphaSD <- as.data.frame(apply(alphamat[rownames(alphamat) %in% V(g.alpha)$name,],1, FUN = norm_vec))
+colnames(alphaSD) <- "mean_sds"
+alphaSD$ref <- rownames(alphaSD)
+orderedName <- data.frame(V(g.alpha)$name)
+orderedalphaSD <- data.frame(orderedName, alphaSD[match(orderedName$V.g.alpha..name, alphaSD$ref),])[,"mean_sds"]
+orderedalphaSD <- orderedalphaSD[!is.na(orderedalphaSD)]
+
+clln.alpha <- cluster_louvain(g.alpha)
+layout <- layout_nicely(g.alpha,2)
+g.alpha$layout <- layout
+
+memb <- as.list(membership(clln.alpha))
+
+vertexData <- data.frame(orderedREFID= names(membership(clln.alpha)))
+vertexData <- data.frame(vertexData, similarAlpha[match(vertexData$orderedREFID, similarAlpha$REFID),])
+
+for (r in vertexData$REFID){
+  vertexData[vertexData$REFID == r,"memb_sd"] <- memb[r]
+}
+
+par(mar = c(0,0,0,0))
+plot(g.alpha, edge.width = sqrt(cs.alpha$diff_sd) * 2, vertex.size = vertexData$sdAlpha * 50,
+     vertex.label.cex = 0.7,  edge.curved=.2, vertex.color = membership(clln.alpha))
+
+# mean average value of alpha reported by group
+aggregate(vertexData[,"sdAlpha"], by=list(vertexData$memb_sd), FUN=meanNum)
+
+```
+
+
+## Similarity of n alpha
+```{r nAlphaSim}
+cs.alpha <- diff_n[diff_n$diff_n < 0.1,]
+g.alpha <- graph_from_data_frame(cs.alpha, directed=F)
+alphaN <- as.data.frame(apply(alphamat[rownames(alphamat) %in% V(g.alpha)$name,],1, FUN = norm_vec))
+colnames(alphaN) <- "mean_ns"
+alphaN$ref <- rownames(alphaN)
+orderedName <- data.frame(V(g.alpha)$name)
+orderedalphaN <- data.frame(orderedName, alphaN[match(orderedName$V.g.alpha..name, alphaN$ref),])[,"mean_ns"]
+orderedalphaN <- orderedalphaN[!is.na(orderedalphaN)]
+
+clln.alpha <- cluster_louvain(g.alpha)
+layout <- layout_nicely(g.alpha,2)
+g.alpha$layout <- layout
+
+memb <- as.list(membership(clln.alpha))
+
+vertexData <- data.frame(orderedREFID= names(membership(clln.alpha)))
+vertexData <- data.frame(vertexData, similarAlpha[match(vertexData$orderedREFID, similarAlpha$REFID),])
+
+for (r in vertexData$REFID){
+  vertexData[vertexData$REFID == r,"memb_n"] <- memb[r]
+}
+
+par(mar = c(0,0,0,0))
+plot(g.alpha, edge.width = sqrt(cs.alpha$diff_n) * 2, vertex.size = vertexData$nAlpha * 0.4,
+     vertex.label.cex = 0.7,  edge.curved=.2, vertex.color = membership(clln.alpha))
+
+# mean average value of alpha reported by group
+aggregate(vertexData[,"nAlpha"], by=list(vertexData$memb_n), FUN=meanNum)
+
+
+```
+
+# Regression models of similarity in mean and sd alpha
+## Preparation of data 
+```{r prepmodelling}
+
+# import diff in alpha means
+meanAlphaDyads <- read.csv2("simNets/diff_mean.csv", sep=",", stringsAsFactors = F)[,-1]
+meanAlphaDyads$dyadID <- paste(meanAlphaDyads$i, meanAlphaDyads$j, sep = "_")
+meanAlphaDyads$meanAlphaSim <- -as.numeric(meanAlphaDyads$diff_mean)
+meanAlphaDyads[,1:3] <- NULL
+DYADS <- meanAlphaDyads
+DYAD_ID_order <- DYADS$dyadID
+
+# import diff in alpha sd
+sdAlphaDyads <- read.csv2("simNets/diff_sd.csv", sep=",", stringsAsFactors = F)[,-1]
+sdAlphaDyads$dyadIJ <- paste(substr(sdAlphaDyads$i, 1, 8), 
+                             substr(sdAlphaDyads$j, 1, 8), sep = "_")
+sdAlphaDyads$dyadJI <- paste(substr(sdAlphaDyads$i, 1, 8), 
+                             substr(sdAlphaDyads$j, 1, 8), sep = "_")
+sdAlphaDyads$dyadID <- ifelse(sdAlphaDyads$dyadIJ %in% DYAD_ID_order, sdAlphaDyads$dyadIJ, sdAlphaDyads$dyadJI)
+
+sdAlphaDyads$sdAlphaSim <- -as.numeric(sdAlphaDyads$diff_sd)
+sdAlphaDyads[,1:5] <- NULL
+DYADS <- data.frame(DYADS, sdAlphaDyads[match(DYADS$dyadID, sdAlphaDyads$dyadID),"sdAlphaSim"])
+
+# import diff in n alpha 
+nAlphaDyads <- read.csv2("simNets/diff_n.csv", sep=",", stringsAsFactors = F)[,-1]
+nAlphaDyads$dyadIJ <- paste(substr(nAlphaDyads$i, 1, 8), 
+                             substr(nAlphaDyads$j, 1, 8), sep = "_")
+nAlphaDyads$dyadJI <- paste(substr(nAlphaDyads$i, 1, 8), 
+                             substr(nAlphaDyads$j, 1, 8), sep = "_")
+nAlphaDyads$dyadID <- ifelse(nAlphaDyads$dyadIJ %in% DYAD_ID_order, nAlphaDyads$dyadIJ, nAlphaDyads$dyadJI)
+
+nAlphaDyads$nAlphaSim <- -as.numeric(nAlphaDyads$diff_n)
+nAlphaDyads[,1:5] <- NULL
+DYADS <- data.frame(DYADS, nAlphaDyads[match(DYADS$dyadID, nAlphaDyads$dyadID),"nAlphaSim"])
+
+# import similarity in wording as explanation
+wordingDyads <- read.csv2("simNets/SimilarWording.csv", sep=",", stringsAsFactors = F)[,-1]
+head(wordingDyads)
+wordingDyads$dyadIJ <- paste(substr(wordingDyads$i, 1, 8), 
+                             substr(wordingDyads$j, 1, 8), sep = "_")
+wordingDyads$dyadJI <- paste(substr(wordingDyads$i, 1, 8), 
+                             substr(wordingDyads$j, 1, 8), sep = "_")
+wordingDyads$dyadID <- ifelse(wordingDyads$dyadIJ %in% DYAD_ID_order, wordingDyads$dyadIJ, wordingDyads$dyadJI)
+
+wordingDyads$wordingCosSim <- as.numeric(wordingDyads$cosSimTerm)
+wordingDyads[,1:5] <- NULL
+DYADS <- data.frame(DYADS, wordingDyads[match(DYADS$dyadID, wordingDyads$dyadID),"wordingCosSim"])
+
+# import similarity in citation as explanation
+citationDyads <- read.csv2("simNets/SimilarCitations.csv", sep=",", stringsAsFactors = F)[,-1]
+citationDyads$dyadIJ <- paste(citationDyads$i, citationDyads$j, sep = "_")
+citationDyads$dyadJI <- paste(citationDyads$j, citationDyads$i, sep = "_")
+citationDyads$dyadID <- ifelse(citationDyads$dyadIJ %in% DYAD_ID_order, citationDyads$dyadIJ, citationDyads$dyadJI)
+citationDyads$citationCosSim <- as.numeric(citationDyads$cosSim)
+citationDyads[,1:5] <- NULL
+DYADS <- data.frame(DYADS, citationDyads[match(DYADS$dyadID, citationDyads$dyadID),"citationCosSim"])
+
+# import similarity in discipline as explanation
+disciplineDyads <- read.csv2("simNets/SimilarDisciplinesCited_rel.csv", sep=",", stringsAsFactors = F)[,-1]
+disciplineDyads$dyadIJ <- paste(disciplineDyads$i, disciplineDyads$j, sep = "_")
+disciplineDyads$dyadJI <- paste(disciplineDyads$j, disciplineDyads$i, sep = "_")
+disciplineDyads$dyadID <- ifelse(disciplineDyads$dyadIJ %in% DYAD_ID_order, disciplineDyads$dyadIJ, disciplineDyads$dyadJI)
+disciplineDyads$disciplineCosSim <- as.numeric(disciplineDyads$cosSim)
+disciplineDyads[,1:5] <- NULL
+DYADS <- data.frame(DYADS, disciplineDyads[match(DYADS$dyadID, disciplineDyads$dyadID),"disciplineCosSim"])
+
+# import similarity in countries studied as control
+countryDyads <- read.csv2("simNets/SimilarCountries.csv", sep=",", stringsAsFactors = F)[,-1]
+countryDyads$dyadIJ <- paste(countryDyads$i, countryDyads$j, sep = "_")
+countryDyads$dyadJI <- paste(countryDyads$j, countryDyads$i, sep = "_")
+countryDyads$dyadID <- ifelse(countryDyads$dyadIJ %in% DYAD_ID_order, countryDyads$dyadIJ, countryDyads$dyadJI)
+countryDyads$countryCosSim <- as.numeric(countryDyads$cosSimC)
+countryDyads[,1:5] <- NULL
+DYADS <- data.frame(DYADS, countryDyads[match(DYADS$dyadID, countryDyads$dyadID),"countryCosSim"])
+
+# import similarity in decades studied as control
+decadeDyads <- read.csv2("simNets/SimilarDecades.csv", sep=",", stringsAsFactors = F)[,-1]
+decadeDyads$dyadIJ <- paste(decadeDyads$i, decadeDyads$j, sep = "_")
+decadeDyads$dyadJI <- paste(decadeDyads$j, decadeDyads$i, sep = "_")
+decadeDyads$dyadID <- ifelse(decadeDyads$dyadIJ %in% DYAD_ID_order, decadeDyads$dyadIJ, decadeDyads$dyadJI)
+decadeDyads$decadeCosSim <- as.numeric(decadeDyads$cosSimCt)
+decadeDyads[,1:5] <- NULL
+DYADS <- data.frame(DYADS, decadeDyads[match(DYADS$dyadID, decadeDyads$dyadID),"decadeCosSim"])
+
+# import similarity in city definition used as control
+cityDefDyads <- read.csv2("simNets/SimilarCities.csv", sep=",", stringsAsFactors = F)[,-1]
+cityDefDyads$dyadIJ <- paste(cityDefDyads$i, cityDefDyads$j, sep = "_")
+cityDefDyads$dyadJI <- paste(cityDefDyads$j, cityDefDyads$i, sep = "_")
+cityDefDyads$dyadID <- ifelse(cityDefDyads$dyadIJ %in% DYAD_ID_order, cityDefDyads$dyadIJ, cityDefDyads$dyadJI)
+cityDefDyads$cityDefCosSim <- as.numeric(cityDefDyads$cosSimCt)
+cityDefDyads[,1:5] <- NULL
+DYADS <- data.frame(DYADS, cityDefDyads[match(DYADS$dyadID, cityDefDyads$dyadID),"cityDefCosSim"])
+
+colnames(DYADS) <- c("dyadID","meanAlphaSim", "sdAlphaSim", "nAlphaSim", 
+                     "fullTextCosSim", "externalCitationCosSim", "disciplineCitationCosSim",
+                     "countriesCosSim", "decadesCosSim", "cityDefCosSim")
+
+# scale all variables
+DYADS$meanAlphaSim_scaled <- scale(DYADS$meanAlphaSim)
+DYADS$sdAlphaSim_scaled <- scale(DYADS$sdAlphaSim)
+DYADS$nAlphaSim_scaled <- scale(DYADS$nAlphaSim)
+DYADS$fullTextCosSim_scaled <- scale(DYADS$fullTextCosSim)
+DYADS$externalCitationCosSim_scaled <- scale(DYADS$externalCitationCosSim)
+DYADS$disciplineCitationCosSim_scaled <- scale(DYADS$disciplineCitationCosSim)
+DYADS$countriesCosSim_scaled <- scale(DYADS$countriesCosSim)
+DYADS$decadesCosSim_scaled <- scale(DYADS$decadesCosSim)
+DYADS$cityDefCosSim_scaled <- scale(DYADS$cityDefCosSim)
+
+DYADSwithNA <- DYADS
+DYADS <- DYADS[complete.cases(DYADS),]
+
+modeldata<- DYADS[,c("dyadID","meanAlphaSim_scaled", "sdAlphaSim_scaled", "nAlphaSim_scaled",
+                     "fullTextCosSim_scaled", "externalCitationCosSim_scaled", "disciplineCitationCosSim_scaled",
+                     "countriesCosSim_scaled", "decadesCosSim_scaled", "cityDefCosSim_scaled")]
+colnames(modeldata) <- c("ID", "alpha", "sd_alpha", "n_estim","text", "citation", "discipline", "country", "decade", "city")
+
+```
+
+
+## Models of mean alpha
+```{r meanAlphaModels}
+
+ftm_a <- lm(data = modeldata,
+            formula = alpha ~ text,
+            na.action = na.omit)
+ecm_a <- lm(data = modeldata,
+            formula = alpha ~ citation,
+            na.action = na.omit)
+dcm_a <- lm(data = modeldata,
+            formula = alpha ~ discipline,
+            na.action = na.omit)
+ctrm_a <- lm(data = modeldata,
+            formula = alpha ~ n_estim +
+             country * decade * city,
+            na.action = na.omit)
+fullmodel_a <- lm(data = modeldata,
+            formula = alpha ~ 
+              text + citation + discipline + n_estim +
+              country * decade * city,
+            na.action = na.omit)
+
+sgm<- stargazer(ftm_a, ecm_a, dcm_a,
+          ctrm_a,
+          fullmodel_a,
+          type="text", out="model_comp_results_meanAlpha.html", font.size = "small", column.sep.width = "1pt")
+
+```
+
+## Models of sd alpha
+```{r sdAlphaModels}
+
+ftm_sd <- lm(data = modeldata,
+            formula = sd_alpha ~ text,
+            na.action = na.omit)
+ecm_sd <- lm(data = modeldata,
+            formula = sd_alpha ~ citation,
+            na.action = na.omit)
+dcm_sd <- lm(data = modeldata,
+            formula = sd_alpha ~ discipline,
+            na.action = na.omit)
+ n_sd <- lm(data = modeldata,
+             formula = sd_alpha ~ n_estim,
+             na.action = na.omit)
+ctrm_sd <- lm(data = modeldata,
+             formula = sd_alpha ~ 
+               country * decade * city,
+             na.action = na.omit)
+fullmodel_sd <- lm(data = modeldata,
+                  formula = sd_alpha ~ 
+                    text + citation + discipline + n_estim +
+                    country * decade * city,
+                  na.action = na.omit)
+
+sgm<- stargazer(ftm_sd, ecm_sd, dcm_sd,n_sd,
+                ctrm_sd,
+                fullmodel_sd,
+                type="text", out="model_comp_results_sdAlpha.html", font.size = "small", column.sep.width = "1pt")
+
+```
+
+## Residuals analysis
+```{r residuals, warning=FALSE}
+
+modeldata$res <- fullmodel_a$residuals
+head(modeldata[order(-modeldata$res),])
+modeldata$i <- substr(modeldata$ID, 1,8)
+modeldata$j <- substr(modeldata$ID, 10, 17)
+
+cs.residuals_resPos <- modeldata[modeldata$res > 1.1,c("i", "j", "res")]
+g.residuals <- graph_from_data_frame(cs.residuals_resPos, directed=F)
+resPos <- as.data.frame(apply(alphamat[rownames(alphamat) %in% V(g.residuals)$name,],1, FUN = norm_vec))
+colnames(resPos) <- "residuals"
+resPos$ref <- rownames(resPos)
+orderedName <- data.frame(V(g.residuals)$name)
+orderedresidualsRes <- data.frame(orderedName, resPos[match(orderedName$V.g.residuals..name, resPos$ref),])[,"residuals"]
+orderedresidualsRes <- orderedresidualsRes[!is.na(orderedresidualsRes)]
+
+layout <- layout_nicely(g.residuals,2)
+g.residuals$layout <- layout
+par(mar = c(0,0,1,0))
+plot(g.residuals, edge.width = sqrt(cs.residuals_resPos$res) * 2, vertex.size = 2,
+     vertex.label.cex = 0.7,  edge.curved=.2, vertex.color = "green", edge.color = "coral3", 
+     main = "Most positive residuals in mean alpha similarity")
+
+
+
+cs.residuals_resNeg <- modeldata[modeldata$res < -2,c("i", "j", "res")]
+g.residuals <- graph_from_data_frame(cs.residuals_resNeg, directed=F)
+resNeg <- as.data.frame(apply(alphamat[rownames(alphamat) %in% V(g.residuals)$name,],1, FUN = norm_vec))
+colnames(resNeg) <- "residuals"
+resNeg$ref <- rownames(resNeg)
+orderedName <- data.frame(V(g.residuals)$name)
+orderedresidualsRes <- data.frame(orderedName, resNeg[match(orderedName$V.g.residuals..name, resNeg$ref),])[,"residuals"]
+orderedresidualsRes <- orderedresidualsRes[!is.na(orderedresidualsRes)]
+
+layout <- layout_nicely(g.residuals,2)
+g.residuals$layout <- layout
+par(mar = c(0,0,1,0))
+plot(g.residuals, edge.width = sqrt(cs.residuals_resNeg$res) * 2, vertex.size = 2,
+     vertex.label.cex = 0.7,  edge.curved=.2, vertex.color = "orange", edge.color = "dodgerblue3", 
+     main = "Most negative residuals in mean alpha similarity")
+
+
+
+modeldata$res <- fullmodel_sd$residuals
+modeldata$i <- substr(modeldata$ID, 1,8)
+modeldata$j <- substr(modeldata$ID, 10, 17)
+
+cs.residuals_resPos <- modeldata[modeldata$res > 1,c("i", "j", "res")]
+g.residuals <- graph_from_data_frame(cs.residuals_resPos, directed=F)
+resPos <- as.data.frame(apply(alphamat[rownames(alphamat) %in% V(g.residuals)$name,],1, FUN = norm_vec))
+colnames(resPos) <- "residuals"
+resPos$ref <- rownames(resPos)
+orderedName <- data.frame(V(g.residuals)$name)
+orderedresidualsRes <- data.frame(orderedName, resPos[match(orderedName$V.g.residuals..name, resPos$ref),])[,"residuals"]
+orderedresidualsRes <- orderedresidualsRes[!is.na(orderedresidualsRes)]
+
+#clln.residuals <- cluster_louvain(g.residuals)
+layout <- layout_nicely(g.residuals,2)
+g.residuals$layout <- layout
+par(mar = c(0,0,1,0))
+plot(g.residuals, edge.width = sqrt(cs.residuals_resPos$res) * 2, vertex.size = 2,
+     vertex.label.cex = 0.7,  edge.curved=.2, vertex.color = "green", edge.color = "coral3", 
+     main = "Most positive residuals in sd alpha similarity")
+
+
+
+cs.residuals_resNeg <- modeldata[modeldata$res < -1.5,c("i", "j", "res")]
+g.residuals <- graph_from_data_frame(cs.residuals_resNeg, directed=F)
+resNeg <- as.data.frame(apply(alphamat[rownames(alphamat) %in% V(g.residuals)$name,],1, FUN = norm_vec))
+colnames(resNeg) <- "residuals"
+resNeg$ref <- rownames(resNeg)
+orderedName <- data.frame(V(g.residuals)$name)
+orderedresidualsRes <- data.frame(orderedName, resNeg[match(orderedName$V.g.residuals..name, resNeg$ref),])[,"residuals"]
+orderedresidualsRes <- orderedresidualsRes[!is.na(orderedresidualsRes)]
+
+layout <- layout_nicely(g.residuals,2)
+g.residuals$layout <- layout
+par(mar = c(0,0,1,0))
+plot(g.residuals, edge.width = sqrt(cs.residuals_resNeg$res) * 2, vertex.size = 2,
+     vertex.label.cex = 0.7,  edge.curved=.2, vertex.color = "orange", edge.color = "dodgerblue3", 
+     main = "Most negative residuals in sd alpha similarity")
+
+
+```
+
