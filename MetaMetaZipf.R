@@ -461,57 +461,57 @@ for(i in cols){
 summary(discipline2ref)
 dim(discipline2ref)
 
-#ABSOLUTE NUMBERS
-disc2ref <- as.matrix(discipline2ref[,1:66])
-str(disc2ref)
-scaled_disc2ref <- disc2ref / colSums(disc2ref)
-tdisc2ref <- t(disc2ref)
-
-refSim <- rownames(tdisc2ref)
-cosSim <- data.frame()
-k=0
-ilist <- c()
-for(i in refSim){
-  ilist <- c(ilist, i)
-  for(j in refSim){
-    if (j %!in% ilist){
-      k <- k + 1
-      cosSim[k,1] <- i
-      cosSim[k,2] <- j
-      vi <- tdisc2ref[i,]
-      vj <- tdisc2ref[j,]
-      cosSim[k,3] <- (sumNum(vi * vj)) / (norm_vec(vi) *  norm_vec(vj)) 
-    }
-  }
-}
-colnames(cosSim) <- c('i', 'j', 'cosSim')
-dim(cosSim)
-head(cosSim)
-summary(cosSim$cosSim)
-write.csv(cosSim[order(-cosSim$cosSim),], "simNets/SimilarDisciplinesCited_abs.csv")
-head(cosSim[order(-cosSim$cosSim),])
-#citingN <- apply(toutcitemat,1, FUN = norm_vec)
-
-cs.cit <- cosSim[cosSim$cosSim >= 0.9,]
-g.cit <- graph_from_data_frame(cs.cit, directed=F)
-
-disCitedNs <- as.data.frame(apply(toutcitemat[rownames(tdisc2ref) %in% V(g.cit)$name,],1, FUN = norm_vec))
-colnames(disCitedNs) <- "disCitedNs"
-disCitedNs$ref <- rownames(disCitedNs)
-orderedName <- data.frame(V(g.cit)$name)
-disCitedNs <- data.frame(orderedName, disCitedNs[match(orderedName$V.g.cit..name, disCitedNs$ref),])[,"disCitedNs"]
-disCitedNs <- disCitedNs[!is.na(disCitedNs)] 
-
-colnames(orderedName) <- "REFID"
-refinfo <- cites[1:66,c("REFID", "DISCIPLINE")]
-own_discipline <- data.frame(orderedName, refinfo[match(orderedName$REFID, refinfo$REFID),])
-odisc <- own_discipline$DISCIPLINE
-  
-#clln.cit <- cluster_louvain(g.cit)
-layout <- layout_nicely(g.cit,2)
-g.cit$layout <- layout
-plot(g.cit, edge.width = sqrt(cs.cit$cosSim) * 2, vertex.size = disCitedNs,
-     vertex.label.cex = 0.7,  edge.curved=.2, vertex.color = odisc)
+# #ABSOLUTE NUMBERS
+# disc2ref <- as.matrix(discipline2ref[,1:66])
+# str(disc2ref)
+# scaled_disc2ref <- disc2ref / colSums(disc2ref)
+# tdisc2ref <- t(disc2ref)
+# 
+# refSim <- rownames(tdisc2ref)
+# cosSim <- data.frame()
+# k=0
+# ilist <- c()
+# for(i in refSim){
+#   ilist <- c(ilist, i)
+#   for(j in refSim){
+#     if (j %!in% ilist){
+#       k <- k + 1
+#       cosSim[k,1] <- i
+#       cosSim[k,2] <- j
+#       vi <- tdisc2ref[i,]
+#       vj <- tdisc2ref[j,]
+#       cosSim[k,3] <- (sumNum(vi * vj)) / (norm_vec(vi) *  norm_vec(vj)) 
+#     }
+#   }
+# }
+# colnames(cosSim) <- c('i', 'j', 'cosSim')
+# dim(cosSim)
+# head(cosSim)
+# summary(cosSim$cosSim)
+# write.csv(cosSim[order(-cosSim$cosSim),], "simNets/SimilarDisciplinesCited_abs.csv")
+# head(cosSim[order(-cosSim$cosSim),])
+# #citingN <- apply(toutcitemat,1, FUN = norm_vec)
+# 
+# cs.cit <- cosSim[cosSim$cosSim >= 0.9,]
+# g.cit <- graph_from_data_frame(cs.cit, directed=F)
+# 
+# disCitedNs <- as.data.frame(apply(toutcitemat[rownames(tdisc2ref) %in% V(g.cit)$name,],1, FUN = norm_vec))
+# colnames(disCitedNs) <- "disCitedNs"
+# disCitedNs$ref <- rownames(disCitedNs)
+# orderedName <- data.frame(V(g.cit)$name)
+# disCitedNs <- data.frame(orderedName, disCitedNs[match(orderedName$V.g.cit..name, disCitedNs$ref),])[,"disCitedNs"]
+# disCitedNs <- disCitedNs[!is.na(disCitedNs)] 
+# 
+# colnames(orderedName) <- "REFID"
+# refinfo <- cites[1:66,c("REFID", "DISCIPLINE")]
+# own_discipline <- data.frame(orderedName, refinfo[match(orderedName$REFID, refinfo$REFID),])
+# odisc <- own_discipline$DISCIPLINE
+#   
+# #clln.cit <- cluster_louvain(g.cit)
+# layout <- layout_nicely(g.cit,2)
+# g.cit$layout <- layout
+# plot(g.cit, edge.width = sqrt(cs.cit$cosSim) * 2, vertex.size = disCitedNs,
+#      vertex.label.cex = 0.7,  edge.curved=.2, vertex.color = odisc)
 
 
 
@@ -691,37 +691,37 @@ write.csv(cosSimTerm[order(-cosSimTerm$cosSimTerm),], "SimilarWording.csv")
 # membershipTableCit <- data.frame("IDtxt" = clln.cit$names, "groupTerm" = clln.cit$membership)
 # 
 # 
-
-pap = "And05Reg"
-pap = "Del04Con"
- cosSimTerm$ij <- paste0(cosSimTerm$i, "_", cosSimTerm$j)
- cosSimTerm$Paper <- ifelse(cosSimTerm$i == paste0(pap, ".txt") | cosSimTerm$j == paste0(pap, ".txt"), 1, 0)
- summary(cosSimTerm)
- cosSimTer <- cosSimTerm[,c("ij","cosSimTerm", "Paper")]
- PairCompa <- cosSim
- summary(cosSim)
- PairCompa$ij <- paste0(PairCompa$i, ".txt_", PairCompa$j, ".txt")
- PairCompa$ji <- paste0(PairCompa$j, ".txt_", PairCompa$i, ".txt")
- PairCompa$CitationSimilarity <- PairCompa$cosSim
- PairCompa <- PairCompa[,c("ij", "ji", "CitationSimilarity")]
- PairCompa <- data.frame(PairCompa, cosSimTer[match(PairCompa$ij, cosSimTer$ij),])
- PairCompa <- data.frame(PairCompa, cosSimTer[match(PairCompa$ji, cosSimTer$ij),])
- PairCompa$TermSimilarity <- ifelse(!is.na(PairCompa$cosSimTerm), PairCompa$cosSimTerm, PairCompa$cosSimTerm.1)
- PairCompa$Papers <- as.factor(ifelse(PairCompa$Paper == 1 | PairCompa$Paper.1 == 1, pap, "Other"))
-  summary(PairCompa)
- PairCompaTable <- PairCompa[,c("ij", "CitationSimilarity", "TermSimilarity", "Papers")]
- summary(PairCompaTable)
+# 
+# pap = "And05Reg"
+# pap = "Del04Con"
+#  cosSimTerm$ij <- paste0(cosSimTerm$i, "_", cosSimTerm$j)
+#  cosSimTerm$Paper <- ifelse(cosSimTerm$i == paste0(pap, ".txt") | cosSimTerm$j == paste0(pap, ".txt"), 1, 0)
+#  summary(cosSimTerm)
+#  cosSimTer <- cosSimTerm[,c("ij","cosSimTerm", "Paper")]
+#  PairCompa <- cosSim
+#  summary(cosSim)
+#  PairCompa$ij <- paste0(PairCompa$i, ".txt_", PairCompa$j, ".txt")
+#  PairCompa$ji <- paste0(PairCompa$j, ".txt_", PairCompa$i, ".txt")
+#  PairCompa$CitationSimilarity <- PairCompa$cosSim
+#  PairCompa <- PairCompa[,c("ij", "ji", "CitationSimilarity")]
+#  PairCompa <- data.frame(PairCompa, cosSimTer[match(PairCompa$ij, cosSimTer$ij),])
+#  PairCompa <- data.frame(PairCompa, cosSimTer[match(PairCompa$ji, cosSimTer$ij),])
+#  PairCompa$TermSimilarity <- ifelse(!is.na(PairCompa$cosSimTerm), PairCompa$cosSimTerm, PairCompa$cosSimTerm.1)
+#  PairCompa$Papers <- as.factor(ifelse(PairCompa$Paper == 1 | PairCompa$Paper.1 == 1, pap, "Other"))
+#   summary(PairCompa)
+#  PairCompaTable <- PairCompa[,c("ij", "CitationSimilarity", "TermSimilarity", "Papers")]
+#  summary(PairCompaTable)
+#  
+#  q <- ggplot(PairCompaTable, aes(x=CitationSimilarity, y = TermSimilarity, color = Papers))
+#  q + geom_point(cex=1) +
+#    labs(x="Citation Similarity", y="Wording Similarity")
  
- q <- ggplot(PairCompaTable, aes(x=CitationSimilarity, y = TermSimilarity, color = Papers))
- q + geom_point(cex=1) +
-   labs(x="Citation Similarity", y="Wording Similarity")
- 
- summary(lm(CitationSimilarity~TermSimilarity, data=PairCompaTable))
-  PairCompaTable[order(PairCompaTable$TermSimilarity, PairCompaTable$CitationSimilarity),]
-  PairCompaTable[order(-PairCompaTable$CitationSimilarity, -PairCompaTable$TermSimilarity),]
+ # summary(lm(CitationSimilarity~TermSimilarity, data=PairCompaTable))
+ #  PairCompaTable[order(PairCompaTable$TermSimilarity, PairCompaTable$CitationSimilarity),]
+ #  PairCompaTable[order(-PairCompaTable$CitationSimilarity, -PairCompaTable$TermSimilarity),]
+ #  
   
   
-  paperList <- colnames(cites_out[,6:71])
   
   
   
@@ -732,7 +732,10 @@ pap = "Del04Con"
   ##### similarity network of countroes studied
   
   data <- read.csv2("data/zipf_meta.csv", sep=",", dec=".")
- countryData <- data[data$TERRITORY_TYPE == "Country" & data$REFID %in% paperList,]
+  
+  
+  paperList <- colnames(cites_out[,6:71])
+  countryData <- data[data$TERRITORY_TYPE == "Country" & data$REFID %in% paperList,]
 country2Ref <- table(countryData$CNTR_ID, countryData$REFID)[-1,]
 dim(country2Ref)
 country2Ref.mat <- as.matrix(country2Ref[rowSums(country2Ref)>0,colnames(country2Ref) %in% paperList])
@@ -1245,6 +1248,8 @@ modeldata<- DYADS[,c("dyadID","meanAlphaSim_scaled", "sdAlphaSim_scaled", "nAlph
                      "countriesCosSim_scaled", "decadesCosSim_scaled", "cityDefCosSim_scaled")]
 colnames(modeldata) <- c("ID", "alpha", "sd_alpha", "n_estim","text", "citation", "discipline", "country", "decade", "city")
 
+
+# modelling
 ftm_a <- lm(data = modeldata,
             formula = alpha ~ text,
             na.action = na.omit)

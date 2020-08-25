@@ -6,6 +6,7 @@ output: html_notebook
 This is an R Notebook which reproduces the analysis, tables and figures of the working paper "MetaMetaZipf. What do analyses of city size distributions have in common?", as of August 2020. The data is stored on the [MetaZipf](https://github.com/ClementineCttn/MetaZipf) GitHub repository.
 
 ```{r setup, include = FALSE}
+library(rmarkdown)
 library(igraph)
 library(scales)
 library(wesanderson)
@@ -72,7 +73,7 @@ cites <- read.csv2("data/zipf_cites.csv", sep=',')
 data <- read.csv2("data/zipf_meta.csv", sep=",", dec=".")
 cname <- "data/FullText/"
 docs <- Corpus(DirSource(cname))   
-J2D <- read.csv2('data/journals2Disciplines.csv', sep=';')
+J2D <- read.csv2("data/journals2Disciplines.csv", sep=';')
 ```
 
 
@@ -101,6 +102,7 @@ head(cites)
 j <- cites[1:66,1:5]
 j$n <- 1
 journals <- aggregate(j[,"n"], by=list(j[,"JOURNAL"]), FUN = sum)
+disciplines <- aggregate(j[,"n"], by=list(j[,"DISCIPLINE"]), FUN = sum)
 q <- ggplot(journals, aes(x= Group.1, y = x))
  q + geom_lollipop(aes(reorder( Group.1, -x)),color = "orangered", cex=1) +
   coord_flip() +
@@ -117,8 +119,8 @@ cope_full_names <- data.frame(cope, cites[match(cope$ref, cites$REFID),c("AUTHOR
 cope_full_names$ref <- paste(cope_full_names$AUTHOR, cope_full_names$YEAR, sep=" ")
 
 par(mar = c(2,2,2,2))
-q <- ggplot(cope_full_names, aes(x=ref, y = cop))
-q + geom_lollipop(aes(reorder(ref, -cop)),color = "seagreen3", cex=1) +
+q <- ggplot(cope_full_names, aes(x=ref, y = co))
+q + geom_lollipop(aes(reorder(ref, -co)),color = "seagreen3", cex=1) +
   coord_flip() +
   labs(x="Reference", y="Number of in-citations from the corpus")
 
