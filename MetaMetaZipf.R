@@ -1415,3 +1415,6 @@ g.residuals$layout <- layout
 plot(g.residuals, edge.width = sqrt(cs.residuals_resNeg$res) * 2, vertex.size = 2,
      vertex.label.cex = 0.7,  edge.curved=.2, vertex.color = "orange", edge.color = "dodgerblue3")
 
+
+glossary <- refs[refs$REFID %in% paperList,c("REFID", "AUTHOR", "YEAR", "JOURNAL")]
+write.csv2(glossary,"results/glossary.xls")
